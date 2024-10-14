@@ -1,4 +1,12 @@
+// eslint-disable-next-line no-undef
 module.exports = {
   root: true,
-  extends: '@react-native',
+  env: {
+    node: true,
+  },
+  extends: ['@react-native', 'airbnb', 'plugin:prettier/recommended'],
+  plugins: ['prettier'],
+  rules: {
+    'prettier.prettier': ['error'],
+  },
 };
