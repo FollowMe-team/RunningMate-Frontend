@@ -26,6 +26,7 @@ import crewIconAc from '../../assets/images/NaviIcon/crew_icon_ac.png';
 import myProfileIcon from '../../assets/images/NaviIcon/myprofile_icon.png';
 import myProfileIconAc from '../../assets/images/NaviIcon/myprofile_icon_ac.png';
 import back from '../../assets/images/NaviIcon/left.png';
+import settingsIcon from '../../assets/images/NaviIcon/web-settings.png';
 
 const Tab = createBottomTabNavigator();
 
@@ -90,34 +91,59 @@ const NavigationBar = () => {
     }).start();
   };
 
+  const renderHeaderLeft = routeName => {
+    if (['Course', 'Community', 'Crew', 'MyProfile'].includes(routeName)) {
+      return null;
+    }
+    return (
+      <TouchableOpacity
+        onPress={() => navigation.goBack()}
+        onPressIn={handlePressIn}
+        onPressOut={handlePressOut}
+        style={styles.backButton}
+        activeOpacity={0.7}
+      >
+        <Animated.View
+          style={[
+            styles.backButtonCircle,
+            { transform: [{ scale: scaleValue }] },
+          ]}
+        >
+          <Image source={back} style={styles.backIcon} />
+        </Animated.View>
+      </TouchableOpacity>
+    );
+  };
+
   return (
     <Tab.Navigator
-      screenOptions={{
+      screenOptions={({ route }) => ({
         initialRouteName: 'Course',
         tabBarStyle: styles.tabBar,
         headerStyle: styles.header,
         headerTitleStyle: styles.headerTitle,
         tabBarShowLabel: false,
         headerTitleAlign: 'center',
-        headerLeft: () => (
+        headerLeft: () => renderHeaderLeft(route.name),
+        headerRight: () => (
           <TouchableOpacity
-            onPress={() => navigation.goBack()}
+            onPress={() => navigation.navigate('Setting')}
             onPressIn={handlePressIn}
             onPressOut={handlePressOut}
-            style={styles.backButton}
+            style={styles.settingButton}
             activeOpacity={0.7}
           >
             <Animated.View
               style={[
-                styles.backButtonCircle,
+                styles.settingButtonCircle,
                 { transform: [{ scale: scaleValue }] },
               ]}
             >
-              <Image source={back} style={styles.backIcon} />
+              <Image source={settingsIcon} style={styles.settingIcon} />
             </Animated.View>
           </TouchableOpacity>
         ),
-      }}
+      })}
     >
       <Tab.Screen
         name="Course"
@@ -190,7 +216,7 @@ const NavigationBar = () => {
 // 네비게이션 바 스타일링
 const styles = StyleSheet.create({
   header: {
-    backgroundColor: 'transparent',
+    backgroundColor: 'white',
     elevation: 0,
     shadowOpacity: 0,
   },
@@ -203,6 +229,7 @@ const styles = StyleSheet.create({
     height: 80,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
+    borderTopColor: 'white',
     position: 'absolute',
     bottom: 0,
     left: 0,
@@ -240,6 +267,21 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   backIcon: {
+    width: 24,
+    height: 24,
+  },
+  settingButton: {
+    marginRight: 16,
+  },
+  settingButtonCircle: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: '#50C878',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  settingIcon: {
     width: 24,
     height: 24,
   },

@@ -1,9 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import { StatusBar, BackHandler, ToastAndroid } from 'react-native';
+import {
+  StatusBar,
+  BackHandler,
+  ToastAndroid,
+  View,
+  StyleSheet,
+} from 'react-native';
 
 import Navigation from './src/components/Navigation/Navigation';
+import Setting from './src/screens/setting/Setting';
 
 // StatusBar 투명하게 설정
 StatusBar.setBackgroundColor('transparent');
@@ -46,17 +53,44 @@ const App = () => {
     return () => backHandler.remove();
   }, [backPressedOnce]);
 
+  const customTheme = {
+    ...DefaultTheme,
+    colors: {
+      ...DefaultTheme.colors,
+      background: 'white',
+    },
+    fonts: {
+      regular: {
+        fontFamily: 'Pretendard',
+      },
+    },
+  };
+
   return (
-    <NavigationContainer>
-      <Stack.Navigator>
-        <Stack.Screen
-          name="Navigation"
-          component={Navigation}
-          options={{ headerShown: false }}
-        />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <View style={styles.container}>
+      <NavigationContainer theme={customTheme}>
+        <Stack.Navigator>
+          <Stack.Screen
+            name="Navigation"
+            component={Navigation}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="Setting"
+            component={Setting}
+            options={{ title: '설정' }}
+          />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: 'white',
+  },
+});
 
 export default App;
