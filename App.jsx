@@ -11,6 +11,8 @@ import {
 
 import Navigation from './src/components/Navigation/Navigation';
 import Setting from './src/screens/setting/Setting';
+import MyProfileChange from './src/screens/setting/MyProfileChange';
+import SearchAddress from './src/screens/setting/SearchAddress';
 
 // StatusBar 투명하게 설정
 StatusBar.setBackgroundColor('transparent');
@@ -61,6 +63,7 @@ const App = () => {
     },
     fonts: {
       regular: {
+        color: 'black',
         fontFamily: 'Pretendard',
       },
     },
@@ -79,6 +82,16 @@ const App = () => {
             name="Setting"
             component={Setting}
             options={{ title: '설정' }}
+          />
+          <Stack.Screen
+            name="MyProfileChange"
+            component={MyProfileChange}
+            options={{ title: '마이 프로필 변경' }}
+          />
+          <Stack.Screen
+            name="SearchAddress"
+            component={SearchAddress}
+            options={{ title: '주소 검색' }}
           />
         </Stack.Navigator>
       </NavigationContainer>

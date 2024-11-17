@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { View, Image, Text, StyleSheet } from 'react-native';
 
+import defaultProfileImage from '../../assets/images/Settings/profile.png';
 import nameImg from '../../assets/images/MyProfile/free-icon-business-12930954.png';
 import birthdayImg from '../../assets/images/MyProfile/free-icon-firecracker-3119764.png';
 import genderImg from '../../assets/images/MyProfile/free-icon-gender-fluid-2556165.png';
@@ -23,7 +24,9 @@ const ProfileBox = ({ data }) => {
       <View style={styles.infoContainer}>
         <View style={{ alignItems: 'center', marginBottom: 7 }}>
           <Image
-            source={{ uri: data.profile_url }}
+            source={
+              data.profile_url ? { uri: data.profile_url } : defaultProfileImage
+            }
             style={styles.profileImage}
           />
           <Text style={styles.nickname}>{data.nickname}</Text>
