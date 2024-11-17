@@ -14,6 +14,8 @@ import Setting from './src/screens/setting/Setting';
 import MyProfileChange from './src/screens/setting/MyProfileChange';
 import SearchAddress from './src/screens/setting/SearchAddress';
 import PasswordChange from './src/screens/setting/PasswordChange';
+import Withdrawal from './src/screens/setting/Withdrawal';
+import WithdrawalComplete from './src/screens/setting/WithdrawalComplete';
 
 // StatusBar 투명하게 설정
 StatusBar.setBackgroundColor('transparent');
@@ -98,6 +100,16 @@ const App = () => {
             name="PasswordChange"
             component={PasswordChange}
             options={{ title: '비밀번호 변경' }}
+          />
+          <Stack.Screen
+            name="Withdrawal"
+            component={Withdrawal}
+            options={{ title: '계정 탈퇴' }}
+          />
+          <Stack.Screen
+            name="WithdrawalComplete"
+            component={WithdrawalComplete}
+            options={{ title: '계정 탈퇴' }}
           />
         </Stack.Navigator>
       </NavigationContainer>
