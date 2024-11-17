@@ -13,6 +13,7 @@ import Navigation from './src/components/Navigation/Navigation';
 import Setting from './src/screens/setting/Setting';
 import MyProfileChange from './src/screens/setting/MyProfileChange';
 import SearchAddress from './src/screens/setting/SearchAddress';
+import PasswordChange from './src/screens/setting/PasswordChange';
 
 // StatusBar 투명하게 설정
 StatusBar.setBackgroundColor('transparent');
@@ -92,6 +93,11 @@ const App = () => {
             name="SearchAddress"
             component={SearchAddress}
             options={{ title: '주소 검색' }}
+          />
+          <Stack.Screen
+            name="PasswordChange"
+            component={PasswordChange}
+            options={{ title: '비밀번호 변경' }}
           />
         </Stack.Navigator>
       </NavigationContainer>
