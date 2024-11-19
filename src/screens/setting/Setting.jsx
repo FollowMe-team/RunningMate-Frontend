@@ -68,7 +68,7 @@ const Setting = () => {
       </View>
       <View style={styles.bundle}>
         <View style={styles.resignNLogout}>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={() => navigation.navigate('Withdrawal')}>
             <Text style={{ color: 'red', fontSize: 15 }}>회원탈퇴</Text>
           </TouchableOpacity>
           <TouchableOpacity>
