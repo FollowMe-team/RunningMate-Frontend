@@ -1,6 +1,6 @@
 // eslint-disable-next-line no-undef
 module.exports = {
-  presets: ['module:@react-native/babel-preset'],
+  presets: ['module:metro-react-native-babel-preset'],
   plugins: [
     [
       'module-resolver',
@@ -28,5 +28,9 @@ module.exports = {
       },
     ],
     'babel-plugin-styled-components',
+    'react-native-reanimated/plugin',
+    ['@babel/plugin-transform-class-properties', { loose: true }],
+    ['@babel/plugin-transform-private-methods', { loose: true }],
+    ['@babel/plugin-transform-private-property-in-object', { loose: true }],
   ],
 };
