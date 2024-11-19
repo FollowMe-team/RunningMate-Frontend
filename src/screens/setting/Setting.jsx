@@ -26,7 +26,9 @@ const Setting = () => {
           >
             <Text style={styles.button}>마이 프로필 변경</Text>
           </TouchableOpacity>
-          <TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => navigation.navigate('PasswordChange')}
+          >
             <Text style={styles.button}>비밀번호 변경</Text>
           </TouchableOpacity>
         </View>
