@@ -1,13 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import {
-  StatusBar,
-  BackHandler,
-  ToastAndroid,
-  View,
-  StyleSheet,
-} from 'react-native';
+import { StatusBar, BackHandler, ToastAndroid, StyleSheet } from 'react-native';
 
 import Navigation from './src/components/Navigation/Navigation';
 import Setting from './src/screens/setting/Setting';
@@ -16,6 +10,8 @@ import SearchAddress from './src/screens/setting/SearchAddress';
 import PasswordChange from './src/screens/setting/PasswordChange';
 import Withdrawal from './src/screens/setting/Withdrawal';
 import WithdrawalComplete from './src/screens/setting/WithdrawalComplete';
+import CreateCrew from './src/screens/Crew/CreateCrew';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 // StatusBar 투명하게 설정
 StatusBar.setBackgroundColor('transparent');
@@ -73,13 +69,18 @@ const App = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <GestureHandlerRootView style={styles.container}>
       <NavigationContainer theme={customTheme}>
         <Stack.Navigator>
           <Stack.Screen
             name="Navigation"
             component={Navigation}
             options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="CreateCrew"
+            component={CreateCrew}
+            options={{ title: '크루 생성' }}
           />
           <Stack.Screen
             name="Setting"
@@ -113,7 +114,7 @@ const App = () => {
           />
         </Stack.Navigator>
       </NavigationContainer>
-    </View>
+    </GestureHandlerRootView>
   );
 };
 
