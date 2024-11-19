@@ -1,0 +1,94 @@
+{
+  "badge": [
+    {
+      "id": 1,
+      "name": "Beginner",
+      "description": "You have completed 1 course",
+      "isGotten": true
+    },
+    {
+      "id": 2,
+      "name": "Intermediate",
+      "description": "You have completed 5 courses",
+      "isGotten": true
+    },
+    {
+      "id": 3,
+      "name": "Advanced",
+      "description": "You have completed 10 courses",
+      "isGotten": true
+    },
+    {
+      "id": 4,
+      "name": "Expert",
+      "description": "You have completed 20 courses",
+      "isGotten": true
+    },
+    {
+      "id": 5,
+      "name": "Master",
+      "description": "You have completed 50 courses",
+      "isGotten": true
+    },
+    {
+      "id": 6,
+      "name": "Legend",
+      "description": "You have completed 100 courses",
+      "isGotten": true
+    },
+    {
+      "id": 7,
+      "name": "God",
+      "description": "You have completed 200 courses",
+      "isGotten": true
+    },
+    {
+      "id": 8,
+      "name": "Guru",
+      "description": "You have completed 500 courses",
+      "isGotten": false
+    },
+    {
+      "id": 9,
+      "name": "Master Guru",
+      "description": "You have completed 1000 courses",
+      "isGotten": false
+    },
+    {
+      "id": 10,
+      "name": "God Guru",
+      "description": "You have completed 2000 courses",
+      "isGotten": false
+    },
+    {
+      "id": 11,
+      "name": "Legend Guru",
+      "description": "You have completed 5000 courses",
+      "isGotten": false
+    },
+    {
+      "id": 12,
+      "name": "Master Legend Guru",
+      "description": "You have completed 10000 courses",
+      "isGotten": false
+    },
+    {
+      "id": 13,
+      "name": "God Legend Guru",
+      "description": "You have completed 20000 courses",
+      "isGotten": false
+    },
+    {
+      "id": 14,
+      "name": "Legend Legend Guru",
+      "description": "You have completed 50000 courses",
+      "isGotten": false
+    },
+    {
+      "id": 15,
+      "name": "Master Legend Legend Guru",
+      "description": "You have completed 100000 courses",
+      "isGotten": false
+    }
+  ]
+}
