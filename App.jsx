@@ -2,7 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { StatusBar, BackHandler, ToastAndroid, StyleSheet } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
+import Login from './src/screens/Home/Login';
+import Signup from './src/screens/Home/Signup';
 import Navigation from './src/components/Navigation/Navigation';
 import Setting from './src/screens/setting/Setting';
 import MyProfileChange from './src/screens/setting/MyProfileChange';
@@ -11,7 +15,7 @@ import PasswordChange from './src/screens/setting/PasswordChange';
 import Withdrawal from './src/screens/setting/Withdrawal';
 import WithdrawalComplete from './src/screens/setting/WithdrawalComplete';
 import CreateCrew from './src/screens/Crew/CreateCrew';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import ForgotPassword from './src/screens/Home/ForgotPassword';
 
 // StatusBar 투명하게 설정
 StatusBar.setBackgroundColor('transparent');
@@ -22,9 +26,27 @@ StatusBar.setBarStyle('dark-content');
 const Stack = createStackNavigator();
 
 const App = () => {
+  const [isLoading, setIsLoading] = useState(true);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [backPressedOnce, setBackPressedOnce] = useState(false);
 
   useEffect(() => {
+    const checkLoginStatus = async () => {
+      const value = await AsyncStorage.getItem('isLoggedIn');
+      if (value === 'true') {
+        setIsLoggedIn(true);
+      }
+      setIsLoading(false);
+    };
+
+    checkLoginStatus();
+  }, []);
+
+  useEffect(() => {
+    if (isLoading) {
+      return;
+    }
+
     // 뒤로가기 버튼 이벤트
     const backAction = () => {
       // 한번 더 누르면 앱 종료
@@ -52,7 +74,11 @@ const App = () => {
     );
 
     return () => backHandler.remove();
-  }, [backPressedOnce]);
+  }, [backPressedOnce, isLoading]);
+
+  if (isLoading) {
+    return null; // 로딩 중일 때 표시할 컴포넌트 (스플래시 화면 등)
+  }
 
   const customTheme = {
     ...DefaultTheme,
@@ -72,46 +98,68 @@ const App = () => {
     <GestureHandlerRootView style={styles.container}>
       <NavigationContainer theme={customTheme}>
         <Stack.Navigator>
-          <Stack.Screen
-            name="Navigation"
-            component={Navigation}
-            options={{ headerShown: false }}
-          />
-          <Stack.Screen
-            name="CreateCrew"
-            component={CreateCrew}
-            options={{ title: '크루 생성' }}
-          />
-          <Stack.Screen
-            name="Setting"
-            component={Setting}
-            options={{ title: '설정' }}
-          />
-          <Stack.Screen
-            name="MyProfileChange"
-            component={MyProfileChange}
-            options={{ title: '마이 프로필 변경' }}
-          />
-          <Stack.Screen
-            name="SearchAddress"
-            component={SearchAddress}
-            options={{ title: '주소 검색' }}
-          />
-          <Stack.Screen
-            name="PasswordChange"
-            component={PasswordChange}
-            options={{ title: '비밀번호 변경' }}
-          />
-          <Stack.Screen
-            name="Withdrawal"
-            component={Withdrawal}
-            options={{ title: '계정 탈퇴' }}
-          />
-          <Stack.Screen
-            name="WithdrawalComplete"
-            component={WithdrawalComplete}
-            options={{ title: '계정 탈퇴' }}
-          />
+          {isLoggedIn ? (
+            <>
+              <Stack.Screen
+                name="Navigation"
+                component={Navigation}
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="CreateCrew"
+                component={CreateCrew}
+                options={{ title: '크루 생성' }}
+              />
+              <Stack.Screen
+                name="Setting"
+                component={Setting}
+                options={{ title: '설정' }}
+              />
+              <Stack.Screen
+                name="MyProfileChange"
+                component={MyProfileChange}
+                options={{ title: '마이 프로필 변경' }}
+              />
+              <Stack.Screen
+                name="SearchAddress"
+                component={SearchAddress}
+                options={{ title: '주소 검색' }}
+              />
+              <Stack.Screen
+                name="PasswordChange"
+                component={PasswordChange}
+                options={{ title: '비밀번호 변경' }}
+              />
+              <Stack.Screen
+                name="Withdrawal"
+                component={Withdrawal}
+                options={{ title: '계정 탈퇴' }}
+              />
+              <Stack.Screen
+                name="WithdrawalComplete"
+                component={WithdrawalComplete}
+                options={{ title: '계정 탈퇴' }}
+              />
+            </>
+          ) : (
+            <>
+              <Stack.Screen
+                name="Login"
+                component={Login}
+                options={{ title: '로그인', headerShown: false }}
+              />
+              <Stack.Screen
+                name="Signup"
+                component={Signup}
+                options={{ title: '회원 가입' }}
+              />
+              <Stack.Screen
+                name="ForgotPassword"
+                component={ForgotPassword}
+                options={{ title: '비밀번호 찾기' }}
+              />
+            </>
+          )}
         </Stack.Navigator>
       </NavigationContainer>
     </GestureHandlerRootView>

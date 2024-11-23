@@ -18,6 +18,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import ProfilePhotoPicker from './ProfilePhotoPicker';
 import calendarIcon from '../../assets/images/Settings/free-icon-calendar-8786347.png';
 import down from '../../assets/images/Settings/free-icon-down-arrow-748063.png';
+import AddressInput from '../../components/AddressInput';
 
 const MyProfileChange = () => {
   const navigation = useNavigation();
@@ -147,23 +148,7 @@ const MyProfileChange = () => {
       </View>
       <View style={styles.bundle}>
         <Text style={styles.title}>주소</Text>
-        <View style={styles.addressSet}>
-          <TextInput
-            style={styles.addressInput}
-            value={address}
-            editable={false}
-          />
-          <TouchableOpacity
-            style={styles.addressButton}
-            onPress={() =>
-              navigation.navigate('SearchAddress', {
-                onAddressSelected: handleAddressChange,
-              })
-            }
-          >
-            <Text style={styles.button}>검색</Text>
-          </TouchableOpacity>
-        </View>
+        <AddressInput address={address} onAddressChange={handleAddressChange} />
       </View>
       <View style={styles.changeButton}>
         <TouchableOpacity onPress={handleProfileChange}>

@@ -3,15 +3,15 @@ import {
   View,
   StyleSheet,
   Text,
-  TextInput,
   TouchableOpacity,
   Image,
   Modal,
+  TextInput,
 } from 'react-native';
+import PasswordInput, { validatePassword } from '../../components/Password';
 
 import myprofile from '../../components/MyProfile/myprofileInfo.json';
 
-import correct from '../../assets/images/Settings/checked.png';
 import bad from '../../assets/images/Settings/delete.png';
 import eye from '../../assets/images/Settings/show.png';
 import eyeOff from '../../assets/images/Settings/hide.png';
@@ -25,43 +25,16 @@ const PasswordChange = () => {
   const [currentPasswordError, setCurrentPasswordError] = useState('');
   const [isModalVisible, setModalVisible] = useState(false);
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
-  const [showNewPassword, setShowNewPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isCurrentPasswordFocused, setIsCurrentPasswordFocused] =
-    useState(false);
-  const [isNewPasswordFocused, setIsNewPasswordFocused] = useState(false);
-  const [isConfirmPasswordFocused, setIsConfirmPasswordFocused] =
     useState(false);
 
   const validateCurrentPassword = password => {
     if (password !== myprofile.password) {
-      setCurrentPasswordError('기존 비밀번호랑 다릅니다.');
+      setCurrentPasswordError('기존 비밀번호와 일치하지 않습니다.');
     } else {
       setCurrentPasswordError('');
     }
     setCurrentPassword(password);
-  };
-
-  const validatePassword = password => {
-    const passwordRegex =
-      /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-    if (!passwordRegex.test(password)) {
-      setPasswordError(
-        '8자리 이상, 영문과 숫자, 특수문자를 반드시 포함해야 합니다.',
-      );
-    } else {
-      setPasswordError('적용 가능한 비밀번호입니다!');
-    }
-    setNewPassword(password);
-  };
-
-  const validateConfirmPassword = password => {
-    if (password !== newPassword) {
-      setConfirmPasswordError('새 비밀번호와 일치하지 않습니다.');
-    } else {
-      setConfirmPasswordError('');
-    }
-    setConfirmPassword(password);
   };
 
   const handlePasswordChange = () => {
@@ -111,82 +84,32 @@ const PasswordChange = () => {
           ) : null}
         </View>
       </View>
-      <View style={styles.bundle}>
-        <Text style={styles.title}>새 비밀번호</Text>
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.input}
-            secureTextEntry={!showNewPassword}
-            value={newPassword}
-            onChangeText={validatePassword}
-            onFocus={() => setIsNewPasswordFocused(true)}
-            onBlur={() => setIsNewPasswordFocused(false)}
-          />
-          {isNewPasswordFocused && (
-            <TouchableOpacity
-              style={styles.eyeButton}
-              onPress={() => setShowNewPassword(!showNewPassword)}
-            >
-              <Image
-                source={showNewPassword ? eyeOff : eye}
-                style={styles.eyeIcon}
-              />
-            </TouchableOpacity>
-          )}
-          {passwordError ? (
-            <View style={styles.errorContainer}>
-              <Image
-                source={
-                  passwordError === '적용 가능한 비밀번호입니다!'
-                    ? correct
-                    : bad
-                }
-                style={styles.errorIcon}
-              />
-              <Text
-                style={[
-                  styles.errorText,
-                  passwordError === '적용 가능한 비밀번호입니다!'
-                    ? styles.successText
-                    : null,
-                ]}
-              >
-                {passwordError}
-              </Text>
-            </View>
-          ) : null}
-        </View>
-      </View>
-      <View style={styles.bundle}>
-        <Text style={styles.title}>새 비밀번호 확인</Text>
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.input}
-            secureTextEntry={!showConfirmPassword}
-            value={confirmPassword}
-            onChangeText={validateConfirmPassword}
-            onFocus={() => setIsConfirmPasswordFocused(true)}
-            onBlur={() => setIsConfirmPasswordFocused(false)}
-          />
-          {isConfirmPasswordFocused && (
-            <TouchableOpacity
-              style={styles.eyeButton}
-              onPress={() => setShowConfirmPassword(!showConfirmPassword)}
-            >
-              <Image
-                source={showConfirmPassword ? eyeOff : eye}
-                style={styles.eyeIcon}
-              />
-            </TouchableOpacity>
-          )}
-          {confirmPasswordError ? (
-            <View style={styles.errorContainer}>
-              <Image source={bad} style={styles.errorIcon} />
-              <Text style={styles.errorText}>{confirmPasswordError}</Text>
-            </View>
-          ) : null}
-        </View>
-      </View>
+      <PasswordInput
+        label="새 비밀번호"
+        value={newPassword}
+        onChangeText={password => {
+          validatePassword(password, setPasswordError);
+          setNewPassword(password);
+        }}
+        error={passwordError}
+        placeholder="8자리 이상, 영문과 숫자, 특수문자를 반드시 포함해야 합니다."
+        titleStyle={styles.title}
+      />
+      <PasswordInput
+        label="새 비밀번호 확인"
+        value={confirmPassword}
+        onChangeText={password => {
+          if (password !== newPassword) {
+            setConfirmPasswordError('새 비밀번호와 일치하지 않습니다.');
+          } else {
+            setConfirmPasswordError('');
+          }
+          setConfirmPassword(password);
+        }}
+        error={confirmPasswordError}
+        placeholder="동일한 비밀번호를 입력해주세요"
+        titleStyle={styles.title}
+      />
       <TouchableOpacity
         onPress={handlePasswordChange}
         disabled={isButtonDisabled}
