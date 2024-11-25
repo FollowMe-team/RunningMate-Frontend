@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { StatusBar, BackHandler, ToastAndroid, StyleSheet } from 'react-native';
@@ -16,6 +16,8 @@ import Withdrawal from './src/screens/setting/Withdrawal';
 import WithdrawalComplete from './src/screens/setting/WithdrawalComplete';
 import CreateCrew from './src/screens/Crew/CreateCrew';
 import ForgotPassword from './src/screens/Home/ForgotPassword';
+import CrewSearch from './src/screens/Crew/CrewSearch';
+import Header from './src/components/Header';
 
 // StatusBar 투명하게 설정
 StatusBar.setBackgroundColor('transparent');
@@ -26,6 +28,7 @@ StatusBar.setBarStyle('dark-content');
 const Stack = createStackNavigator();
 
 const App = () => {
+  const navigationRef = useRef();
   const [isLoading, setIsLoading] = useState(true);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [backPressedOnce, setBackPressedOnce] = useState(false);
@@ -47,27 +50,32 @@ const App = () => {
       return;
     }
 
-    // 뒤로가기 버튼 이벤트
     const backAction = () => {
-      // 한번 더 누르면 앱 종료
-      if (backPressedOnce) {
-        BackHandler.exitApp();
+      const currentRoute = navigationRef.current?.getCurrentRoute()?.name;
+
+      if (
+        currentRoute === 'Login' ||
+        ['Course', 'Community', 'Crew', 'MyProfile'].includes(currentRoute)
+      ) {
+        if (backPressedOnce) {
+          BackHandler.exitApp();
+          return true;
+        }
+
+        setBackPressedOnce(true);
+        ToastAndroid.show('한번 더 누르면 종료됩니다.', ToastAndroid.SHORT);
+
+        setTimeout(() => {
+          setBackPressedOnce(false);
+        }, 2000);
+
         return true;
       }
 
-      // 한번 더 누르면 종료 메시지 출력
-      setBackPressedOnce(true);
-      ToastAndroid.show('한번 더 누르면 종료됩니다.', ToastAndroid.SHORT);
-
-      // 2초 내에 뒤로가기 버튼을 한번 더 누르면 앱 종료
-      setTimeout(() => {
-        setBackPressedOnce(false);
-      }, 2000);
-
+      navigationRef.current?.goBack();
       return true;
     };
 
-    // 뒤로가기 버튼 이벤트 등록
     const backHandler = BackHandler.addEventListener(
       'hardwareBackPress',
       backAction,
@@ -96,8 +104,14 @@ const App = () => {
 
   return (
     <GestureHandlerRootView style={styles.container}>
-      <NavigationContainer theme={customTheme}>
-        <Stack.Navigator>
+      <NavigationContainer theme={customTheme} ref={navigationRef}>
+        <Stack.Navigator
+          screenOptions={{
+            headerShown: false,
+            animationEnabled: true,
+            gestureDirection: 'vertical',
+          }}
+        >
           {isLoggedIn ? (
             <>
               <Stack.Screen
@@ -108,38 +122,87 @@ const App = () => {
               <Stack.Screen
                 name="CreateCrew"
                 component={CreateCrew}
-                options={{ title: '크루 생성' }}
+                options={{
+                  title: '크루 생성',
+                  header: ({ navigation }) => (
+                    <Header title="크루 생성" navigation={navigation} />
+                  ),
+                  headerShown: true,
+                }}
+              />
+              <Stack.Screen
+                name="CreateSearch"
+                component={CreateCrew}
+                options={{ headerShown: false }}
               />
               <Stack.Screen
                 name="Setting"
                 component={Setting}
-                options={{ title: '설정' }}
+                options={{
+                  title: '설정',
+                  header: ({ navigation }) => (
+                    <Header title="설정" navigation={navigation} />
+                  ),
+                  headerShown: true,
+                }}
               />
               <Stack.Screen
                 name="MyProfileChange"
                 component={MyProfileChange}
-                options={{ title: '마이 프로필 변경' }}
+                options={{
+                  title: '마이 프로필 변경',
+                  header: ({ navigation }) => (
+                    <Header title="마이 프로필 변경" navigation={navigation} />
+                  ),
+                  headerShown: true,
+                }}
               />
               <Stack.Screen
                 name="SearchAddress"
                 component={SearchAddress}
-                options={{ title: '주소 검색' }}
+                options={{
+                  title: '주소 검색',
+                  header: ({ navigation }) => (
+                    <Header title="주소 검색" navigation={navigation} />
+                  ),
+                  headerShown: true,
+                }}
               />
               <Stack.Screen
                 name="PasswordChange"
                 component={PasswordChange}
-                options={{ title: '비밀번호 변경' }}
+                options={{
+                  title: '비밀번호 변경',
+                  header: ({ navigation }) => (
+                    <Header title="비밀번호 변경" navigation={navigation} />
+                  ),
+                  headerShown: true,
+                }}
               />
               <Stack.Screen
                 name="Withdrawal"
                 component={Withdrawal}
-                options={{ title: '계정 탈퇴' }}
+                options={{
+                  title: '계정 탈퇴',
+                  header: ({ navigation }) => (
+                    <Header title="계정 탈퇴" navigation={navigation} />
+                  ),
+                  headerShown: true,
+                }}
               />
               <Stack.Screen
                 name="WithdrawalComplete"
                 component={WithdrawalComplete}
-                options={{ title: '계정 탈퇴' }}
+                options={{
+                  title: '계정 탈퇴',
+                  header: ({ navigation }) => (
+                    <Header title="계정 탈퇴" navigation={navigation} />
+                  ),
+                  headerShown: true,
+                }}
               />
+              {/* <Stack.Screen name="Crew" component={Crew} /> */}
+              <Stack.Screen name="CrewSearch" component={CrewSearch} />
             </>
           ) : (
             <>
@@ -151,12 +214,24 @@ const App = () => {
               <Stack.Screen
                 name="Signup"
                 component={Signup}
-                options={{ title: '회원 가입' }}
+                options={{
+                  title: '회원 가입',
+                  header: ({ navigation }) => (
+                    <Header title="회원 가입" navigation={navigation} />
+                  ),
+                  headerShown: true,
+                }}
               />
               <Stack.Screen
                 name="ForgotPassword"
                 component={ForgotPassword}
-                options={{ title: '비밀번호 찾기' }}
+                options={{
+                  title: '비밀번호 찾기',
+                  header: ({ navigation }) => (
+                    <Header title="비밀번호 찾기" navigation={navigation} />
+                  ),
+                  headerShown: true,
+                }}
               />
             </>
           )}

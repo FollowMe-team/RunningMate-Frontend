@@ -1,4 +1,4 @@
-import React, { useRef, useCallback } from 'react';
+import React, { useRef, useCallback, useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -13,6 +13,7 @@ import {
   BottomSheetBackdrop,
   BottomSheetModalProvider,
 } from '@gorhom/bottom-sheet';
+import { useNavigation, useRoute } from '@react-navigation/native'; // 추가
 
 import CreateCrewButton from '../../components/Crew/CreateCrewButton';
 import CrewCard from '../../components/Crew/CrewCard';
@@ -20,8 +21,49 @@ import crewData from '../../components/Crew/crew.json';
 import search from '../../assets/images/Crew/searching.png';
 
 const Crew = () => {
+  const navigation = useNavigation(); // 추가
+  const route = useRoute(); // 추가
   const bottomSheetRef = useRef(null);
   const snapPoints = ['70%'];
+  const [filteredCrew, setFilteredCrew] = useState(crewData.crew); // 추가
+
+  useEffect(() => {
+    if (route.params?.searchParams) {
+      const { name, location, week, startTime, endTime, footprint } =
+        route.params.searchParams;
+      const filtered = crewData.crew.filter(crew => {
+        const matchesName = name ? crew.name.includes(name) : true;
+        const matchesLocation = location
+          ? crew.city.includes(location) || crew.district.includes(location)
+          : true;
+        const matchesWeek =
+          week.length > 0 ? week.some(day => crew.week.includes(day)) : true;
+        const matchesTime =
+          startTime && endTime
+            ? crew.start_time === startTime && crew.end_time === endTime
+            : true;
+        const matchesFootprint =
+          footprint.length > 0
+            ? footprint.some(f => {
+                if (f === 6) return crew.footprint >= 85;
+                if (f === 5) return crew.footprint >= 70 && crew.footprint < 85;
+                if (f === 4) return crew.footprint >= 55 && crew.footprint < 70;
+                if (f === 3) return crew.footprint >= 40 && crew.footprint < 55;
+                if (f === 2) return crew.footprint >= 25 && crew.footprint < 40;
+                return crew.footprint < 25;
+              })
+            : true;
+        return (
+          matchesName &&
+          matchesLocation &&
+          matchesWeek &&
+          matchesTime &&
+          matchesFootprint
+        );
+      });
+      setFilteredCrew(filtered);
+    }
+  }, [route.params?.searchParams]);
 
   const handleCrewPress = useCallback(() => {
     bottomSheetRef.current?.present();
@@ -39,7 +81,7 @@ const Crew = () => {
   );
 
   const renderCrewList = isMyCrew => {
-    return crewData.crew
+    return filteredCrew
       .filter(crew => crew.is_my_crew === isMyCrew)
       .map(crew => (
         <CrewCard key={crew.id} crew={crew} onPress={handleCrewPress} />
@@ -63,7 +105,9 @@ const Crew = () => {
             <View style={styles.titleSet}>
               <Text style={styles.title}>신청 가능한 크루</Text>
               <TouchableOpacity style={styles.sortingButton}></TouchableOpacity>
-              <TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => navigation.navigate('CrewSearch')}
+              >
                 <Image source={search} style={styles.searchIcon} />
               </TouchableOpacity>
             </View>
@@ -100,7 +144,7 @@ const Crew = () => {
               <Text style={styles.infoText}>(월, 화, 수) 오후 8 ~ 9시</Text>
 
               <Text style={styles.infoTitle}>크루 활동 지역</Text>
-              <Text style={styles.infoText}>고양시 일산서구</Text>
+              <Text style={styles.infoText}>고양시 산서구</Text>
             </View>
 
             <TouchableOpacity style={styles.joinButton}>

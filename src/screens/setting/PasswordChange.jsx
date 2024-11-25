@@ -9,6 +9,7 @@ import {
   TextInput,
 } from 'react-native';
 import PasswordInput, { validatePassword } from '../../components/Password';
+import { useNavigation } from '@react-navigation/native';
 
 import myprofile from '../../components/MyProfile/myprofileInfo.json';
 
@@ -27,6 +28,7 @@ const PasswordChange = () => {
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [isCurrentPasswordFocused, setIsCurrentPasswordFocused] =
     useState(false);
+  const navigation = useNavigation();
 
   const validateCurrentPassword = password => {
     if (password !== myprofile.password) {
@@ -44,10 +46,11 @@ const PasswordChange = () => {
 
   const closeModal = () => {
     setModalVisible(false);
+    navigation.navigate('Setting'); // 'Setting' 페이지로 이동
   };
 
   const isButtonDisabled =
-    passwordError !== '적용 가능한 비밀번호입니다!' ||
+    passwordError !== '' ||
     confirmPasswordError !== '' ||
     currentPasswordError !== '' ||
     !currentPassword;
@@ -64,6 +67,8 @@ const PasswordChange = () => {
             onChangeText={validateCurrentPassword}
             onFocus={() => setIsCurrentPasswordFocused(true)}
             onBlur={() => setIsCurrentPasswordFocused(false)}
+            placeholder="기존 비밀번호를 입력해주세요"
+            placeholderTextColor={'#9B9B9D'}
           />
           {isCurrentPasswordFocused && (
             <TouchableOpacity
@@ -134,7 +139,7 @@ const PasswordChange = () => {
           <View style={styles.modalContent}>
             <Text style={styles.modalText}>비밀번호 변경이 완료되었어요!</Text>
             <TouchableOpacity onPress={closeModal} style={styles.modalButton}>
-              <Text style={styles.modalButtonText}>확인</Text>
+              <Text style={styles.modalButtonText}>OK</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -148,8 +153,9 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   bundle: {
-    padding: 20,
+    paddingVertical: 20,
     borderBottomColor: '#E5E5E5',
+    marginHorizontal: 16,
   },
   title: {
     fontSize: 20,
