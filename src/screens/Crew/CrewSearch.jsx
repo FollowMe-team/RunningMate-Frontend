@@ -8,9 +8,9 @@ import {
   ScrollView,
   Text,
 } from 'react-native';
-import { Dropdown } from 'react-native-element-dropdown';
 import { useNavigation } from '@react-navigation/native';
 import Footprint from '../../components/Footprint';
+import TimePicker from '../../components/TimePicker';
 
 import search from '../../assets/images/Crew/searching.png';
 import locate from '../../assets/images/Crew/locate.png';
@@ -77,7 +77,7 @@ const CrewSearch = () => {
   });
   const [selectedDays, setSelectedDays] = useState([]);
   const [activityTimes, setActivityTimes] = useState([
-    { startTime: '', endTime: '' },
+    { startTime: null, endTime: null },
   ]);
 
   const handleDaySelect = day => {
@@ -107,13 +107,28 @@ const CrewSearch = () => {
     searchParams.footprint.includes(footprint);
 
   const handleAddTime = () => {
-    setActivityTimes([...activityTimes, { startTime: '', endTime: '' }]);
+    setActivityTimes([...activityTimes, { startTime: null, endTime: null }]);
   };
 
   const handleRemoveTime = () => {
     if (activityTimes.length > 1) {
       setActivityTimes(activityTimes.slice(0, -1));
     }
+  };
+
+  const handleTimeChange = (index, type, value) => {
+    const newTimes = [...activityTimes];
+    newTimes[index][type] = value;
+    setActivityTimes(newTimes);
+    setSearchParams({
+      ...searchParams,
+      startTime: newTimes[0].startTime
+        ? newTimes[0].startTime.toTimeString().slice(0, 5)
+        : '',
+      endTime: newTimes[0].endTime
+        ? newTimes[0].endTime.toTimeString().slice(0, 5)
+        : '',
+    });
   };
 
   return (
@@ -203,40 +218,16 @@ const CrewSearch = () => {
             </View>
             {activityTimes.map((time, index) => (
               <View key={index} style={styles.activityTimeDropdownLayout}>
-                <Dropdown
-                  style={styles.timeDropdown}
-                  data={[]}
-                  labelField="label"
-                  valueField="value"
-                  placeholder="시작 시간 선택"
-                  value={time.startTime}
-                  onChange={item => {
-                    const newTimes = [...activityTimes];
-                    newTimes[index].startTime = item.value;
-                    setActivityTimes(newTimes);
-                    setSearchParams({ ...searchParams, startTime: item.value });
-                  }}
-                  placeholderStyle={{ color: '#101010' }}
-                  itemTextStyle={{ color: '#101010' }}
-                  selectedTextStyle={{ color: '#101010' }}
+                <TimePicker
+                  time={time.startTime}
+                  setTime={value => handleTimeChange(index, 'startTime', value)}
+                  placeholder="시작 시간"
                 />
                 <Image source={wave} style={{ width: 25, height: 11 }} />
-                <Dropdown
-                  style={styles.timeDropdown}
-                  data={[]}
-                  labelField="label"
-                  valueField="value"
-                  placeholder="끝 시간 선택"
-                  value={time.endTime}
-                  onChange={item => {
-                    const newTimes = [...activityTimes];
-                    newTimes[index].endTime = item.value;
-                    setActivityTimes(newTimes);
-                    setSearchParams({ ...searchParams, endTime: item.value });
-                  }}
-                  placeholderStyle={{ color: '#101010' }}
-                  itemTextStyle={{ color: '#101010' }}
-                  selectedTextStyle={{ color: '#101010' }}
+                <TimePicker
+                  time={time.endTime}
+                  setTime={value => handleTimeChange(index, 'endTime', value)}
+                  placeholder="끝 시간"
                 />
               </View>
             ))}
