@@ -335,14 +335,6 @@ const styles = StyleSheet.create({
   weekSelectButtonTextActive: {
     color: 'white',
   },
-  timeDropdown: {
-    width: '45%',
-    borderColor: '#D6D6D6',
-    borderWidth: 1,
-    borderRadius: 8,
-    padding: 16,
-    marginTop: 8,
-  },
   plusButton: {
     justifyContent: 'center',
     paddingVertical: 2,

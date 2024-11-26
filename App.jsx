@@ -19,6 +19,7 @@ import ForgotPassword from './src/screens/Home/ForgotPassword';
 import CrewSearch from './src/screens/Crew/CrewSearch';
 import Header from './src/components/Header';
 import MyCrew from './src/screens/Crew/MyCrew';
+import CrewScheduleRegister from './src/screens/Crew/CrewScheduleRegister';
 
 // StatusBar 투명하게 설정
 StatusBar.setBackgroundColor('transparent');
@@ -149,6 +150,17 @@ const App = () => {
                   ),
                   headerShown: true,
                 })}
+              />
+              <Stack.Screen
+                name="CrewScheduleRegister"
+                component={CrewScheduleRegister}
+                options={{
+                  title: '크루 일정 등록',
+                  header: ({ navigation }) => (
+                    <Header title="크루 일정 등록" navigation={navigation} />
+                  ),
+                  headerShown: true,
+                }}
               />
               <Stack.Screen
                 name="Setting"
