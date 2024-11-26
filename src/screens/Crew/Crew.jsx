@@ -65,9 +65,13 @@ const Crew = () => {
     }
   }, [route.params?.searchParams]);
 
-  const handleCrewPress = useCallback(() => {
-    bottomSheetRef.current?.present();
-  }, []);
+  const handleCrewPress = useCallback(
+    crewName => {
+      // 수정
+      navigation.navigate('MyCrew', { crewName }); // 수정
+    },
+    [navigation],
+  );
 
   const renderBackdrop = useCallback(
     props => (
@@ -84,7 +88,11 @@ const Crew = () => {
     return filteredCrew
       .filter(crew => crew.is_my_crew === isMyCrew)
       .map(crew => (
-        <CrewCard key={crew.id} crew={crew} onPress={handleCrewPress} />
+        <CrewCard
+          key={crew.id}
+          crew={crew}
+          onPress={() => handleCrewPress(crew.name)}
+        /> // 수정
       ));
   };
 

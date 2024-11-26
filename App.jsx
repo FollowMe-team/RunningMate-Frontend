@@ -18,6 +18,7 @@ import CreateCrew from './src/screens/Crew/CreateCrew';
 import ForgotPassword from './src/screens/Home/ForgotPassword';
 import CrewSearch from './src/screens/Crew/CrewSearch';
 import Header from './src/components/Header';
+import MyCrew from './src/screens/Crew/MyCrew';
 
 // StatusBar 투명하게 설정
 StatusBar.setBackgroundColor('transparent');
@@ -134,6 +135,20 @@ const App = () => {
                 name="CreateSearch"
                 component={CreateCrew}
                 options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="MyCrew"
+                component={MyCrew}
+                options={({ route }) => ({
+                  title: route.params.crewName,
+                  header: ({ navigation }) => (
+                    <Header
+                      title={route.params.crewName}
+                      navigation={navigation}
+                    />
+                  ),
+                  headerShown: true,
+                })}
               />
               <Stack.Screen
                 name="Setting"

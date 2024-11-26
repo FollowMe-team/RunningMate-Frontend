@@ -3,19 +3,17 @@ import { StyleSheet, View, Image } from 'react-native';
 import { Calendar } from 'react-native-calendars';
 import PropTypes from 'prop-types';
 
-import records from './MyProfile/record.json';
-
 import LeftImg from '../assets/images/MyProfile/free-icon-left-chevron-9923677.png';
 import RightImg from '../assets/images/MyProfile/free-icon-right-chevron-9923681.png';
 
-const Calendars = ({ onDayPress }) => {
+const Calendars = ({ onDayPress, dataSource }) => {
   const today = new Date().toISOString().split('T')[0];
   const [selectedDate, setSelectedDate] = useState(today);
   const [markedDates, setMarkedDates] = useState({});
 
   useEffect(() => {
     const marks = {};
-    records.forEach(record => {
+    dataSource.forEach(record => {
       marks[record.date] = {
         marked: true,
         dotColor: selectedDate === record.date ? 'white' : 'black',
@@ -30,7 +28,7 @@ const Calendars = ({ onDayPress }) => {
     };
     setMarkedDates(marks);
     handleDayPress({ dateString: today });
-  }, []);
+  }, [dataSource]);
 
   const handleDayPress = day => {
     const newMarkedDates = { ...markedDates };
@@ -40,7 +38,7 @@ const Calendars = ({ onDayPress }) => {
         selected: false,
         selectedColor: undefined,
         selectedTextColor: undefined,
-        dotColor: records.some(record => record.date === selectedDate)
+        dotColor: dataSource.some(record => record.date === selectedDate)
           ? 'black'
           : undefined,
       };
@@ -50,7 +48,7 @@ const Calendars = ({ onDayPress }) => {
       selected: true,
       selectedColor: '#73D393',
       selectedTextColor: 'white',
-      dotColor: records.some(record => record.date === day.dateString)
+      dotColor: dataSource.some(record => record.date === day.dateString)
         ? 'white'
         : undefined,
     };
@@ -86,6 +84,7 @@ const Calendars = ({ onDayPress }) => {
 
 Calendars.propTypes = {
   onDayPress: PropTypes.func.isRequired,
+  dataSource: PropTypes.array.isRequired,
 };
 
 const styles = StyleSheet.create({
