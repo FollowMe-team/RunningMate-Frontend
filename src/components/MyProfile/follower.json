@@ -1,0 +1,50 @@
+[
+  {
+    "id": 1,
+    "nickname": "user3",
+    "info": "안녕하세요~!",
+    "profile_url": "https://example.com/profile3.jpg"
+  },
+  {
+    "id": 2,
+    "nickname": "user4",
+    "info": "안녕하세요~!",
+    "profile_url": "../../assets/images/Settings/profile.png"
+  },
+  {
+    "id": 3,
+    "nickname": "user5",
+    "info": "안녕하세요~!",
+    "profile_url": "https://example.com/profile5.jpg"
+  },
+  {
+    "id": 4,
+    "nickname": "user6",
+    "info": "안녕하세요~!",
+    "profile_url": "https://example.com/profile6.jpg"
+  },
+  {
+    "id": 5,
+    "nickname": "user7",
+    "info": "안녕하세요~!",
+    "profile_url": "../../assets/images/Settings/profile.png"
+  },
+  {
+    "id": 6,
+    "nickname": "user8",
+    "info": "안녕하세요~!",
+    "profile_url": "https://example.com/profile8.jpg"
+  },
+  {
+    "id": 7,
+    "nickname": "user9",
+    "info": "안녕하세요~!",
+    "profile_url": "../../assets/images/Settings/profile.png"
+  },
+  {
+    "id": 8,
+    "nickname": "user10",
+    "info": "안녕하세요~!",
+    "profile_url": "https://example.com/profile10.jpg"
+  }
+]

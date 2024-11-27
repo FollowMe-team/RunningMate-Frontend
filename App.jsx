@@ -20,6 +20,8 @@ import CrewSearch from './src/screens/Crew/CrewSearch';
 import Header from './src/components/Header';
 import MyCrew from './src/screens/Crew/MyCrew';
 import CrewScheduleRegister from './src/screens/Crew/CrewScheduleRegister';
+import FollowerList from './src/screens/MyProfile/FollowerList';
+import FollowingList from './src/screens/MyProfile/FollowingList';
 
 // StatusBar 투명하게 설정
 StatusBar.setBackgroundColor('transparent');
@@ -158,6 +160,28 @@ const App = () => {
                   title: '크루 일정 등록',
                   header: ({ navigation }) => (
                     <Header title="크루 일정 등록" navigation={navigation} />
+                  ),
+                  headerShown: true,
+                }}
+              />
+              <Stack.Screen
+                name="FollowerList"
+                component={FollowerList}
+                options={{
+                  title: '팔로워 목록',
+                  header: ({ navigation }) => (
+                    <Header title="팔로워 목록" navigation={navigation} />
+                  ),
+                  headerShown: true,
+                }}
+              />
+              <Stack.Screen
+                name="FollowingList"
+                component={FollowingList}
+                options={{
+                  title: '팔로잉 목록',
+                  header: ({ navigation }) => (
+                    <Header title="팔로잉 목록" navigation={navigation} />
                   ),
                   headerShown: true,
                 }}
