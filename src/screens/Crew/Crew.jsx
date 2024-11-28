@@ -101,7 +101,7 @@ const Crew = () => {
           <View style={styles.dividingLine} />
           <View style={styles.crewListSet}>
             <View style={styles.titleSet}>
-              <Text style={styles.title}>신청 가능한 크루</Text>
+              <Text style={styles.title}>크루 리스트</Text>
               <TouchableOpacity style={styles.sortingButton}></TouchableOpacity>
               <TouchableOpacity
                 onPress={() => navigation.navigate('CrewSearch')}

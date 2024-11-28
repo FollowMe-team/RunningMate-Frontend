@@ -14,17 +14,22 @@ import TimePicker from '../../components/TimePicker';
 
 import search from '../../assets/images/Crew/searching.png';
 import locate from '../../assets/images/Crew/locate.png';
-import plus from '../../assets/images/Crew/plus.png';
-import minus from '../../assets/images/Crew/minus.png';
 import wave from '../../assets/images/Crew/wave.png';
 import back from '../../assets/images/Crew/back.png';
 
 import PropTypes from 'prop-types';
 
-const CrewSearchHeader = ({ searchParams, setSearchParams }) => {
+const CrewSearchHeader = ({ searchParams, setSearchParams, crewList }) => {
   const navigation = useNavigation();
   const handleSearch = () => {
-    navigation.navigate('Crew', { searchParams, type: 'search' });
+    const filteredCrew = crewList.filter(crew =>
+      crew.name.toLowerCase().includes(searchParams.name.toLowerCase()),
+    );
+    navigation.navigate('CrewSearchResult', {
+      searchParams,
+      type: 'search',
+      filteredCrew,
+    });
   };
 
   return (
@@ -44,7 +49,7 @@ const CrewSearchHeader = ({ searchParams, setSearchParams }) => {
           onChangeText={text =>
             setSearchParams({ ...searchParams, name: text })
           }
-          placeholder="크루명 또는 지역명"
+          placeholder="크루명"
           style={styles.headerInput}
           placeholderTextColor="#9B9B9D"
           onSubmitEditing={handleSearch}
@@ -57,13 +62,14 @@ const CrewSearchHeader = ({ searchParams, setSearchParams }) => {
 CrewSearchHeader.propTypes = {
   searchParams: PropTypes.shape({
     name: PropTypes.string,
-    footprint: PropTypes.arrayOf(PropTypes.number), // 수정된 부분
+    footprint: PropTypes.arrayOf(PropTypes.number),
     location: PropTypes.string,
     week: PropTypes.arrayOf(PropTypes.string),
     startTime: PropTypes.string,
     endTime: PropTypes.string,
   }).isRequired,
   setSearchParams: PropTypes.func.isRequired,
+  crewList: PropTypes.array.isRequired,
 };
 
 const CrewSearch = () => {
@@ -73,12 +79,15 @@ const CrewSearch = () => {
     week: [],
     startTime: '',
     endTime: '',
-    footprint: [], // 수정된 부분
+    footprint: [],
   });
   const [selectedDays, setSelectedDays] = useState([]);
-  const [activityTimes, setActivityTimes] = useState([
-    { startTime: null, endTime: null },
-  ]);
+  const [activityTime, setActivityTime] = useState({
+    startTime: null,
+    endTime: null,
+  });
+
+  const crewList = []; // crewList를 정의하거나 props로 전달받도록 수정
 
   const handleDaySelect = day => {
     let updatedDays = [...selectedDays];
@@ -106,27 +115,16 @@ const CrewSearch = () => {
   const isFootprintSelected = footprint =>
     searchParams.footprint.includes(footprint);
 
-  const handleAddTime = () => {
-    setActivityTimes([...activityTimes, { startTime: null, endTime: null }]);
-  };
-
-  const handleRemoveTime = () => {
-    if (activityTimes.length > 1) {
-      setActivityTimes(activityTimes.slice(0, -1));
-    }
-  };
-
-  const handleTimeChange = (index, type, value) => {
-    const newTimes = [...activityTimes];
-    newTimes[index][type] = value;
-    setActivityTimes(newTimes);
+  const handleTimeChange = (type, value) => {
+    const newTime = { ...activityTime, [type]: value };
+    setActivityTime(newTime);
     setSearchParams({
       ...searchParams,
-      startTime: newTimes[0].startTime
-        ? newTimes[0].startTime.toTimeString().slice(0, 5)
+      startTime: newTime.startTime
+        ? newTime.startTime.toTimeString().slice(0, 5)
         : '',
-      endTime: newTimes[0].endTime
-        ? newTimes[0].endTime.toTimeString().slice(0, 5)
+      endTime: newTime.endTime
+        ? newTime.endTime.toTimeString().slice(0, 5)
         : '',
     });
   };
@@ -136,6 +134,7 @@ const CrewSearch = () => {
       <CrewSearchHeader
         searchParams={searchParams}
         setSearchParams={setSearchParams}
+        crewList={crewList} // crewList를 전달
       />
       <ScrollView style={{ paddingHorizontal: 26 }}>
         <View style={styles.container}>
@@ -150,13 +149,13 @@ const CrewSearch = () => {
               onChangeText={text =>
                 setSearchParams({ ...searchParams, location: text })
               }
-              placeholder="크루명 또는 지역명"
+              placeholder="지역명"
               style={styles.input}
               placeholderTextColor="#9B9B9D"
             />
           </View>
           <View>
-            <Text style={styles.title}>랭크 선택</Text>
+            <Text style={styles.title}>크루 최소 조건</Text>
             <View style={styles.footprintButtonLayout}>
               {[1, 2, 3, 4, 5, 6].map((footprint, index) => (
                 <TouchableOpacity
@@ -198,39 +197,19 @@ const CrewSearch = () => {
                 </TouchableOpacity>
               ))}
             </View>
-            <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
-              <TouchableOpacity
-                style={styles.plusButton}
-                onPress={handleAddTime}
-              >
-                <View>
-                  <Image source={plus} style={{ width: 11, height: 11 }} />
-                </View>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.minusButton}
-                onPress={handleRemoveTime}
-              >
-                <View>
-                  <Image source={minus} style={{ width: 10, height: 3 }} />
-                </View>
-              </TouchableOpacity>
+            <View style={styles.activityTimeDropdownLayout}>
+              <TimePicker
+                time={activityTime.startTime}
+                setTime={value => handleTimeChange('startTime', value)}
+                placeholder="시작 시간"
+              />
+              <Image source={wave} style={{ width: 25, height: 11 }} />
+              <TimePicker
+                time={activityTime.endTime}
+                setTime={value => handleTimeChange('endTime', value)}
+                placeholder="끝 시간"
+              />
             </View>
-            {activityTimes.map((time, index) => (
-              <View key={index} style={styles.activityTimeDropdownLayout}>
-                <TimePicker
-                  time={time.startTime}
-                  setTime={value => handleTimeChange(index, 'startTime', value)}
-                  placeholder="시작 시간"
-                />
-                <Image source={wave} style={{ width: 25, height: 11 }} />
-                <TimePicker
-                  time={time.endTime}
-                  setTime={value => handleTimeChange(index, 'endTime', value)}
-                  placeholder="끝 시간"
-                />
-              </View>
-            ))}
           </View>
         </View>
       </ScrollView>
