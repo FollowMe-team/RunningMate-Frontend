@@ -119,7 +119,7 @@ const App = () => {
             gestureDirection: 'vertical',
           }}
         >
-          {isLoggedIn ? (
+          {!isLoggedIn ? (
             <>
               <Stack.Screen
                 name="Navigation"

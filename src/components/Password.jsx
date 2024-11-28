@@ -42,7 +42,6 @@ const PasswordInput = ({
       <Text style={[styles.title, titleStyle]}>{label}</Text>
       <View style={styles.inputContainer}>
         <TextInput
-          key={showPassword ? 'text' : 'password'}
           style={styles.input}
           secureTextEntry={!showPassword}
           value={value}
@@ -84,20 +83,17 @@ const PasswordInput = ({
 const styles = StyleSheet.create({
   bundle: {
     marginTop: 10,
-    marginBottom: 40,
-    marginHorizontal: 16,
+    marginBottom: 30,
     // padding: 20,
     borderBottomColor: '#E5E5E5',
   },
   title: {
     fontSize: 20,
     color: '#000',
-    paddingBottom: 6,
   },
-  inputContainer: {
-    width: '100%',
-  },
+  inputContainer: {},
   input: {
+    width: '100%',
     color: 'black',
     height: 50,
     borderRadius: 8,

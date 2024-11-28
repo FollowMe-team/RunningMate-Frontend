@@ -14,6 +14,8 @@ import AddressInput from '../../components/AddressInput';
 import api from '../../utils/api';
 import { useNavigation } from '@react-navigation/native';
 
+import ProfilePhotoPicker from '../../screens/setting/ProfilePhotoPicker';
+
 const runningCareer = [
   { label: '시작', value: 'BEGINNER' },
   { label: '1 ~ 3년차', value: '1-3' },
@@ -22,11 +24,16 @@ const runningCareer = [
 ];
 
 const Signup = () => {
+  const [photo, setPhoto] = useState(null);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [passwordError, setPasswordError] = useState('');
   const [confirmPasswordError, setConfirmPasswordError] = useState('');
+  const [isEmailChecked, setIsEmailChecked] = useState(false);
+  const [emailError, setEmailError] = useState('');
+  const [isNicknameChecked, setIsNicknameChecked] = useState(false);
+  const [nicknameError, setNicknameError] = useState('');
 
   const [address, setAddress] = useState('');
   const [year, setYear] = useState('');
@@ -36,6 +43,7 @@ const Signup = () => {
   const [experience, setExperience] = useState('');
   const [name, setName] = useState('');
   const [nickname, setNickname] = useState('');
+  const [info, setInfo] = useState('');
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const navigation = useNavigation();
@@ -69,6 +77,7 @@ const Signup = () => {
 
   const validateForm = () => {
     if (
+      photo &&
       email &&
       password &&
       confirmPassword &&
@@ -79,11 +88,47 @@ const Signup = () => {
       day &&
       experience &&
       !passwordError &&
-      !confirmPasswordError
+      !confirmPasswordError &&
+      isEmailChecked && // 이메일 중복 확인이 완료된 경우에만 활성화
+      isNicknameChecked // 닉네임 중복 확인이 완료된 경우에만 활성화
     ) {
       setIsButtonDisabled(false);
     } else {
       setIsButtonDisabled(true);
+    }
+  };
+
+  const handleEmailCheck = async () => {
+    try {
+      const response = await api.post('/auth/check-email', { email });
+      if (response.data.isAvailable) {
+        setIsEmailChecked(true);
+        setEmailError('');
+        alert('사용 가능한 이메일입니다.');
+      } else {
+        setIsEmailChecked(false);
+        setEmailError('이미 사용 중인 이메일입니다.');
+      }
+    } catch {
+      setIsEmailChecked(false);
+      setEmailError('이메일 확인 중 오류가 발생했습니다.');
+    }
+  };
+
+  const handleNicknameCheck = async () => {
+    try {
+      const response = await api.post('/auth/check-nickname', { nickname });
+      if (response.data.isAvailable) {
+        setIsNicknameChecked(true);
+        setNicknameError('');
+        alert('사용 가능한 닉네임입니다.');
+      } else {
+        setIsNicknameChecked(false);
+        setNicknameError('이미 사용 중인 닉네임입니다.');
+      }
+    } catch {
+      setIsNicknameChecked(false);
+      setNicknameError('닉네임 확인 중 오류가 발생했습니다.');
     }
   };
 
@@ -93,6 +138,7 @@ const Signup = () => {
 
     try {
       const response = await api.post('/auth/signup', {
+        profileUrl: photo,
         email,
         password,
         name,
@@ -117,15 +163,34 @@ const Signup = () => {
   return (
     <ScrollView>
       <View style={styles.container}>
-        <View style={styles.formContainer}>
+        <ProfilePhotoPicker photo={photo} setPhoto={setPhoto} />
+        <View style={[styles.formContainer, { marginTop: 20 }]}>
           <Text style={styles.formTitle}>이메일</Text>
-          <TextInput
-            placeholder="abcd@naver.com"
-            style={styles.input}
-            value={email}
-            onChangeText={setEmail}
-            placeholderTextColor="#9B9B9D"
-          />
+          <View style={styles.inputContainer}>
+            <TextInput
+              placeholder="abcd@naver.com"
+              style={[styles.input, { flex: 1 }]}
+              value={email}
+              onChangeText={text => {
+                setEmail(text);
+                setIsEmailChecked(false); // 이메일이 변경되면 중복 확인 상태를 초기화
+                setEmailError('');
+                validateForm();
+              }}
+              placeholderTextColor="#9B9B9D"
+            />
+            <TouchableOpacity
+              style={styles.emailCheckButton}
+              onPress={handleEmailCheck}
+            >
+              <Text style={styles.emailCheckButtonText}>중복 체크</Text>
+            </TouchableOpacity>
+          </View>
+          <View style={styles.errorContainer}>
+            {emailError ? (
+              <Text style={styles.errorText}>{emailError}</Text>
+            ) : null}
+          </View>
         </View>
         <PasswordInput
           label="비밀번호 입력"
@@ -249,16 +314,31 @@ const Signup = () => {
         </View>
         <View style={styles.formContainer}>
           <Text style={styles.formTitle}>닉네임</Text>
-          <TextInput
-            placeholder="ex) 길동이"
-            style={styles.input}
-            value={nickname}
-            onChangeText={text => {
-              setNickname(text);
-              validateForm();
-            }}
-            placeholderTextColor="#9B9B9D"
-          />
+          <View style={styles.inputContainer}>
+            <TextInput
+              placeholder="ex) 길동이"
+              style={[styles.input, { flex: 1 }]}
+              value={nickname}
+              onChangeText={text => {
+                setNickname(text);
+                setIsNicknameChecked(false); // 닉네임이 변경되면 중복 확인 상태를 초기화
+                setNicknameError('');
+                validateForm();
+              }}
+              placeholderTextColor="#9B9B9D"
+            />
+            <TouchableOpacity
+              style={styles.nicknameCheckButton}
+              onPress={handleNicknameCheck}
+            >
+              <Text style={styles.nicknameCheckButtonText}>중복 체크</Text>
+            </TouchableOpacity>
+          </View>
+          <View style={styles.errorContainer}>
+            {nicknameError ? (
+              <Text style={styles.errorText}>{nicknameError}</Text>
+            ) : null}
+          </View>
         </View>
         <View style={styles.formContainer}>
           <Text style={styles.formTitle}>거주지</Text>
@@ -286,6 +366,10 @@ const Signup = () => {
             itemTextStyle={{ color: '#101010' }} // 드롭다운 리스트 글자색 수정
             selectedTextStyle={{ color: '#101010' }} // 선택된 항목 글자색 수정
           />
+        </View>
+        <View style={styles.formContainer}>
+          <Text style={styles.formTitle}>한줄 소개</Text>
+          <TextInput style={styles.input} value={info} onChangeText={setInfo} />
         </View>
       </View>
       <View
@@ -331,13 +415,11 @@ const Signup = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginVertical: 50,
+    marginHorizontal: 20,
   },
   formContainer: {
-    width: '85%',
-    marginBottom: 20,
+    width: '100%',
+    marginBottom: 30,
   },
   formTitle: {
     color: '#101010',
@@ -353,7 +435,7 @@ const styles = StyleSheet.create({
     borderColor: '#D6D6D6',
     borderWidth: 1,
     borderRadius: 8,
-    padding: 16,
+    paddingHorizontal: 16,
   },
   genderSet: {
     flexDirection: 'row',
@@ -392,11 +474,8 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   errorContainer: {
-    position: 'absolute',
-    bottom: -20,
-    left: 0,
-    flexDirection: 'row',
-    alignItems: 'center',
+    height: 20, // 고정 높이 설정
+    justifyContent: 'center', // 수직 중앙 정렬
   },
   errorIcon: {
     width: 15,
@@ -471,6 +550,32 @@ const styles = StyleSheet.create({
   modalButtonText: {
     color: 'white',
     fontSize: 16,
+  },
+  emailCheckButton: {
+    position: 'absolute',
+    left: '77%',
+    backgroundColor: '#352555',
+    borderRadius: 32,
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    marginLeft: 10,
+  },
+  emailCheckButtonText: {
+    color: 'white',
+    fontSize: 10,
+  },
+  nicknameCheckButton: {
+    position: 'absolute',
+    left: '77%',
+    backgroundColor: '#352555',
+    borderRadius: 32,
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    marginLeft: 10,
+  },
+  nicknameCheckButtonText: {
+    color: 'white',
+    fontSize: 10,
   },
 });
 
