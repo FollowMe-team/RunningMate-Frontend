@@ -11,7 +11,7 @@ const CrewCard = ({ crew, onPress }) => {
     <TouchableOpacity style={styles.cardContainer} onPress={onPress}>
       <Image source={defaultProfileImage} style={{ width: 40, height: 40 }} />
       <View style={styles.cardInfoSet}>
-        <View style={{ flexDirection: 'row' }}>
+        <View style={{ flexDirection: 'row', marginBottom: 10 }}>
           <Text style={styles.cardTitle}>{crew.name}</Text>
           <Footprint experience={crew.footprint} />
         </View>
@@ -52,7 +52,7 @@ const styles = StyleSheet.create({
   cardTitle: {
     color: '#101010',
     fontSize: 14,
-    fontWeight: 'semibold',
+    fontWeight: 'bold',
     marginRight: 6,
   },
   cardBriefInfo: {
