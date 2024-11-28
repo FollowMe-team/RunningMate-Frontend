@@ -74,6 +74,7 @@ const styles = StyleSheet.create({
 
 CrewCard.propTypes = {
   crew: PropTypes.shape({
+    id: PropTypes.number.isRequired,
     name: PropTypes.string.isRequired,
     footprint: PropTypes.number.isRequired,
     brief: PropTypes.string.isRequired,
