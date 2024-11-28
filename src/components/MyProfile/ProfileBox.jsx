@@ -2,13 +2,16 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { View, Image, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { Bar } from 'react-native-progress';
+
+import Footprint from '../Footprint';
 
 import defaultProfileImage from '../../assets/images/Settings/profile.png';
 import nameImg from '../../assets/images/MyProfile/free-icon-business-12930954.png';
 import birthdayImg from '../../assets/images/MyProfile/free-icon-firecracker-3119764.png';
 import genderImg from '../../assets/images/MyProfile/free-icon-gender-fluid-2556165.png';
 import addressImg from '../../assets/images/MyProfile/free-icon-placeholder-149226.png';
-// import detail from "../../assets/images/MyProfile/free-icon-magnifier-2319177.png";
+import detail from '../../assets/images/MyProfile/free-icon-magnifier-2319177.png';
 
 const formatNumber = num => {
   if (num >= 1000000) {
@@ -104,6 +107,31 @@ const ProfileBox = ({ data }) => {
             <Text style={styles.runningLabel}>회</Text>
           </View>
         </View>
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            marginTop: 12,
+          }}
+        >
+          <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
+            <Text style={styles.detailValue}>나의 발걸음 지수</Text>
+            <Image source={detail} style={styles.icon} />
+          </View>
+          <Footprint experience={data.footprint} />
+        </View>
+        <View style={styles.barContainer}>
+          <Bar
+            progress={data.footprint / 100}
+            width={null}
+            height={20}
+            color="#4A9B8C"
+            unfilledColor="#BCBCBC"
+            borderWidth={0}
+            borderRadius={15}
+          />
+          <Text style={styles.barText}>{`${data.footprint} / 100`}</Text>
+        </View>
       </View>
     </View>
   );
@@ -170,6 +198,20 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginRight: 8,
   },
+  barContainer: {
+    position: 'relative',
+    height: 20,
+    marginTop: 5,
+  },
+  barText: {
+    position: 'absolute',
+    top: 3,
+    left: '60%',
+    transform: [{ translateX: -50 }],
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 10,
+  },
 });
 
 ProfileBox.propTypes = {
@@ -185,6 +227,7 @@ ProfileBox.propTypes = {
     address: PropTypes.string,
     running_distance: PropTypes.number,
     running_count: PropTypes.number,
+    footprint: PropTypes.number,
   }).isRequired,
 };
 

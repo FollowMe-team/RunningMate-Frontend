@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Switch } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
+import myprofile from '../../components/MyProfile/myprofileInfo.json';
+
 const Setting = () => {
   const navigation = useNavigation();
   const [isNotificationEnabled, setIsNotificationEnabled] = useState(false);
@@ -19,7 +21,9 @@ const Setting = () => {
         <View>
           <View style={styles.buttonDetail}>
             <Text style={styles.nonButton}>로그인 계정</Text>
-            <Text style={{ color: '#A8A5AF', fontSize: 13 }}>{}</Text>
+            <Text style={{ color: '#A8A5AF', fontSize: 13, paddingBottom: 19 }}>
+              {myprofile.login_id}
+            </Text>
           </View>
           <TouchableOpacity
             onPress={() => navigation.navigate('MyProfileChange')}
