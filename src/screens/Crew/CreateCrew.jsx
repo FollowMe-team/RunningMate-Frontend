@@ -12,9 +12,10 @@ import {
 import { Dropdown } from 'react-native-element-dropdown';
 import PropTypes from 'prop-types';
 import CrewPhotoPicker from '../../components/Crew/CrewPhotoPicker';
+import TimePicker from '../../components/TimePicker';
 
-import plus from '../../assets/images/Crew/plus.png';
-import minus from '../../assets/images/Crew/minus.png';
+// import plus from '../../assets/images/Crew/plus.png';
+// import minus from '../../assets/images/Crew/minus.png';
 import wave from '../../assets/images/Crew/wave.png';
 
 const CreateCrew = ({ navigation }) => {
@@ -34,23 +35,14 @@ const CreateCrew = ({ navigation }) => {
     // ... 다른 구/군들 ...
   ];
   const [openChatUrl, setOpenChatUrl] = useState('');
-  const [activityTimes, setActivityTimes] = useState([
-    { startTime: '', endTime: '' },
-  ]);
+  const [activityTime, setActivityTime] = useState({
+    startTime: null,
+    endTime: null,
+  });
   const [selectedDays, setSelectedDays] = useState([]);
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
   const [modalVisible, setModalVisible] = useState(false);
   const [photos, setPhotos] = useState([]);
-
-  const handleAddTime = () => {
-    setActivityTimes([...activityTimes, { startTime: '', endTime: '' }]);
-  };
-
-  const handleRemoveTime = () => {
-    if (activityTimes.length > 1) {
-      setActivityTimes(activityTimes.slice(0, -1));
-    }
-  };
 
   const handleDaySelect = day => {
     let updatedDays = [...selectedDays];
@@ -80,7 +72,9 @@ const CreateCrew = ({ navigation }) => {
       detailDescription &&
       city &&
       district &&
-      openChatUrl
+      openChatUrl &&
+      activityTime.startTime &&
+      activityTime.endTime
     ) {
       setIsButtonDisabled(false);
     } else {
@@ -220,69 +214,29 @@ const CreateCrew = ({ navigation }) => {
           </View>
         </View>
         <View style={styles.formContainer}>
-          <View
-            style={{ flexDirection: 'row', justifyContent: 'space-between' }}
-          >
-            <View style={styles.titleSet}>
-              <Text style={styles.title}>주 활동 시간대</Text>
-              <Text style={styles.subTitle}>(중복 선택 가능)</Text>
-            </View>
-            <View style={{ flexDirection: 'row' }}>
-              <TouchableOpacity
-                style={styles.plusButton}
-                onPress={handleAddTime}
-              >
-                <View>
-                  <Image source={plus} style={{ width: 11, height: 11 }} />
-                </View>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.minusButton}
-                onPress={handleRemoveTime}
-              >
-                <View>
-                  <Image source={minus} style={{ width: 10, height: 3 }} />
-                </View>
-              </TouchableOpacity>
-            </View>
+          <View style={styles.titleSet}>
+            <Text style={styles.title}>주 활동 시간대</Text>
+            <Text style={styles.subTitle}>(중복 선택 가능)</Text>
           </View>
-          {activityTimes.map((time, index) => (
-            <View key={index} style={styles.activityTimeDropdownLayout}>
-              <Dropdown
-                style={styles.timeDropdown}
-                data={[]}
-                labelField="label"
-                valueField="value"
-                placeholder="시작 시간 선택"
-                value={time.startTime}
-                onChange={item => {
-                  const newTimes = [...activityTimes];
-                  newTimes[index].startTime = item.value;
-                  setActivityTimes(newTimes);
-                }}
-                placeholderStyle={{ color: '#101010' }}
-                itemTextStyle={{ color: '#101010' }}
-                selectedTextStyle={{ color: '#101010' }}
-              />
-              <Image source={wave} style={{ width: 25, height: 11 }} />
-              <Dropdown
-                style={styles.timeDropdown}
-                data={[]}
-                labelField="label"
-                valueField="value"
-                placeholder="끝 시간 선택"
-                value={time.endTime}
-                onChange={item => {
-                  const newTimes = [...activityTimes];
-                  newTimes[index].endTime = item.value;
-                  setActivityTimes(newTimes);
-                }}
-                placeholderStyle={{ color: '#101010' }}
-                itemTextStyle={{ color: '#101010' }}
-                selectedTextStyle={{ color: '#101010' }}
-              />
-            </View>
-          ))}
+          <View style={styles.activityTimeDropdownLayout}>
+            <TimePicker
+              time={activityTime.startTime}
+              setTime={time => {
+                setActivityTime({ ...activityTime, startTime: time });
+                checkFormCompletion();
+              }}
+              placeholder="시작 시간 선택"
+            />
+            <Image source={wave} style={{ width: 25, height: 11 }} />
+            <TimePicker
+              time={activityTime.endTime}
+              setTime={time => {
+                setActivityTime({ ...activityTime, endTime: time });
+                checkFormCompletion();
+              }}
+              placeholder="끝 시간 선택"
+            />
+          </View>
         </View>
         <View style={styles.formContainer}>
           <Text style={styles.title}>
@@ -317,7 +271,7 @@ const CreateCrew = ({ navigation }) => {
 
       <Modal
         animationType="slide"
-        transparent={true}
+        transparent={false}
         visible={modalVisible}
         onRequestClose={() => setModalVisible(false)}
       >

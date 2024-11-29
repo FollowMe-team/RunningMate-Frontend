@@ -69,6 +69,11 @@ const Crew = () => {
     }
   }, [route.params?.searchParams]);
 
+  useEffect(() => {
+    // 크루 데이터가 변경되었을 때 다시 렌더링
+    setFilteredApplicableCrew(crewData.crew.filter(crew => !crew.is_my_crew));
+  }, [crewData]);
+
   const renderBackdrop = useCallback(
     props => (
       <BottomSheetBackdrop

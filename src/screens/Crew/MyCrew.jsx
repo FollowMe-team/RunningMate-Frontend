@@ -6,8 +6,11 @@ import {
   Image,
   Text,
   TouchableOpacity,
+  Modal,
+  Animated,
 } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
+import Header from '../../components/Header';
 
 import Calendars from '../../components/Calendars';
 import schedule from '../../components/Crew/schedule.json';
@@ -19,8 +22,25 @@ const MyCrew = () => {
   const route = useRoute();
   const navigation = useNavigation();
   const [selectedSchedule, setSelectedSchedule] = useState(null);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [confirmationModalVisible, setConfirmationModalVisible] =
+    useState(false);
+  const [fadeAnim] = useState(new Animated.Value(0));
+  const [confirmationFadeAnim] = useState(new Animated.Value(0));
 
   const crew = route.params?.crew;
+
+  React.useLayoutEffect(() => {
+    navigation.setOptions({
+      header: ({ navigation }) => (
+        <Header
+          title={crew.name}
+          navigation={navigation}
+          openChatUrl={crew.open_chat}
+        />
+      ),
+    });
+  }, [navigation, crew]);
 
   if (!crew) {
     return (
@@ -33,6 +53,45 @@ const MyCrew = () => {
   const handleDayPress = day => {
     const scheduleForDay = schedule.find(item => item.date === day.dateString);
     setSelectedSchedule(scheduleForDay || null);
+  };
+
+  const handleLeaveCrew = () => {
+    setModalVisible(true);
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 200,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const closeModal = () => {
+    Animated.timing(fadeAnim, {
+      toValue: 0,
+      duration: 200,
+      useNativeDriver: true,
+    }).start(() => setModalVisible(false));
+  };
+
+  const confirmLeaveCrew = () => {
+    closeModal();
+    setConfirmationModalVisible(true);
+    Animated.timing(confirmationFadeAnim, {
+      toValue: 1,
+      duration: 200,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const closeConfirmationModal = () => {
+    Animated.timing(confirmationFadeAnim, {
+      toValue: 0,
+      duration: 200,
+      useNativeDriver: true,
+    }).start(() => {
+      setConfirmationModalVisible(false);
+      crew.is_my_crew = false;
+      navigation.navigate('Crew');
+    });
   };
 
   return (
@@ -78,6 +137,55 @@ const MyCrew = () => {
               {}
             </View>
           </View>
+          <TouchableOpacity onPress={handleLeaveCrew} style={styles.button}>
+            <Text style={styles.buttonText}>크루 탈퇴</Text>
+          </TouchableOpacity>
+
+          <Modal
+            transparent={true}
+            visible={modalVisible}
+            onRequestClose={closeModal}
+          >
+            <View style={styles.modalBackground}>
+              <Animated.View
+                style={[styles.modalContainer, { opacity: fadeAnim }]}
+              >
+                <Text style={styles.modalText}>
+                  해당 크루를 탈퇴하시겠습니까?
+                </Text>
+                <View style={styles.modalButtonContainer}>
+                  <TouchableOpacity onPress={closeModal}>
+                    <Text style={styles.modalNoButtonText}>No</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={confirmLeaveCrew}>
+                    <Text style={styles.modalYesButtonText}>Yes</Text>
+                  </TouchableOpacity>
+                </View>
+              </Animated.View>
+            </View>
+          </Modal>
+
+          <Modal
+            transparent={true}
+            visible={confirmationModalVisible}
+            onRequestClose={closeConfirmationModal}
+          >
+            <View style={styles.modalBackground}>
+              <Animated.View
+                style={[
+                  styles.modalContainer,
+                  { opacity: confirmationFadeAnim },
+                ]}
+              >
+                <Text style={styles.modalText}>
+                  해당 크루를 탈퇴하셨습니다.
+                </Text>
+                <TouchableOpacity onPress={closeConfirmationModal}>
+                  <Text style={styles.modalYesButtonText}>OK</Text>
+                </TouchableOpacity>
+              </Animated.View>
+            </View>
+          </Modal>
         </View>
       </View>
     </ScrollView>
@@ -87,6 +195,7 @@ const MyCrew = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    marginBottom: 50,
   },
   errorContainer: {
     flex: 1,
@@ -148,6 +257,57 @@ const styles = StyleSheet.create({
   crewScheduleDetail: {
     width: '100%',
     marginBottom: 20,
+  },
+  button: {
+    width: '30%',
+    height: 50,
+    backgroundColor: '#FF0000',
+    justifyContent: 'center',
+    alignItems: 'center',
+    alignSelf: 'flex-end',
+    borderRadius: 10,
+    marginBottom: 20,
+  },
+  buttonText: {
+    color: 'white',
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
+  modalBackground: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContainer: {
+    width: 250,
+    paddingHorizontal: 20,
+    paddingVertical: 30,
+    backgroundColor: 'white',
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  modalText: {
+    fontSize: 12,
+    fontWeight: 'bold',
+    color: '#959393',
+    textAlign: 'center',
+    marginBottom: 50,
+  },
+  modalButtonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    width: '100%',
+  },
+  modalNoButtonText: {
+    fontSize: 12,
+    fontWeight: 'bold',
+    color: 'black',
+  },
+  modalYesButtonText: {
+    fontSize: 12,
+    fontWeight: 'bold',
+    color: '#00C81B',
   },
 });
 

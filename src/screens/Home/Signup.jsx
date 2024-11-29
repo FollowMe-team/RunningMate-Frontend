@@ -390,18 +390,17 @@ const Signup = () => {
       <Modal
         visible={isModalVisible}
         transparent={true}
-        animationType="slide"
+        animationType="fade"
         onRequestClose={() => setIsModalVisible(false)}
       >
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
+        <View style={styles.modalBackground}>
+          <View style={styles.modalContainer}>
             <Text style={styles.modalText}>회원 가입에 성공하였습니다!</Text>
             <TouchableOpacity
               onPress={() => {
                 setIsModalVisible(false);
                 navigation.navigate('Login');
               }}
-              style={styles.modalButton}
             >
               <Text style={styles.modalButtonText}>OK</Text>
             </TouchableOpacity>
@@ -525,31 +524,31 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
   },
-  modalContainer: {
+  modalBackground: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
-  modalContent: {
-    width: 300,
-    padding: 20,
+  modalContainer: {
+    width: 250,
+    paddingHorizontal: 20,
+    paddingVertical: 30,
     backgroundColor: 'white',
     borderRadius: 10,
     alignItems: 'center',
   },
   modalText: {
-    fontSize: 18,
-    marginBottom: 20,
-  },
-  modalButton: {
-    backgroundColor: '#73D393',
-    padding: 10,
-    borderRadius: 5,
+    fontSize: 12,
+    fontWeight: 'bold',
+    color: '#959393',
+    textAlign: 'center',
+    marginBottom: 50,
   },
   modalButtonText: {
-    color: 'white',
-    fontSize: 16,
+    fontSize: 12,
+    fontWeight: 'bold',
+    color: '#00C81B',
   },
   emailCheckButton: {
     position: 'absolute',
