@@ -105,7 +105,7 @@ const CrewPhotoPicker = ({ photos, setPhotos }) => {
           <Text style={styles.photoText}>대표 이미지 사진</Text>
         )}
       </TouchableOpacity>
-      <TouchableOpacity onPress={showActionSheet} style={styles.photoSet}>
+      {/* <TouchableOpacity onPress={showActionSheet} style={styles.photoSet}>
         {photos.length > 0 ? (
           <>
             <Image source={{ uri: photos[0] }} style={styles.photo} />
@@ -123,7 +123,7 @@ const CrewPhotoPicker = ({ photos, setPhotos }) => {
         ) : (
           <Text style={styles.photoText}>크루 활동 사진</Text>
         )}
-      </TouchableOpacity>
+      </TouchableOpacity> */}
 
       <ActionSheet id="photoPickerSheet">
         <View style={styles.actionSheetContent}>

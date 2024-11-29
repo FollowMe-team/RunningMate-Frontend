@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { View, Image, Text, StyleSheet } from 'react-native';
+import { View, Image, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 
 import defaultProfileImage from '../../assets/images/Settings/profile.png';
 import nameImg from '../../assets/images/MyProfile/free-icon-business-12930954.png';
@@ -19,6 +20,7 @@ const formatNumber = num => {
 };
 
 const ProfileBox = ({ data }) => {
+  const navigation = useNavigation();
   return (
     <View style={styles.container}>
       <View style={styles.infoContainer}>
@@ -39,18 +41,24 @@ const ProfileBox = ({ data }) => {
             marginBottom: 7,
           }}
         >
-          <View style={styles.detailsContainer}>
+          <TouchableOpacity
+            onPress={() => navigation.navigate('FollowerList')}
+            style={styles.detailsContainer}
+          >
             <Text style={styles.detailLabel}>팔로워</Text>
             <Text style={styles.detailValue}>
               {formatNumber(data.follower)}
             </Text>
-          </View>
-          <View style={styles.detailsContainer}>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => navigation.navigate('FollowingList')}
+            style={styles.detailsContainer}
+          >
             <Text style={styles.detailLabel}>팔로잉</Text>
             <Text style={styles.detailValue}>
               {formatNumber(data.following)}
             </Text>
-          </View>
+          </TouchableOpacity>
         </View>
         <View
           style={{
