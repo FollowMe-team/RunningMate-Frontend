@@ -1,5 +1,13 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Switch } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Switch,
+  Modal,
+  ToastAndroid,
+} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
 import myprofile from '../../components/MyProfile/myprofileInfo.json';
@@ -8,11 +16,18 @@ const Setting = () => {
   const navigation = useNavigation();
   const [isNotificationEnabled, setIsNotificationEnabled] = useState(false);
   const [isVibrationEnabled, setIsVibrationEnabled] = useState(false);
+  const [isModalVisible, setIsModalVisible] = useState(false);
 
   const toggleNotificationSwitch = () =>
     setIsNotificationEnabled(previousState => !previousState);
   const toggleVibrationSwitch = () =>
     setIsVibrationEnabled(previousState => !previousState);
+
+  const handleLogout = () => {
+    setIsModalVisible(false);
+    ToastAndroid.show('성공적으로 로그아웃하셨습니다.', ToastAndroid.SHORT);
+    navigation.navigate('Login');
+  };
 
   return (
     <View style={styles.container}>
@@ -75,11 +90,31 @@ const Setting = () => {
           <TouchableOpacity onPress={() => navigation.navigate('Withdrawal')}>
             <Text style={{ color: 'red', fontSize: 15 }}>회원탈퇴</Text>
           </TouchableOpacity>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={() => setIsModalVisible(true)}>
             <Text style={{ color: '#A8A5AF', fontSize: 15 }}>로그아웃</Text>
           </TouchableOpacity>
         </View>
       </View>
+
+      <Modal
+        transparent={true}
+        visible={isModalVisible}
+        onRequestClose={() => setIsModalVisible(false)}
+      >
+        <View style={styles.modalBackground}>
+          <View style={styles.modalContainer}>
+            <Text style={styles.modalText}>정말 로그아웃하시겠습니까?</Text>
+            <View style={styles.modalButtonContainer}>
+              <TouchableOpacity onPress={() => setIsModalVisible(false)}>
+                <Text style={styles.modalNoButtonText}>No</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={handleLogout}>
+                <Text style={styles.modalYesButtonText}>Yes</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -116,6 +151,42 @@ const styles = StyleSheet.create({
   resignNLogout: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+  },
+  modalBackground: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContainer: {
+    width: 250,
+    paddingHorizontal: 20,
+    paddingVertical: 30,
+    backgroundColor: 'white',
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  modalText: {
+    fontSize: 12,
+    fontWeight: 'bold',
+    color: '#959393',
+    textAlign: 'center',
+    marginBottom: 50,
+  },
+  modalButtonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    width: '100%',
+  },
+  modalNoButtonText: {
+    fontSize: 12,
+    fontWeight: 'bold',
+    color: 'black',
+  },
+  modalYesButtonText: {
+    fontSize: 12,
+    fontWeight: 'bold',
+    color: '#00C81B',
   },
 });
 

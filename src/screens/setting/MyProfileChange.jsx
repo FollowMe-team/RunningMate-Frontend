@@ -11,13 +11,13 @@ import {
 } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import PropTypes from 'prop-types';
-import RNPickerSelect from 'react-native-picker-select';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Dropdown } from 'react-native-element-dropdown';
+import api from '../../utils/api';
 
 import ProfilePhotoPicker from './ProfilePhotoPicker';
 import calendarIcon from '../../assets/images/Settings/free-icon-calendar-8786347.png';
-import down from '../../assets/images/Settings/free-icon-down-arrow-748063.png';
 import AddressInput from '../../components/AddressInput';
 
 const MyProfileChange = () => {
@@ -31,6 +31,7 @@ const MyProfileChange = () => {
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [nicknameError, setNicknameError] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
+  const [isNicknameChecked, setIsNicknameChecked] = useState(false);
 
   useEffect(() => {
     const loadProfile = async () => {
@@ -58,6 +59,23 @@ const MyProfileChange = () => {
     setAddress(newAddress);
   };
 
+  const handleNicknameCheck = async () => {
+    try {
+      const response = await api.post('/auth/check-nickname', { nickname });
+      if (response.data.isAvailable) {
+        setIsNicknameChecked(true);
+        setNicknameError('');
+        alert('사용 가능한 닉네임입니다.');
+      } else {
+        setIsNicknameChecked(false);
+        setNicknameError('이미 사용 중인 닉네임입니다.');
+      }
+    } catch {
+      setIsNicknameChecked(false);
+      setNicknameError('닉네임 확인 중 오류가 발생했습니다.');
+    }
+  };
+
   const validateNickname = nickname => {
     const nicknameRegex = /^.{2,12}$/; // 2자리 이상 12자리 이하
     if (!nicknameRegex.test(nickname)) {
@@ -66,10 +84,14 @@ const MyProfileChange = () => {
       setNicknameError('');
     }
     setNickname(nickname);
+    setIsNicknameChecked(false); // 닉네임이 변경되면 중복 확인 상태를 초기화
   };
 
   const handleProfileChange = async () => {
-    // 프로필 정보 변경 로직 추가
+    if (!isNicknameChecked) {
+      setNicknameError('닉네임 중복 체크를 해주세요.');
+      return;
+    }
     const updatedProfile = {
       profile_url: photo,
       nickname,
@@ -100,6 +122,12 @@ const MyProfileChange = () => {
             value={nickname}
             onChangeText={validateNickname}
           />
+          <TouchableOpacity
+            style={styles.nicknameCheckButton}
+            onPress={handleNicknameCheck}
+          >
+            <Text style={styles.nicknameCheckButtonText}>중복 체크</Text>
+          </TouchableOpacity>
           {nicknameError ? (
             <Text style={styles.errorText}>{nicknameError}</Text>
           ) : null}
@@ -130,20 +158,21 @@ const MyProfileChange = () => {
         </View>
         <View style={styles.bundleHalf}>
           <Text style={styles.title}>성별</Text>
-          <View style={styles.pickerContainer}>
-            <RNPickerSelect
-              value={gender}
-              onValueChange={value => setGender(value)}
-              items={[
-                { label: '남', value: '남' },
-                { label: '여', value: '여' },
-              ]}
-              style={pickerSelectStyles}
-              Icon={() => {
-                return <Image source={down} style={styles.pickerIcon} />;
-              }}
-            />
-          </View>
+          <Dropdown
+            style={styles.dropdown}
+            data={[
+              { label: '남', value: '남' },
+              { label: '여', value: '여' },
+            ]}
+            labelField="label"
+            valueField="value"
+            placeholder="성별 선택"
+            value={gender}
+            onChange={item => setGender(item.value)}
+            placeholderStyle={{ color: '#101010' }}
+            itemTextStyle={{ color: '#101010' }}
+            selectedTextStyle={{ color: '#101010' }}
+          />
         </View>
       </View>
       <View style={styles.bundle}>
@@ -314,35 +343,25 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#00C81B',
   },
-});
-
-const pickerSelectStyles = StyleSheet.create({
-  inputIOS: {
+  nicknameCheckButton: {
+    position: 'absolute',
+    right: 10,
+    top: 8,
+    backgroundColor: '#352555',
+    borderRadius: 32,
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+  },
+  nicknameCheckButtonText: {
+    color: 'white',
+    fontSize: 10,
+  },
+  dropdown: {
     height: 50,
-    borderRadius: 8,
     borderColor: '#D6D6D6',
     borderWidth: 1,
-    paddingHorizontal: 10,
-    color: 'black',
-  },
-  inputAndroid: {
-    height: 50,
     borderRadius: 8,
-    borderColor: '#D6D6D6',
-    borderWidth: 1,
-    paddingHorizontal: 10,
-    color: 'black',
-  },
-  iconContainer: {
-    top: 15,
-    right: 15,
-  },
-  placeholder: {
-    color: 'black',
-  },
-  done: {
-    borderTopColor: '#D6D6D6',
-    borderTopWidth: 1,
+    padding: 16,
   },
 });
 
