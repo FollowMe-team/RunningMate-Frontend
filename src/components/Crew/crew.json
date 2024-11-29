@@ -3,6 +3,11 @@
     {
       "id": 1,
       "name": "Captain",
+      "profile_url": [
+        "https://s3.ap-northeast-2.amazonaws.com/img.kormedi.com/news/article/__icsFiles/artimage/2017/04/21/c_km601/run540.jpg",
+        "https://cdn.ceopartners.co.kr/news/photo/202102/11284_54269_5733.jpg",
+        "https://www.canceranswer.co.kr/news/photo/202008/1086_1661_5426.jpg"
+      ],
       "footprint": 86,
       "brief": "The captain is the leader of the crew.",
       "number": 15,
@@ -20,6 +25,11 @@
     {
       "id": 2,
       "name": "First Mate",
+      "profile_url": [
+        "https://cdn.mindgil.com/news/photo/202009/69795_4370_1604.jpg",
+        "https://cdn.healthlifeherald.com/news/photo/202408/1063_1767_5117.jpg",
+        "https://cdn.kormedi.com/wp-content/uploads/2019/11/nd3000-580x387.jpg"
+      ],
       "footprint": 71,
       "brief": "The first mate is the captain's right-hand person.",
       "number": 10,
@@ -37,6 +47,11 @@
     {
       "id": 3,
       "name": "Second Mate",
+      "profile_url": [
+        "https://cdn.digitaltoday.co.kr/news/photo/202407/525178_489686_5420.jpg",
+        "https://flexible.img.hani.co.kr/flexible/normal/970/515/imgdb/original/2024/1010/20241010504310.jpg",
+        "https://cdn.news.hidoc.co.kr/news/photo/202211/28629_68507_0358.jpg"
+      ],
       "footprint": 65,
       "brief": "The second mate is the captain's left-hand person.",
       "number": 5,
@@ -55,6 +70,12 @@
       "id": 4,
       "name": "Boatswain",
       "footprint": 94,
+      "profile_url": [
+        "https://dqwc99gnfppi1.cloudfront.net/media/job/article/2020-11-19_104558_cover_KakaoTalk_20201117_175339258_05.png",
+        "https://healthcarejournal.co.kr/boardImage/healthcarejournal/20240215/MC40NjM0OTQwMCAxNzA3OTkzNzAy.jpeg",
+        "https://cdn.hankyung.com/photo/202406/99.37019348.1.jpg",
+        "https://techrecipe.co.kr/wp-content/uploads/2019/11/191110_jogging_running_001.jpg"
+      ],
       "brief": "The boatswain is responsible for the ship's equipment.",
       "number": 20,
       "description": "The boatswain is responsible for the ship's equipment. They are in charge of the crew's safety equipment.",
@@ -71,6 +92,13 @@
     {
       "id": 5,
       "name": "Carpenter",
+      "profile_url": [
+        "https://thumb.mt.co.kr/06/2019/11/2019112811181537259_1.jpg/dims/optimize/",
+        "https://mblogthumb-phinf.pstatic.net/MjAyMjAyMjJfMjYg/MDAxNjQ1NDk2NzU5MTAx.zrXj5Y5KFfHTVTZwKVF-uk37NUnu0TWlamNRlGqbF8Ug.igqvmK_MVMXw8rmqZIQhSQZSPYxT16EayQD2Au9rYdgg.PNG.l_heo/3.png?type=w800",
+        "https://thumbnews.nateimg.co.kr/view610///news.nateimg.co.kr/orgImg/kr/2024/06/05/ck-cb047029866-l-700x467.jpg",
+        "https://imagescdn.gettyimagesbank.com/500/202104/jv12269915.jpg",
+        "https://newsimg-hams.hankookilbo.com/2024/10/14/c867fec5-83e9-4141-928e-d6f7490e2871.jpg"
+      ],
       "footprint": 76,
       "brief": "The carpenter is responsible for the ship's structure.",
       "number": 10,

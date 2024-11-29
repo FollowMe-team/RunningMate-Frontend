@@ -24,6 +24,7 @@ import FollowerList from './src/screens/MyProfile/FollowerList';
 import FollowingList from './src/screens/MyProfile/FollowingList';
 import CrewInformation from './src/components/Crew/CrewInformation';
 import CrewApplicant from './src/screens/Crew/CrewApplicant';
+import CrewSearchResult from './src/screens/Crew/CrewSearchResult';
 
 // StatusBar 투명하게 설정
 StatusBar.setBackgroundColor('transparent');
@@ -142,13 +143,24 @@ const App = () => {
                 options={{ headerShown: false }}
               />
               <Stack.Screen
+                name="CrewSearchResult"
+                component={CrewSearchResult}
+                options={{
+                  title: '크루 검색 결과',
+                  header: ({ navigation }) => (
+                    <Header title="크루 검색 결과" navigation={navigation} />
+                  ),
+                  headerShown: true,
+                }}
+              />
+              <Stack.Screen
                 name="MyCrew"
                 component={MyCrew}
                 options={({ route }) => ({
-                  title: route.params.crewName,
+                  title: route.params.crew.name,
                   header: ({ navigation }) => (
                     <Header
-                      title={route.params.crewName}
+                      title={route.params.crew.name}
                       navigation={navigation}
                     />
                   ),

@@ -4,11 +4,10 @@ import {
   Text,
   StyleSheet,
   ScrollView,
-  Image,
   TouchableOpacity,
 } from 'react-native';
+import CrewActivityPicture from '../Crew/CrewActivityPicture';
 
-import profile from '../../assets/images/Settings/profile.png';
 import { useRoute } from '@react-navigation/native';
 import Footprint from '../Footprint';
 
@@ -18,18 +17,9 @@ const CrewInformation = () => {
 
   return (
     <ScrollView>
+      <CrewActivityPicture profileUrls={crew.profile_url} />
       <View style={styles.container}>
         <View style={styles.profileForm}>
-          <Image
-            source={profile}
-            style={{
-              width: 100,
-              height: 100,
-              borderRadius: 50,
-              alignSelf: 'center',
-              marginTop: 20,
-            }}
-          />
           <View
             style={{
               flexDirection: 'row',

@@ -7,17 +7,28 @@ import {
   Text,
   TouchableOpacity,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 
 import Calendars from '../../components/Calendars';
 import schedule from '../../components/Crew/schedule.json';
 
 import add from '../../assets/images/Crew/icons8-help.png';
-import profile from '../../assets/images/Settings/profile.png';
+import CrewActivityPicture from '../../components/Crew/CrewActivityPicture';
 
 const MyCrew = () => {
-  const [selectedSchedule, setSelectedSchedule] = useState(null);
+  const route = useRoute();
   const navigation = useNavigation();
+  const [selectedSchedule, setSelectedSchedule] = useState(null);
+
+  const crew = route.params?.crew;
+
+  if (!crew) {
+    return (
+      <View style={styles.errorContainer}>
+        <Text style={styles.errorText}>크루 정보를 불러올 수 없습니다.</Text>
+      </View>
+    );
+  }
 
   const handleDayPress = day => {
     const scheduleForDay = schedule.find(item => item.date === day.dateString);
@@ -26,8 +37,8 @@ const MyCrew = () => {
 
   return (
     <ScrollView>
+      <CrewActivityPicture profileUrls={crew.profile_url} />
       <View style={styles.container}>
-        <Image source={profile} style={styles.profileImg} />
         <View style={{ marginHorizontal: 20 }}>
           <View style={styles.crewScheduleLayout}>
             <Text style={styles.mainTitle}>크루 일정</Text>
@@ -77,10 +88,14 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  profileImg: {
-    width: '100%',
-    height: 140,
-    marginBottom: 24,
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  errorText: {
+    fontSize: 18,
+    color: 'red',
   },
   crewScheduleLayout: {
     flexDirection: 'column',
