@@ -30,7 +30,7 @@ const MyProfileChange = () => {
   const [address, setAddress] = useState('');
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [nicknameError, setNicknameError] = useState('');
-  const [isModalVisible, setModalVisible] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
 
   useEffect(() => {
     const loadProfile = async () => {
@@ -157,17 +157,17 @@ const MyProfileChange = () => {
       </View>
 
       <Modal
-        visible={isModalVisible}
         transparent={true}
-        animationType="fade"
+        visible={modalVisible}
         onRequestClose={closeModal}
+        animationType="fade"
       >
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
+        <View style={styles.modalBackground}>
+          <View style={styles.modalContainer}>
             <Text style={styles.modalText}>
               마이 프로필 변경이 완료되었어요!
             </Text>
-            <TouchableOpacity onPress={closeModal} style={styles.modalButton}>
+            <TouchableOpacity onPress={closeModal}>
               <Text style={styles.modalButtonText}>확인</Text>
             </TouchableOpacity>
           </View>
@@ -288,33 +288,31 @@ const styles = StyleSheet.create({
     color: 'red',
     fontSize: 14,
   },
-  modalContainer: {
+  modalBackground: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
-  modalContent: {
-    width: '80%',
+  modalContainer: {
+    width: 250,
+    paddingHorizontal: 20,
+    paddingVertical: 30,
     backgroundColor: 'white',
-    padding: 20,
     borderRadius: 10,
     alignItems: 'center',
   },
   modalText: {
-    color: 'black',
-    fontSize: 18,
-    marginBottom: 20,
-  },
-  modalButton: {
-    backgroundColor: '#73D393',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 5,
+    fontSize: 12,
+    fontWeight: 'bold',
+    color: '#959393',
+    textAlign: 'center',
+    marginBottom: 50,
   },
   modalButtonText: {
-    color: 'white',
-    fontSize: 16,
+    fontSize: 12,
+    fontWeight: 'bold',
+    color: '#00C81B',
   },
 });
 

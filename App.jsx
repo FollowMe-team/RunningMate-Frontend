@@ -4,6 +4,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { StatusBar, BackHandler, ToastAndroid, StyleSheet } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { WebView } from 'react-native-webview';
 
 import Login from './src/screens/Home/Login';
 import Signup from './src/screens/Home/Signup';
@@ -25,6 +26,21 @@ import FollowingList from './src/screens/MyProfile/FollowingList';
 import CrewInformation from './src/components/Crew/CrewInformation';
 import CrewApplicant from './src/screens/Crew/CrewApplicant';
 import CrewSearchResult from './src/screens/Crew/CrewSearchResult';
+
+import PropTypes from 'prop-types';
+
+const WebViewScreen = ({ route }) => {
+  const { url } = route.params;
+  return <WebView source={{ uri: url }} />;
+};
+
+WebViewScreen.propTypes = {
+  route: PropTypes.shape({
+    params: PropTypes.shape({
+      url: PropTypes.string.isRequired,
+    }).isRequired,
+  }).isRequired,
+};
 
 // StatusBar 투명하게 설정
 StatusBar.setBackgroundColor('transparent');
@@ -290,6 +306,11 @@ const App = () => {
               />
               {/* <Stack.Screen name="Crew" component={Crew} /> */}
               <Stack.Screen name="CrewSearch" component={CrewSearch} />
+              <Stack.Screen
+                name="WebViewScreen"
+                component={WebViewScreen}
+                options={{ headerShown: false }}
+              />
             </>
           ) : (
             <>

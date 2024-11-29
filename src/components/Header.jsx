@@ -8,10 +8,12 @@ import {
   Animated,
 } from 'react-native';
 import PropTypes from 'prop-types';
+
 import back from '../assets/images/NaviIcon/left.png';
 import settingsIcon from '../assets/images/NaviIcon/web-settings.png';
+import kakao from '../assets/images/Crew/bubble-chat.png';
 
-const Header = ({ title, navigation }) => {
+const Header = ({ title, navigation, openChatUrl }) => {
   const scaleValue = useRef(new Animated.Value(1)).current;
 
   const handlePressIn = () => {
@@ -57,9 +59,11 @@ const Header = ({ title, navigation }) => {
         </Animated.View>
       </TouchableOpacity>
       <Text style={styles.headerTitle}>{title}</Text>
-      {hideSettingButton && (
+      {openChatUrl ? (
         <TouchableOpacity
-          onPress={() => navigation.navigate('Setting')}
+          onPress={() =>
+            navigation.navigate('WebViewScreen', { url: openChatUrl })
+          }
           onPressIn={handlePressIn}
           onPressOut={handlePressOut}
           style={styles.settingButton}
@@ -71,9 +75,28 @@ const Header = ({ title, navigation }) => {
               { transform: [{ scale: scaleValue }] },
             ]}
           >
-            <Image source={settingsIcon} style={styles.settingIcon} />
+            <Image source={kakao} style={styles.settingIcon} />
           </Animated.View>
         </TouchableOpacity>
+      ) : (
+        hideSettingButton && (
+          <TouchableOpacity
+            onPress={() => navigation.navigate('Setting')}
+            onPressIn={handlePressIn}
+            onPressOut={handlePressOut}
+            style={styles.settingButton}
+            activeOpacity={0.7}
+          >
+            <Animated.View
+              style={[
+                styles.settingButtonCircle,
+                { transform: [{ scale: scaleValue }] },
+              ]}
+            >
+              <Image source={settingsIcon} style={styles.settingIcon} />
+            </Animated.View>
+          </TouchableOpacity>
+        )
       )}
     </View>
   );
@@ -82,6 +105,7 @@ const Header = ({ title, navigation }) => {
 Header.propTypes = {
   title: PropTypes.string.isRequired,
   navigation: PropTypes.object.isRequired,
+  openChatUrl: PropTypes.string,
 };
 
 const styles = StyleSheet.create({

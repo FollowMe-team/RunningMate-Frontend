@@ -13,7 +13,6 @@ import TimePicker from '../../components/TimePicker';
 import { useNavigation } from '@react-navigation/native';
 import schedule from '../../components/Crew/schedule.json';
 
-import search from '../../assets/images/Crew/searching.png';
 import wave from '../../assets/images/Crew/wave.png';
 
 const CrewScheduleRegister = () => {
@@ -69,16 +68,6 @@ const CrewScheduleRegister = () => {
   return (
     <ScrollView>
       <View style={styles.container}>
-        <View style={styles.headerInputContainer}>
-          <TouchableOpacity onPress={() => {}}>
-            <Image source={search} style={styles.searchIcon} />
-          </TouchableOpacity>
-          <TextInput
-            placeholder="코스 검색"
-            style={styles.headerInput}
-            placeholderTextColor="#9B9B9D"
-          />
-        </View>
         <View style={styles.crewScheduleBox}>
           <Text style={styles.crewScheduleText}>코스 즐겨찾기</Text>
           {/* 코스 즐겨찾기 내용 */}
@@ -169,32 +158,13 @@ const styles = StyleSheet.create({
     flex: 1,
     marginHorizontal: 20,
   },
-  headerInputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderRadius: 15,
-    borderWidth: 1,
-    borderColor: '#909090',
-    paddingLeft: 10,
-    marginTop: 20,
-    marginBottom: 42,
-  },
-  searchIcon: {
-    width: 20,
-    height: 20,
-    marginRight: 10,
-  },
-  headerInput: {
-    color: 'black',
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
   crewScheduleBox: {
     alignItems: 'center',
     padding: 15,
     borderColor: '#EEEEEE',
     borderWidth: 1,
     borderRadius: 15,
+    marginTop: 20,
     marginBottom: 20,
   },
   crewScheduleText: {
