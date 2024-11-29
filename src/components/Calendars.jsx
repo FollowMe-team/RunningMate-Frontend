@@ -38,9 +38,7 @@ const Calendars = ({ onDayPress, dataSource }) => {
         selected: false,
         selectedColor: undefined,
         selectedTextColor: undefined,
-        dotColor: dataSource.some(record => record.date === selectedDate)
-          ? 'black'
-          : undefined,
+        dotColor: 'black',
       };
     }
     newMarkedDates[day.dateString] = {
@@ -48,9 +46,7 @@ const Calendars = ({ onDayPress, dataSource }) => {
       selected: true,
       selectedColor: '#73D393',
       selectedTextColor: 'white',
-      dotColor: dataSource.some(record => record.date === day.dateString)
-        ? 'white'
-        : undefined,
+      dotColor: 'white',
     };
     setSelectedDate(day.dateString);
     setMarkedDates(newMarkedDates);

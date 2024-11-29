@@ -24,7 +24,7 @@ import PropTypes from 'prop-types';
 const CrewSearchHeader = ({ searchParams, setSearchParams }) => {
   const navigation = useNavigation();
   const handleSearch = () => {
-    navigation.navigate('Crew', { searchParams });
+    navigation.navigate('Crew', { searchParams, type: 'search' });
   };
 
   return (

@@ -13,22 +13,25 @@ import {
   BottomSheetBackdrop,
   BottomSheetModalProvider,
 } from '@gorhom/bottom-sheet';
-import { useNavigation, useRoute } from '@react-navigation/native'; // 추가
+import { useNavigation, useRoute } from '@react-navigation/native';
 
 import CreateCrewButton from '../../components/Crew/CreateCrewButton';
-import CrewCard from '../../components/Crew/CrewCard';
+import MyCrewList from '../../components/Crew/MyCrewList';
+import ApplicableCrewList from '../../components/Crew/ApplicableCrewList';
 import crewData from '../../components/Crew/crew.json';
 import search from '../../assets/images/Crew/searching.png';
 
 const Crew = () => {
-  const navigation = useNavigation(); // 추가
-  const route = useRoute(); // 추가
+  const navigation = useNavigation();
+  const route = useRoute();
   const bottomSheetRef = useRef(null);
   const snapPoints = ['70%'];
-  const [filteredCrew, setFilteredCrew] = useState(crewData.crew); // 추가
+  const [filteredApplicableCrew, setFilteredApplicableCrew] = useState(
+    crewData.crew.filter(crew => !crew.is_my_crew),
+  );
 
   useEffect(() => {
-    if (route.params?.searchParams) {
+    if (route.params?.type === 'search' && route.params?.searchParams) {
       const { name, location, week, startTime, endTime, footprint } =
         route.params.searchParams;
       const filtered = crewData.crew.filter(crew => {
@@ -58,20 +61,13 @@ const Crew = () => {
           matchesLocation &&
           matchesWeek &&
           matchesTime &&
-          matchesFootprint
+          matchesFootprint &&
+          !crew.is_my_crew
         );
       });
-      setFilteredCrew(filtered);
+      setFilteredApplicableCrew(filtered);
     }
   }, [route.params?.searchParams]);
-
-  const handleCrewPress = useCallback(
-    crewName => {
-      // 수정
-      navigation.navigate('MyCrew', { crewName }); // 수정
-    },
-    [navigation],
-  );
 
   const renderBackdrop = useCallback(
     props => (
@@ -84,16 +80,8 @@ const Crew = () => {
     [],
   );
 
-  const renderCrewList = isMyCrew => {
-    return filteredCrew
-      .filter(crew => crew.is_my_crew === isMyCrew)
-      .map(crew => (
-        <CrewCard
-          key={crew.id}
-          crew={crew}
-          onPress={() => handleCrewPress(crew.name)}
-        /> // 수정
-      ));
+  const handleCrewPress = crew => {
+    navigation.navigate('CrewInformation', { crew });
   };
 
   return (
@@ -106,7 +94,9 @@ const Crew = () => {
               <Text style={styles.title}>내 크루 목록</Text>
               <TouchableOpacity style={styles.sortingButton}></TouchableOpacity>
             </View>
-            <View style={styles.listBundle}>{renderCrewList(true)}</View>
+            <MyCrewList
+              crewData={crewData.crew.filter(crew => crew.is_my_crew)}
+            />
           </View>
           <View style={styles.dividingLine} />
           <View style={styles.crewListSet}>
@@ -119,7 +109,10 @@ const Crew = () => {
                 <Image source={search} style={styles.searchIcon} />
               </TouchableOpacity>
             </View>
-            <View style={styles.listBundle}>{renderCrewList(false)}</View>
+            <ApplicableCrewList
+              crewData={filteredApplicableCrew}
+              onCrewPress={handleCrewPress}
+            />
           </View>
         </ScrollView>
 
