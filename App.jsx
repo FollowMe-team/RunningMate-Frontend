@@ -119,7 +119,7 @@ const App = () => {
             gestureDirection: 'vertical',
           }}
         >
-          {!isLoggedIn ? (
+          {isLoggedIn ? (
             <>
               <Stack.Screen
                 name="Navigation"
@@ -157,10 +157,10 @@ const App = () => {
                 name="MyCrew"
                 component={MyCrew}
                 options={({ route }) => ({
-                  title: route.params.crewName,
+                  title: route.params.crew.name,
                   header: ({ navigation }) => (
                     <Header
-                      title={route.params.crewName}
+                      title={route.params.crew.name}
                       navigation={navigation}
                     />
                   ),

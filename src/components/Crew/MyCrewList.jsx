@@ -8,8 +8,8 @@ import CrewCard from './CrewCard';
 const MyCrewList = ({ crewData }) => {
   const navigation = useNavigation();
 
-  const handleCrewPress = crewName => {
-    navigation.navigate('MyCrew', { crewName });
+  const handleCrewPress = crew => {
+    navigation.navigate('MyCrew', { crew });
   };
 
   return (
@@ -18,7 +18,7 @@ const MyCrewList = ({ crewData }) => {
         <CrewCard
           key={crew.id}
           crew={crew}
-          onPress={() => handleCrewPress(crew.name)}
+          onPress={() => handleCrewPress(crew)}
         />
       ))}
     </View>
