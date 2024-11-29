@@ -4,13 +4,17 @@ import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 
 import defaultProfileImage from '../../assets/images/Settings/profile.png';
 import groups from '../../assets/images/Crew/groups.png';
+import Footprint from '../Footprint';
 
 const CrewCard = ({ crew, onPress }) => {
   return (
     <TouchableOpacity style={styles.cardContainer} onPress={onPress}>
       <Image source={defaultProfileImage} style={{ width: 40, height: 40 }} />
       <View style={styles.cardInfoSet}>
-        <Text style={styles.cardTitle}>{crew.name}</Text>
+        <View style={{ flexDirection: 'row' }}>
+          <Text style={styles.cardTitle}>{crew.name}</Text>
+          <Footprint experience={crew.footprint} />
+        </View>
         <Text
           style={styles.cardBriefInfo}
           numberOfLines={1}
@@ -49,6 +53,7 @@ const styles = StyleSheet.create({
     color: '#101010',
     fontSize: 14,
     fontWeight: 'semibold',
+    marginRight: 6,
   },
   cardBriefInfo: {
     color: '#878787',
@@ -70,6 +75,7 @@ const styles = StyleSheet.create({
 CrewCard.propTypes = {
   crew: PropTypes.shape({
     name: PropTypes.string.isRequired,
+    footprint: PropTypes.number.isRequired,
     brief: PropTypes.string.isRequired,
     number: PropTypes.number.isRequired,
   }).isRequired,

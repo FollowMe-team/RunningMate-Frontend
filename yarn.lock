@@ -3654,6 +3654,7 @@ __metadata:
     react-native-actions-sheet: ^0.9.7
     react-native-actionsheet: ^2.4.2
     react-native-calendars: ^1.1307.0
+    react-native-date-picker: ^5.0.7
     react-native-element-dropdown: ^2.12.2
     react-native-gesture-handler: ^2.20.2
     react-native-image-crop-picker: ^0.41.5
@@ -9154,6 +9155,16 @@ __metadata:
     moment:
       optional: true
   checksum: 1fc559d66bf0c687c09ba9462f243051127154efb4e0e293ddbabdfe8a64523ca114c905d853a2b911626b32c2f25abdb1de39cd07e8865d8c6a970991175195
+  languageName: node
+  linkType: hard
+
+"react-native-date-picker@npm:^5.0.7":
+  version: 5.0.7
+  resolution: "react-native-date-picker@npm:5.0.7"
+  peerDependencies:
+    react: ">= 17.0.1"
+    react-native: ">= 0.64.3"
+  checksum: 94191bf3ce6e88a3acc4ca5e5514eaa6fc15c61666393d85ca258dba3a3efd9145c8fd31ed0f18676d7f083e17f08c760de8193ad24367a65761330084bcdc6b
   languageName: node
   linkType: hard
 

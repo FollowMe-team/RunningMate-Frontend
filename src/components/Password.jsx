@@ -85,7 +85,7 @@ const styles = StyleSheet.create({
   bundle: {
     marginTop: 10,
     marginBottom: 40,
-    width: '85%',
+    marginHorizontal: 16,
     // padding: 20,
     borderBottomColor: '#E5E5E5',
   },
