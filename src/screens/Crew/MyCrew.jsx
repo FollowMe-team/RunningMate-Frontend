@@ -7,6 +7,7 @@ import {
   Text,
   TouchableOpacity,
 } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 
 import Calendars from '../../components/Calendars';
 import schedule from '../../components/Crew/schedule.json';
@@ -16,6 +17,7 @@ import profile from '../../assets/images/Settings/profile.png';
 
 const MyCrew = () => {
   const [selectedSchedule, setSelectedSchedule] = useState(null);
+  const navigation = useNavigation();
 
   const handleDayPress = day => {
     const scheduleForDay = schedule.find(item => item.date === day.dateString);
@@ -38,7 +40,7 @@ const MyCrew = () => {
               <View style={styles.crewScheduleHeader}>
                 <Text style={styles.crewScheduleText}>크루 일정</Text>
                 <TouchableOpacity
-                  onPress={() => {}}
+                  onPress={() => navigation.navigate('CrewScheduleRegister')}
                   style={styles.crewScheduleAddButton}
                 >
                   <Image source={add} style={{ width: 20, height: 20 }} />
