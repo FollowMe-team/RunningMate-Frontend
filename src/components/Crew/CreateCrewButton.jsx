@@ -26,7 +26,9 @@ const CreateCrewButton = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     borderRadius: 15,
     backgroundColor: '#73D393',
     width: '100%',
@@ -35,20 +37,29 @@ const styles = StyleSheet.create({
   },
   layout: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    justifyContent: 'space-around',
+    width: '100%',
+    paddingHorizontal: 20,
   },
   runningIcon: {
     width: 40,
     height: 40,
-    alignSelf: 'flex-end',
+    position: 'absolute',
+    left: 20,
+    top: -7,
   },
   buttonText: {
+    position: 'absolute',
+    left: 110,
     color: 'white',
     fontSize: 23,
     fontWeight: 'bold',
+    textAlign: 'center',
   },
   plusIcon: {
+    position: 'absolute',
+    right: 20,
     width: 30,
     height: 30,
   },
