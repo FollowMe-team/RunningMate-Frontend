@@ -26,6 +26,26 @@ import FollowingList from './src/screens/MyProfile/FollowingList';
 import CrewInformation from './src/components/Crew/CrewInformation';
 import CrewApplicant from './src/screens/Crew/CrewApplicant';
 import CrewSearchResult from './src/screens/Crew/CrewSearchResult';
+import Course_basic from './src/screens/Course/Course_basic';
+import Course_with_record_choosed from './src/screens/Course/Course_with_record_choosed';
+import Course_with_record from './src/screens/Course/Course_with_record';
+import courserecommend from './src/screens/Course/courserecommend';
+import courserecommend_map from './src/screens/Course/courserecommend_map';
+import coursesearch from './src/screens/Course/coursesearch';
+import coursesearchmaplist from './src/screens/Course/coursesearchmaplist';
+import coursesearchmapview from './src/screens/Course/coursesearchmapview';
+import MyCourse from './src/screens/Course/MyCourse';
+import MyCourse_none from './src/screens/Course/MyCourse_none';
+import reviewed from './src/screens/Course/reviewed';
+import reviewing from './src/screens/Course/reviewing';
+import reviewlist from './src/screens/Course/reviewlist';
+import runningtimesaving from './src/screens/Course/runningtimesaving';
+import runningtime from './src/screens/Course/runningtime';
+import savingcourse from './src/screens/Course/savingcourse';
+import runningend from './src/screens/Course/runningend';
+import Othersprofile from './src/screens/Othersprofile/Othersprofile';
+import Othersprofile_notteam from './src/screens/Othersprofile/Othersprofile_notteam';
+import Othersfootprinting from './src/screens/Othersprofile/OthersFootprinting';
 
 import PropTypes from 'prop-types';
 
@@ -341,6 +361,106 @@ const App = () => {
                   headerShown: true,
                 }}
               />
+              <Stack.Screen
+            name="Course_basic"
+            component={Course_basic}
+            options={{ title: '러닝 코스' }}
+          />
+          <Stack.Screen
+            name="Course_with_record"
+            component={Course_with_record}
+            options={{ title: '러닝 코스_기록' }}
+          />
+          <Stack.Screen
+            name="Course_with_record_choosed"
+            component={Course_with_record_choosed}
+            options={{ title: '코스 추천_선택' }}
+          />
+          <Stack.Screen
+            name="Courserecommend"
+            component={courserecommend}
+            options={{ title: '코스 추천' }}
+          />
+          <Stack.Screen
+            name="Courserecommend_map"
+            component={courserecommend_map}
+            options={{ title: '코스 추천_지도' }}
+          />
+          <Stack.Screen
+            name="Coursesearch"
+            component={coursesearch}
+            options={{ title: '코스 검색' }}
+          />
+          <Stack.Screen
+            name="Coursesearchmaplist"
+            component={coursesearchmaplist}
+            options={{ title: '러닝 검색 리스트' }}
+          />
+          <Stack.Screen
+            name="Coursesearchmapview"
+            component={coursesearchmapview}
+            options={{ title: '코스 검색 선택 뷰' }}
+          />
+          <Stack.Screen
+            name="MyCourse"
+            component={MyCourse}
+            options={{ title: '내 코스' }}
+          />
+          <Stack.Screen
+            name="MyCourse_none"
+            component={MyCourse_none}
+            options={{ title: '내 코스 없음' }}
+          />
+          <Stack.Screen
+            name="Reviewed"
+            component={reviewed}
+            options={{ title: '리뷰' }}
+          />
+          <Stack.Screen
+            name="Reviewing"
+            component={reviewing}
+            options={{ title: '리뷰 작성' }}
+          />
+          <Stack.Screen
+            name="Reviewlist"
+            component={reviewlist}
+            options={{ title: '리뷰 리스트' }}
+          />
+          <Stack.Screen
+            name="Runningtimesaving"
+            component={runningtimesaving}
+            options={{ title: '코스 기록' }}
+          />
+          <Stack.Screen
+            name="Runningtime"
+            component={runningtime}
+            options={{ title: '달리기' }}
+          />
+          <Stack.Screen
+            name="Savingcourse"
+            component={savingcourse}
+            options={{ title: '코스 저장' }}
+          />
+          <Stack.Screen
+            name="Runningend"
+            component={runningend}
+            options={{ title: '달리기 완료' }}
+          />
+          <Stack.Screen
+            name="Othersprofile"
+            component={Othersprofile}
+            options={{ title: '타인 프로필 기본' }}
+          />
+          <Stack.Screen
+            name="Othersprofile_notteam"
+            component={Othersprofile_notteam}
+            options={{ title: '타인 프로필 기본' }}
+          />
+          <Stack.Screen
+            name="Othersfootprinting"
+            component={Othersfootprinting}
+            options={{ title: '발자국 평가' }}
+          />
             </>
           )}
         </Stack.Navigator>
