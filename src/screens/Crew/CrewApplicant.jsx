@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import PropTypes from 'prop-types';
 import {
   View,
   ScrollView,
@@ -11,13 +12,17 @@ import ProfileBox from '../../components/MyProfile/ProfileBox';
 import Tabs from '../../components/MyProfile/Tabs';
 import RecordView from '../../components/MyProfile/RecordView';
 import ActivityView from '../../components/MyProfile/ActivityView';
-import applicant from './applicant.json';
 
-const CrewApplicant = () => {
+const CrewApplicant = ({ route }) => {
+  const { applicant } = route.params;
   const [activeTab, setActiveTab] = useState('record');
   const [selectedRecord, setSelectedRecord] = useState(null);
 
   const handleDayPress = day => {
+    if (!day || !day.dateString) {
+      setSelectedRecord({ message: '유효하지 않은 날짜입니다.' });
+      return;
+    }
     const recordForDay = applicant.records.find(
       item => item.date === day.dateString,
     );
@@ -39,7 +44,13 @@ const CrewApplicant = () => {
         ) : (
           <ActivityView />
         )}
-        <View style={{ flexDirection: 'row' }}>
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'center',
+            marginVertical: 25,
+          }}
+        >
           <TouchableOpacity style={styles.rejectButton}>
             <Text style={styles.rejectButtonText}>거절</Text>
           </TouchableOpacity>
@@ -63,6 +74,7 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   rejectButton: {
+    width: '30%',
     borderWidth: 1,
     borderColor: '#73D393',
     borderRadius: 15,
@@ -76,6 +88,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   applyButton: {
+    width: '30%',
     backgroundColor: '#73D393',
     borderRadius: 15,
     padding: 10,
@@ -87,5 +100,13 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
 });
+
+CrewApplicant.propTypes = {
+  route: PropTypes.shape({
+    params: PropTypes.shape({
+      applicant: PropTypes.object.isRequired,
+    }).isRequired,
+  }).isRequired,
+};
 
 export default CrewApplicant;

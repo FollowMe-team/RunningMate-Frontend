@@ -12,15 +12,26 @@ import iron from '../assets/images/rank/iron-legs-badge.png';
 import demon from '../assets/images/rank/speed-demon-badge.png';
 
 const rankImages = {
-  jogger,
-  runner,
-  racer,
-  sprinter,
-  marathoner,
-  ultra,
-  iron,
-  demon,
+  JOGGER: jogger,
+  RUNNER: runner,
+  RACER: racer,
+  SPRINTER: sprinter,
+  MARATHONER: marathoner,
+  ULTRA_RUNNER: ultra,
+  IRON_LEGS: iron,
+  SPEED_DEMON: demon,
 };
+
+// const rankDescriptions = {
+//   JOGGER: "달리기를 시작한 초보 러너",
+//   RUNNER: "꾸준히 달리기를 즐기는 러너",
+//   RACER: "속도와 거리를 높여가는 중급 러너",
+//   SPRINTER: "빠른 속도로 달리는 전문가",
+//   MARATHONER: "장거리 달리기의 마스터",
+//   ULTRA_RUNNER: "극한의 장거리를 정복하는 러너",
+//   IRON_LEGS: "어떤 코스도 견디는 강철 다리의 소유자",
+//   SPEED_DEMON: "번개같은 속도의 전설적인 러너",
+// };
 
 const Rank = ({ rank }) => {
   return (
@@ -37,7 +48,13 @@ const styles = StyleSheet.create({
   },
   badge: {
     width: 50,
-    height: 50,
+    height: 25,
+  },
+  description: {
+    fontSize: 12,
+    color: '#666',
+    textAlign: 'center',
+    marginTop: 5,
   },
 });
 

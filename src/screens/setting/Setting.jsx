@@ -11,6 +11,7 @@ import {
 import { useNavigation } from '@react-navigation/native';
 
 import myprofile from '../../components/MyProfile/myprofileInfo.json';
+import { logout } from '../../utils/api';
 
 const Setting = () => {
   const navigation = useNavigation();
@@ -23,10 +24,16 @@ const Setting = () => {
   const toggleVibrationSwitch = () =>
     setIsVibrationEnabled(previousState => !previousState);
 
-  const handleLogout = () => {
-    setIsModalVisible(false);
-    ToastAndroid.show('성공적으로 로그아웃하셨습니다.', ToastAndroid.SHORT);
-    navigation.navigate('Login');
+  const handleLogout = async () => {
+    const success = await logout();
+    if (success) {
+      console.log('Logout response received successfully');
+      setIsModalVisible(false);
+      ToastAndroid.show('성공적으로 로그아웃하셨습니다.', ToastAndroid.SHORT);
+      navigation.navigate('Login', { screen: 'Login' });
+    } else {
+      ToastAndroid.show('로그아웃에 실패했습니다.', ToastAndroid.SHORT);
+    }
   };
 
   return (

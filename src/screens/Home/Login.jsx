@@ -9,8 +9,8 @@ import {
   TouchableOpacity,
   ScrollView,
 } from 'react-native';
+import { login } from '../../utils/api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import api from '../../utils/api';
 
 import logo from '../../assets/images/Home/logo.png';
 import right from '../../assets/images/Home/right-arrow.png';
@@ -19,33 +19,23 @@ const Login = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleLogin = async () => {
-    try {
-      const response = await api.post('/auth/login', {
-        email,
-        password,
-      });
+  React.useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      setEmail('');
+      setPassword('');
+    });
 
-      if (response.status === 200) {
-        const { accessToken, refreshToken } = response.data.data;
-        await AsyncStorage.setItem('isLoggedIn', 'true');
-        await AsyncStorage.setItem('accessToken', accessToken);
-        await AsyncStorage.setItem('refreshToken', refreshToken);
-        navigation.replace('Navigation');
-      }
-    } catch (error) {
-      if (error.response) {
-        const { data } = error.response;
-        if (data.code === 'MEMBER001') {
-          alert('회원을 찾을 수 없습니다.');
-        } else if (data.code === 'AUTH010') {
-          alert('잘못된 비밀번호입니다.');
-        } else {
-          alert('로그인에 실패했습니다.');
-        }
-      } else {
-        alert('로그인에 실패했습니다.');
-      }
+    return unsubscribe;
+  }, [navigation]);
+
+  const handleLogin = async () => {
+    const result = await login(email, password);
+    console.log('result:', result);
+    if (result.success) {
+      await AsyncStorage.setItem('isLoggedIn', 'true');
+      navigation.navigate('Main', { screen: 'Course' });
+    } else {
+      alert(result.message);
     }
   };
 
@@ -150,6 +140,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     borderColor: '#9B9B9D',
     borderWidth: 1,
+    paddingLeft: 10,
   },
   forgetNSignupContainer: {
     flexDirection: 'row',

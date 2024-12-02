@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
 import { StatusBar, BackHandler, ToastAndroid, StyleSheet } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -49,6 +48,10 @@ import Othersfootprinting from './src/screens/Othersprofile/OthersFootprinting';
 
 import PropTypes from 'prop-types';
 
+// import back from './src/assets/images/NaviIcon/left.png';
+// import settingsIcon from './src/assets/images/NaviIcon/web-settings.png';
+import StackNavigator from './src/navigation/StackNavigator';
+
 const WebViewScreen = ({ route }) => {
   const { url } = route.params;
   return <WebView source={{ uri: url }} />;
@@ -67,22 +70,21 @@ StatusBar.setBackgroundColor('transparent');
 StatusBar.setTranslucent(true);
 StatusBar.setBarStyle('dark-content');
 
-// Stack Navigation
-const Stack = createStackNavigator();
-
 const App = () => {
   const navigationRef = useRef();
   const [isLoading, setIsLoading] = useState(true);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [backPressedOnce, setBackPressedOnce] = useState(false);
 
   useEffect(() => {
     const checkLoginStatus = async () => {
-      const value = await AsyncStorage.getItem('isLoggedIn');
-      if (value === 'true') {
-        setIsLoggedIn(true);
+      try {
+        const value = await AsyncStorage.getItem('isLoggedIn');
+        console.log('isLoggedIn value:', value); // 로그 추가
+      } catch (error) {
+        console.error('Failed to fetch isLoggedIn from AsyncStorage', error);
+      } finally {
+        setIsLoading(false);
       }
-      setIsLoading(false);
     };
 
     checkLoginStatus();
@@ -148,220 +150,8 @@ const App = () => {
   return (
     <GestureHandlerRootView style={styles.container}>
       <NavigationContainer theme={customTheme} ref={navigationRef}>
-        <Stack.Navigator
-          screenOptions={{
-            headerShown: false,
-            animationEnabled: true,
-            gestureDirection: 'vertical',
-          }}
-        >
-          {isLoggedIn ? (
-            <>
-              <Stack.Screen
-                name="Navigation"
-                component={Navigation}
-                options={{ headerShown: false }}
-              />
-              <Stack.Screen
-                name="CreateCrew"
-                component={CreateCrew}
-                options={{
-                  title: '크루 생성',
-                  header: ({ navigation }) => (
-                    <Header title="크루 생성" navigation={navigation} />
-                  ),
-                  headerShown: true,
-                }}
-              />
-              <Stack.Screen
-                name="CreateSearch"
-                component={CreateCrew}
-                options={{ headerShown: false }}
-              />
-              <Stack.Screen
-                name="CrewSearchResult"
-                component={CrewSearchResult}
-                options={{
-                  title: '크루 검색 결과',
-                  header: ({ navigation }) => (
-                    <Header title="크루 검색 결과" navigation={navigation} />
-                  ),
-                  headerShown: true,
-                }}
-              />
-              <Stack.Screen
-                name="MyCrew"
-                component={MyCrew}
-                options={({ route }) => ({
-                  title: route.params.crew.name,
-                  header: ({ navigation }) => (
-                    <Header
-                      title={route.params.crew.name}
-                      navigation={navigation}
-                    />
-                  ),
-                  headerShown: true,
-                })}
-              />
-              <Stack.Screen
-                name="CrewScheduleRegister"
-                component={CrewScheduleRegister}
-                options={{
-                  title: '크루 일정 등록',
-                  header: ({ navigation }) => (
-                    <Header title="크루 일정 등록" navigation={navigation} />
-                  ),
-                  headerShown: true,
-                }}
-              />
-              <Stack.Screen
-                name="CrewInformation"
-                component={CrewInformation}
-                options={{
-                  title: '크루 정보',
-                  header: ({ navigation }) => (
-                    <Header title="크루 정보" navigation={navigation} />
-                  ),
-                  headerShown: true,
-                }}
-              />
-              <Stack.Screen
-                name="CrewApplicant"
-                component={CrewApplicant}
-                options={{
-                  title: '크루 신청자',
-                  header: ({ navigation }) => (
-                    <Header title="크루 신청자" navigation={navigation} />
-                  ),
-                  headerShown: true,
-                }}
-              />
-              <Stack.Screen
-                name="FollowerList"
-                component={FollowerList}
-                options={{
-                  title: '팔로워 목록',
-                  header: ({ navigation }) => (
-                    <Header title="팔로워 목록" navigation={navigation} />
-                  ),
-                  headerShown: true,
-                }}
-              />
-              <Stack.Screen
-                name="FollowingList"
-                component={FollowingList}
-                options={{
-                  title: '팔로잉 목록',
-                  header: ({ navigation }) => (
-                    <Header title="팔로잉 목록" navigation={navigation} />
-                  ),
-                  headerShown: true,
-                }}
-              />
-              <Stack.Screen
-                name="Setting"
-                component={Setting}
-                options={{
-                  title: '설정',
-                  header: ({ navigation }) => (
-                    <Header title="설정" navigation={navigation} />
-                  ),
-                  headerShown: true,
-                }}
-              />
-              <Stack.Screen
-                name="MyProfileChange"
-                component={MyProfileChange}
-                options={{
-                  title: '마이 프로필 변경',
-                  header: ({ navigation }) => (
-                    <Header title="마이 프로필 변경" navigation={navigation} />
-                  ),
-                  headerShown: true,
-                }}
-              />
-              <Stack.Screen
-                name="SearchAddress"
-                component={SearchAddress}
-                options={{
-                  title: '주소 검색',
-                  header: ({ navigation }) => (
-                    <Header title="주소 검색" navigation={navigation} />
-                  ),
-                  headerShown: true,
-                }}
-              />
-              <Stack.Screen
-                name="PasswordChange"
-                component={PasswordChange}
-                options={{
-                  title: '비밀번호 변경',
-                  header: ({ navigation }) => (
-                    <Header title="비밀번호 변경" navigation={navigation} />
-                  ),
-                  headerShown: true,
-                }}
-              />
-              <Stack.Screen
-                name="Withdrawal"
-                component={Withdrawal}
-                options={{
-                  title: '계정 탈퇴',
-                  header: ({ navigation }) => (
-                    <Header title="계정 탈퇴" navigation={navigation} />
-                  ),
-                  headerShown: true,
-                }}
-              />
-              <Stack.Screen
-                name="WithdrawalComplete"
-                component={WithdrawalComplete}
-                options={{
-                  title: '계정 탈퇴',
-                  header: ({ navigation }) => (
-                    <Header title="계정 탈퇴" navigation={navigation} />
-                  ),
-                  headerShown: true,
-                }}
-              />
-              {/* <Stack.Screen name="Crew" component={Crew} /> */}
-              <Stack.Screen name="CrewSearch" component={CrewSearch} />
-              <Stack.Screen
-                name="WebViewScreen"
-                component={WebViewScreen}
-                options={{ headerShown: false }}
-              />
-            </>
-          ) : (
-            <>
-              <Stack.Screen
-                name="Login"
-                component={Login}
-                options={{ title: '로그인', headerShown: false }}
-              />
-              <Stack.Screen
-                name="Signup"
-                component={Signup}
-                options={{
-                  title: '회원 가입',
-                  header: ({ navigation }) => (
-                    <Header title="회원 가입" navigation={navigation} />
-                  ),
-                  headerShown: true,
-                }}
-              />
-              <Stack.Screen
-                name="ForgotPassword"
-                component={ForgotPassword}
-                options={{
-                  title: '비밀번호 찾기',
-                  header: ({ navigation }) => (
-                    <Header title="비밀번호 찾기" navigation={navigation} />
-                  ),
-                  headerShown: true,
-                }}
-              />
-              <Stack.Screen
+        <StackNavigator />
+          <Stack.Screen
             name="Course_basic"
             component={Course_basic}
             options={{ title: '러닝 코스' }}
@@ -461,9 +251,6 @@ const App = () => {
             component={Othersfootprinting}
             options={{ title: '발자국 평가' }}
           />
-            </>
-          )}
-        </Stack.Navigator>
       </NavigationContainer>
     </GestureHandlerRootView>
   );
@@ -473,6 +260,36 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: 'white',
+  },
+  backButton: {
+    marginLeft: 16,
+  },
+  backButtonCircle: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: '#50C878',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  backIcon: {
+    width: 24,
+    height: 24,
+  },
+  settingButton: {
+    marginRight: 16,
+  },
+  settingButtonCircle: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: '#50C878',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  settingIcon: {
+    width: 24,
+    height: 24,
   },
 });
 
