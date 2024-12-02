@@ -12,7 +12,7 @@ import PropTypes from 'prop-types';
 import Header from './Header';
 
 // Screens (화면 메인 페이지)
-import Course from '../screens/Course/Course';
+import Course_basic from '../screens/Course/Course_basic';
 import Community from '../screens/Community/Community';
 import Crew from '../screens/Crew/Crew';
 import MyProfile from '../screens/MyProfile/MyProfile';
@@ -82,7 +82,7 @@ const Main = () => {
     >
       <Tab.Screen
         name="Course"
-        component={Course}
+        component={Course_basic}
         options={{
           title: '러닝 코스',
           header: ({ navigation }) => (

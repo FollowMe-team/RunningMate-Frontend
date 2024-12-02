@@ -7,14 +7,28 @@ import Header from '../components/Header';
 
 import Login from '../screens/Home/Login';
 import Signup from '../screens/Home/Signup';
-import Setting from '../screens/setting/Setting';
-import MyProfileChange from '../screens/setting/MyProfileChange';
-import SearchAddress from '../screens/setting/SearchAddress';
-import PasswordChange from '../screens/setting/PasswordChange';
-import Withdrawal from '../screens/setting/Withdrawal';
-import WithdrawalComplete from '../screens/setting/WithdrawalComplete';
+import Main from '../components/Main';
+import Course_basic from '../../src/screens/Course/Course_basic';
+import Course_with_record_choosed from '../../src/screens/Course/Course_with_record_choosed';
+import Course_with_record from '../../src/screens/Course/Course_with_record';
+import courserecommend from '../../src/screens/Course/courserecommend';
+import courserecommend_map from '../../src/screens/Course/courserecommend_map';
+import coursesearch from '../../src/screens/Course/coursesearch';
+import coursesearchmaplist from '../../src/screens/Course/coursesearchmaplist';
+import coursesearchmapview from '../../src/screens/Course/coursesearchmapview';
+import MyCourse from '../../src/screens/Course/MyCourse';
+import MyCourse_none from '../../src/screens/Course/MyCourse_none';
+import reviewed from '../../src/screens/Course/reviewed';
+import reviewing from '../../src/screens/Course/reviewing';
+import reviewlist from '../../src/screens/Course/reviewlist';
+import runningtimesaving from '../../src/screens/Course/runningtimesaving';
+import runningtime from '../../src/screens/Course/runningtime';
+import savingcourse from '../../src/screens/Course/savingcourse';
+import runningend from '../../src/screens/Course/runningend';
+import Othersprofile from '../../src/screens/Othersprofile/Othersprofile';
+import Othersprofile_notteam from '../../src/screens/Othersprofile/Othersprofile_notteam';
+import Othersfootprinting from '../../src/screens/Othersprofile/OthersFootprinting';
 import CreateCrew from '../screens/Crew/CreateCrew';
-import ForgotPassword from '../screens/Home/ForgotPassword';
 import CrewSearch from '../screens/Crew/CrewSearch';
 import MyCrew from '../screens/Crew/MyCrew';
 import CrewScheduleRegister from '../screens/Crew/CrewScheduleRegister';
@@ -23,12 +37,14 @@ import FollowingList from '../screens/MyProfile/FollowingList';
 import CrewInformation from '../components/Crew/CrewInformation';
 import CrewApplicant from '../screens/Crew/CrewApplicant';
 import CrewSearchResult from '../screens/Crew/CrewSearchResult';
-// import Course from '../screens/Course/Course';
-// import Community from '../screens/Community/Community';
-// import Crew from '../screens/Crew/Crew';
-// import MyProfile from '../screens/MyProfile/MyProfile';
-import Main from '../components/Main';
 import ApplyList from '../screens/Crew/ApplyList';
+import Setting from '../screens/setting/Setting';
+import MyProfileChange from '../screens/setting/MyProfileChange';
+import ForgotPassword from '../screens/Home/ForgotPassword';
+import SearchAddress from '../screens/setting/SearchAddress';
+import PasswordChange from '../screens/setting/PasswordChange';
+import Withdrawal from '../screens/setting/Withdrawal';
+import WithdrawalComplete from '../screens/setting/WithdrawalComplete';
 
 const WebViewScreen = ({ route }) => {
   const { url } = route.params;
@@ -88,6 +104,106 @@ const StackNavigator = () => (
       name="Main"
       component={Main}
       options={{ headerShown: false }}
+    />
+    <Stack.Screen
+      name="Course_basic"
+      component={Course_basic}
+      options={{ title: '러닝 코스' }}
+    />
+    <Stack.Screen
+      name="Course_with_record"
+      component={Course_with_record}
+      options={{ title: '러닝 코스_기록' }}
+    />
+    <Stack.Screen
+      name="Course_with_record_choosed"
+      component={Course_with_record_choosed}
+      options={{ title: '코스 추천_선택' }}
+    />
+    <Stack.Screen
+      name="Courserecommend"
+      component={courserecommend}
+      options={{ title: '코스 추천' }}
+    />
+    <Stack.Screen
+      name="Courserecommend_map"
+      component={courserecommend_map}
+      options={{ title: '코스 추천_지도' }}
+    />
+    <Stack.Screen
+      name="Coursesearch"
+      component={coursesearch}
+      options={{ title: '코스 검색' }}
+    />
+    <Stack.Screen
+      name="Coursesearchmaplist"
+      component={coursesearchmaplist}
+      options={{ title: '러닝 검색 리스트' }}
+    />
+    <Stack.Screen
+      name="Coursesearchmapview"
+      component={coursesearchmapview}
+      options={{ title: '코스 검색 선택 뷰' }}
+    />
+    <Stack.Screen
+      name="MyCourse"
+      component={MyCourse}
+      options={{ title: '내 코스' }}
+    />
+    <Stack.Screen
+      name="MyCourse_none"
+      component={MyCourse_none}
+      options={{ title: '내 코스 없음' }}
+    />
+    <Stack.Screen
+      name="Reviewed"
+      component={reviewed}
+      options={{ title: '리뷰' }}
+    />
+    <Stack.Screen
+      name="Reviewing"
+      component={reviewing}
+      options={{ title: '리뷰 작성' }}
+    />
+    <Stack.Screen
+      name="Reviewlist"
+      component={reviewlist}
+      options={{ title: '리뷰 리스트' }}
+    />
+    <Stack.Screen
+      name="Runningtimesaving"
+      component={runningtimesaving}
+      options={{ title: '코스 기록' }}
+    />
+    <Stack.Screen
+      name="Runningtime"
+      component={runningtime}
+      options={{ title: '달리기' }}
+    />
+    <Stack.Screen
+      name="Savingcourse"
+      component={savingcourse}
+      options={{ title: '코스 저장' }}
+    />
+    <Stack.Screen
+      name="Runningend"
+      component={runningend}
+      options={{ title: '달리기 완료' }}
+    />
+    <Stack.Screen
+      name="Othersprofile"
+      component={Othersprofile}
+      options={{ title: '타인 프로필 기본' }}
+    />
+    <Stack.Screen
+      name="Othersprofile_notteam"
+      component={Othersprofile_notteam}
+      options={{ title: '타인 프로필 기본' }}
+    />
+    <Stack.Screen
+      name="Othersfootprinting"
+      component={Othersfootprinting}
+      options={{ title: '발자국 평가' }}
     />
     <Stack.Screen
       name="CreateCrew"
