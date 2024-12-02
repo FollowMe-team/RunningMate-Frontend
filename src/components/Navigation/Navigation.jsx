@@ -11,7 +11,7 @@ import { useNavigation } from '@react-navigation/native';
 import PropTypes from 'prop-types';
 
 // Screens (화면 메인 페이지)
-import Course from '../../screens/Course/Course';
+import Course from '../../screens/Course/Course_basic';
 import Community from '../../screens/Community/Community';
 import Crew from '../../screens/Crew/Crew';
 import MyProfile from '../../screens/MyProfile/MyProfile';
