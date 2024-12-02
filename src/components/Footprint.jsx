@@ -10,11 +10,11 @@ import foot5 from '../assets/images/rank/footprint5.png';
 import foot6 from '../assets/images/rank/footprint6.png';
 
 const getFootprintImage = experience => {
-  if (experience >= 85) return foot6;
-  if (experience >= 70) return foot5;
-  if (experience >= 55) return foot4;
-  if (experience >= 40) return foot3;
-  if (experience >= 25) return foot2;
+  if (experience > 900) return foot6;
+  if (experience > 700) return foot5;
+  if (experience > 500) return foot4;
+  if (experience > 300) return foot3;
+  if (experience > 100) return foot2;
   return foot1;
 };
 

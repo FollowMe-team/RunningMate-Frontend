@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   StyleSheet,
@@ -14,6 +14,7 @@ import Header from '../../components/Header';
 
 import Calendars from '../../components/Calendars';
 import schedule from '../../components/Crew/schedule.json';
+import applyMembers from './applyMember.json';
 
 import add from '../../assets/images/Crew/icons8-help.png';
 import CrewActivityPicture from '../../components/Crew/CrewActivityPicture';
@@ -27,8 +28,14 @@ const MyCrew = () => {
     useState(false);
   const [fadeAnim] = useState(new Animated.Value(0));
   const [confirmationFadeAnim] = useState(new Animated.Value(0));
+  const [applyCount, setApplyCount] = useState(0);
 
   const crew = route.params?.crew;
+
+  useEffect(() => {
+    const count = applyMembers.length;
+    setApplyCount(count);
+  }, []);
 
   React.useLayoutEffect(() => {
     navigation.setOptions({
@@ -36,11 +43,14 @@ const MyCrew = () => {
         <Header
           title={crew.name}
           navigation={navigation}
+          showApplyButton={crew.is_master}
           openChatUrl={crew.open_chat}
+          showModificationButton={crew.is_master}
+          applyCount={applyCount}
         />
       ),
     });
-  }, [navigation, crew]);
+  }, [navigation, crew, applyCount]);
 
   if (!crew) {
     return (

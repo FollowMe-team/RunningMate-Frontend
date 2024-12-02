@@ -11,9 +11,20 @@ import PropTypes from 'prop-types';
 
 import back from '../assets/images/NaviIcon/left.png';
 import settingsIcon from '../assets/images/NaviIcon/web-settings.png';
+import apply from '../assets/images/Crew/online-registration.png';
+import modification from '../assets/images/Crew/edit-file.png';
 import kakao from '../assets/images/Crew/bubble-chat.png';
 
-const Header = ({ title, navigation, openChatUrl }) => {
+const Header = ({
+  title,
+  navigation,
+  hideBackButton,
+  hideSettingButton,
+  showApplyButton,
+  openChatUrl,
+  showModificationButton,
+  applyCount,
+}) => {
   const scaleValue = useRef(new Animated.Value(1)).current;
 
   const handlePressIn = () => {
@@ -32,56 +43,76 @@ const Header = ({ title, navigation, openChatUrl }) => {
     }).start();
   };
 
-  const hideSettingButton = [
-    'Setting',
-    'MyProfileChange',
-    'PasswordChange',
-    'Withdrawal',
-    'WithdrawalComplete',
-  ].includes(title);
-
   return (
     <View style={styles.header}>
-      <TouchableOpacity
-        onPress={() => navigation.goBack()}
-        onPressIn={handlePressIn}
-        onPressOut={handlePressOut}
-        style={styles.backButton}
-        activeOpacity={0.7}
-      >
-        <Animated.View
-          style={[
-            styles.backButtonCircle,
-            { transform: [{ scale: scaleValue }] },
-          ]}
-        >
-          <Image source={back} style={styles.backIcon} />
-        </Animated.View>
-      </TouchableOpacity>
-      <Text style={styles.headerTitle}>{title}</Text>
-      {openChatUrl ? (
-        <TouchableOpacity
-          onPress={() =>
-            navigation.navigate('WebViewScreen', { url: openChatUrl })
-          }
-          onPressIn={handlePressIn}
-          onPressOut={handlePressOut}
-          style={styles.settingButton}
-          activeOpacity={0.7}
-        >
-          <Animated.View
-            style={[
-              styles.settingButtonCircle,
-              { transform: [{ scale: scaleValue }] },
-            ]}
-          >
-            <Image source={kakao} style={styles.settingIcon} />
-          </Animated.View>
-        </TouchableOpacity>
-      ) : (
-        hideSettingButton && (
+      <View style={styles.leftContainer}>
+        {!hideBackButton && (
           <TouchableOpacity
-            onPress={() => navigation.navigate('Setting')}
+            onPress={() => navigation.goBack()}
+            onPressIn={handlePressIn}
+            onPressOut={handlePressOut}
+            style={styles.backButton}
+            activeOpacity={0.7}
+          >
+            <Animated.View
+              style={[
+                styles.backButtonCircle,
+                { transform: [{ scale: scaleValue }] },
+              ]}
+            >
+              <Image source={back} style={styles.backIcon} />
+            </Animated.View>
+          </TouchableOpacity>
+        )}
+      </View>
+      <Text style={styles.headerTitle}>{title}</Text>
+      <View style={styles.rightContainer}>
+        {showApplyButton && (
+          <TouchableOpacity
+            onPress={() => navigation.navigate('ApplyList')} // crew 객체를 params로 전달
+            onPressIn={handlePressIn}
+            onPressOut={handlePressOut}
+            style={styles.rightButton}
+            activeOpacity={0.7}
+          >
+            <Animated.View
+              style={[
+                styles.settingButtonCircle,
+                { transform: [{ scale: scaleValue }] },
+              ]}
+            >
+              <Image source={apply} style={styles.rightIcon} />
+              {applyCount > 0 && (
+                <View style={styles.applyCountBadge}>
+                  <Text style={styles.applyCountText}>{applyCount}</Text>
+                </View>
+              )}
+            </Animated.View>
+          </TouchableOpacity>
+        )}
+        {showModificationButton && (
+          <TouchableOpacity
+            onPress={() => navigation.navigate('Modification')}
+            onPressIn={handlePressIn}
+            onPressOut={handlePressOut}
+            style={styles.rightButton}
+            activeOpacity={0.7}
+          >
+            <Animated.View
+              style={[
+                styles.settingButtonCircle,
+                { transform: [{ scale: scaleValue }] },
+              ]}
+            >
+              <Image source={modification} style={styles.rightIcon} />
+            </Animated.View>
+          </TouchableOpacity>
+        )}
+        {openChatUrl ? (
+          <TouchableOpacity
+            onPress={() =>
+              navigation.navigate('WebViewScreen', { url: openChatUrl })
+            }
             onPressIn={handlePressIn}
             onPressOut={handlePressOut}
             style={styles.settingButton}
@@ -93,11 +124,30 @@ const Header = ({ title, navigation, openChatUrl }) => {
                 { transform: [{ scale: scaleValue }] },
               ]}
             >
-              <Image source={settingsIcon} style={styles.settingIcon} />
+              <Image source={kakao} style={styles.rightIcon} />
             </Animated.View>
           </TouchableOpacity>
-        )
-      )}
+        ) : (
+          !hideSettingButton && (
+            <TouchableOpacity
+              onPress={() => navigation.navigate('Setting')}
+              onPressIn={handlePressIn}
+              onPressOut={handlePressOut}
+              style={styles.settingButton}
+              activeOpacity={0.7}
+            >
+              <Animated.View
+                style={[
+                  styles.settingButtonCircle,
+                  { transform: [{ scale: scaleValue }] },
+                ]}
+              >
+                <Image source={settingsIcon} style={styles.rightIcon} />
+              </Animated.View>
+            </TouchableOpacity>
+          )
+        )}
+      </View>
     </View>
   );
 };
@@ -106,6 +156,12 @@ Header.propTypes = {
   title: PropTypes.string.isRequired,
   navigation: PropTypes.object.isRequired,
   openChatUrl: PropTypes.string,
+  hideBackButton: PropTypes.bool,
+  hideSettingButton: PropTypes.bool,
+  showApplyButton: PropTypes.bool,
+  showModificationButton: PropTypes.bool,
+  applyCount: PropTypes.number,
+  crew: PropTypes.object, // crew 객체의 PropTypes 정의
 };
 
 const styles = StyleSheet.create({
@@ -118,6 +174,17 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginTop: 30,
     height: 56,
+  },
+  leftContainer: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  rightContainer: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
   },
   headerTitle: {
     color: '#352555',
@@ -146,6 +213,9 @@ const styles = StyleSheet.create({
   settingButton: {
     marginRight: 16,
   },
+  rightButton: {
+    marginRight: 5,
+  },
   settingButtonCircle: {
     width: 36,
     height: 36,
@@ -154,9 +224,25 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  settingIcon: {
+  rightIcon: {
     width: 24,
     height: 24,
+  },
+  applyCountBadge: {
+    position: 'absolute',
+    top: -5,
+    right: -5,
+    backgroundColor: 'red',
+    borderRadius: 10,
+    width: 20,
+    height: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  applyCountText: {
+    color: 'white',
+    fontSize: 12,
+    fontWeight: 'bold',
   },
 });
 

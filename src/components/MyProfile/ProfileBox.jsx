@@ -5,6 +5,7 @@ import { useNavigation } from '@react-navigation/native';
 import { Bar } from 'react-native-progress';
 
 import Footprint from '../Footprint';
+import Rank from '../Rank';
 
 import defaultProfileImage from '../../assets/images/Settings/profile.png';
 import nameImg from '../../assets/images/MyProfile/free-icon-business-12930954.png';
@@ -14,6 +15,9 @@ import addressImg from '../../assets/images/MyProfile/free-icon-placeholder-1492
 import detail from '../../assets/images/MyProfile/free-icon-magnifier-2319177.png';
 
 const formatNumber = num => {
+  if (num === undefined || num === null) {
+    return '0';
+  }
   if (num >= 1000000) {
     return (num / 1000000).toFixed(1) + 'm';
   } else if (num >= 1000) {
@@ -30,11 +34,22 @@ const ProfileBox = ({ data }) => {
         <View style={{ alignItems: 'center', marginBottom: 7 }}>
           <Image
             source={
-              data.profile_url ? { uri: data.profile_url } : defaultProfileImage
+              data.profile_url && data.profile_url !== null
+                ? { uri: data.profile_url }
+                : defaultProfileImage
             }
             style={styles.profileImage}
           />
-          <Text style={styles.nickname}>{data.nickname}</Text>
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
+          >
+            <Text style={styles.nickname}>{data.nickname}</Text>
+            <Rank rank={data.ranking} />
+          </View>
           <Text style={styles.info}>{data.info}</Text>
         </View>
         <View
@@ -122,7 +137,7 @@ const ProfileBox = ({ data }) => {
         </View>
         <View style={styles.barContainer}>
           <Bar
-            progress={data.footprint / 100}
+            progress={data.footprint / 1500}
             width={null}
             height={20}
             color="#4A9B8C"
@@ -130,7 +145,7 @@ const ProfileBox = ({ data }) => {
             borderWidth={0}
             borderRadius={15}
           />
-          <Text style={styles.barText}>{`${data.footprint} / 100`}</Text>
+          <Text style={styles.barText}>{`${data.footprint} / 1500`}</Text>
         </View>
       </View>
     </View>
@@ -157,6 +172,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     color: 'black',
+    marginRight: 5,
   },
   info: {
     fontSize: 14,
@@ -228,6 +244,7 @@ ProfileBox.propTypes = {
     running_distance: PropTypes.number,
     running_count: PropTypes.number,
     footprint: PropTypes.number,
+    ranking: PropTypes.string,
   }).isRequired,
 };
 

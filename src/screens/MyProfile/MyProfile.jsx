@@ -1,16 +1,26 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, ScrollView, StyleSheet } from 'react-native';
 
 import ProfileBox from '../../components/MyProfile/ProfileBox';
-import myprofileInfo from '../../components/MyProfile/myprofileInfo.json';
 import Tabs from '../../components/MyProfile/Tabs';
 import RecordView from '../../components/MyProfile/RecordView';
 import ActivityView from '../../components/MyProfile/ActivityView';
 import record from '../../components/MyProfile/record.json';
+import { getProfile } from '../../utils/api';
+import Skeleton from '../../components/MyProfile/Skeleton';
 
 const MyProfile = () => {
   const [activeTab, setActiveTab] = useState('record');
   const [selectedRecord, setSelectedRecord] = useState(null);
+  const [profileData, setProfileData] = useState({ loading: true, data: null });
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      const result = await getProfile();
+      setProfileData(result);
+    };
+    fetchProfile();
+  }, []);
 
   const handleDayPress = day => {
     const recordForDay = record.find(item => item.date === day.dateString);
@@ -21,7 +31,11 @@ const MyProfile = () => {
 
   return (
     <View style={styles.container}>
-      <ProfileBox data={myprofileInfo} />
+      {profileData.loading ? (
+        <Skeleton />
+      ) : (
+        profileData.data && <ProfileBox data={profileData.data} />
+      )}
       <Tabs activeTab={activeTab} setActiveTab={setActiveTab} />
       <ScrollView contentContainerStyle={styles.contentContainer}>
         {activeTab === 'record' ? (
