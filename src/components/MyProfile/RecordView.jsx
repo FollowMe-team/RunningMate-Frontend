@@ -4,12 +4,20 @@ import PropTypes from 'prop-types';
 
 import Calendars from '../Calendars';
 import RecordDetails from './RecordDetails';
-import records from './record.json';
 
-const RecordView = ({ handleDayPress, selectedRecord }) => {
+const RecordView = ({
+  handleDayPress,
+  selectedRecord,
+  records,
+  fetchMonthlyRecords,
+}) => {
   return (
     <View style={styles.recordView}>
-      <Calendars onDayPress={handleDayPress} dataSource={records} />
+      <Calendars
+        onDayPress={handleDayPress}
+        dataSource={records}
+        fetchMonthlyRecords={fetchMonthlyRecords}
+      />
       <RecordDetails selectedRecord={selectedRecord} />
     </View>
   );
@@ -18,6 +26,8 @@ const RecordView = ({ handleDayPress, selectedRecord }) => {
 RecordView.propTypes = {
   handleDayPress: PropTypes.func.isRequired,
   selectedRecord: PropTypes.object,
+  records: PropTypes.array.isRequired,
+  fetchMonthlyRecords: PropTypes.func.isRequired,
 };
 
 const styles = StyleSheet.create({

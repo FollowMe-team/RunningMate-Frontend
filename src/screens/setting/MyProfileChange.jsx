@@ -14,7 +14,7 @@ import PropTypes from 'prop-types';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Dropdown } from 'react-native-element-dropdown';
-import api from '../../utils/api';
+import { updateProfile, checkNickname, getProfile } from '../../utils/api';
 
 import ProfilePhotoPicker from './ProfilePhotoPicker';
 import calendarIcon from '../../assets/images/Settings/free-icon-calendar-8786347.png';
@@ -22,6 +22,7 @@ import AddressInput from '../../components/AddressInput';
 
 const MyProfileChange = () => {
   const navigation = useNavigation();
+
   const [photo, setPhoto] = useState(null);
   const [nickname, setNickname] = useState('');
   const [info, setInfo] = useState('');
@@ -35,15 +36,14 @@ const MyProfileChange = () => {
 
   useEffect(() => {
     const loadProfile = async () => {
-      const profile = await AsyncStorage.getItem('myprofile');
-      if (profile) {
-        const parsedProfile = JSON.parse(profile);
-        setPhoto(parsedProfile.profile_url || null);
-        setNickname(parsedProfile.nickname);
-        setInfo(parsedProfile.info);
-        setBirthday(parsedProfile.birthday);
-        setGender(parsedProfile.gender);
-        setAddress(parsedProfile.address);
+      const response = await getProfile();
+      if (response.data) {
+        setPhoto(response.data.profile_url || null);
+        setNickname(response.data.nickname);
+        setInfo(response.data.info);
+        setBirthday(response.data.birthday);
+        setGender(response.data.gender);
+        setAddress(response.data.address);
       }
     };
     loadProfile();
@@ -61,8 +61,8 @@ const MyProfileChange = () => {
 
   const handleNicknameCheck = async () => {
     try {
-      const response = await api.post('/auth/check-nickname', { nickname });
-      if (response.data.isAvailable) {
+      const response = await checkNickname(nickname);
+      if (response.isAvailable) {
         setIsNicknameChecked(true);
         setNicknameError('');
         alert('사용 가능한 닉네임입니다.');
@@ -92,18 +92,26 @@ const MyProfileChange = () => {
       setNicknameError('닉네임 중복 체크를 해주세요.');
       return;
     }
-    const updatedProfile = {
-      profile_url: photo,
-      nickname,
-      info,
-      birthday,
-      gender,
-      address,
-    };
-    await AsyncStorage.setItem('myprofile', JSON.stringify(updatedProfile));
 
-    // 변경 완료 메시지 출력
-    setModalVisible(true);
+    const profileData = {
+      gender: gender === '남' ? 'MALE' : 'FEMALE',
+      nickname,
+      birth: birthday.replace(/\./g, '-'),
+      introduce: info,
+      locationInfo: {
+        address,
+        latitude: 0,
+        longitude: 0,
+      },
+    };
+
+    const result = await updateProfile(profileData, photo);
+    if (result.success) {
+      await AsyncStorage.setItem('myprofile', JSON.stringify(profileData));
+      setModalVisible(true);
+    } else {
+      alert(result.message);
+    }
   };
 
   const closeModal = () => {

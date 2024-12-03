@@ -100,14 +100,14 @@ const Signup = () => {
 
   const handleEmailCheck = async () => {
     try {
-      const response = await api.post('/auth/check-email', { email });
-      if (response.data.isAvailable) {
+      const response = await api.checkEmail(email);
+      if (response.data.isDuplicated) {
+        setIsEmailChecked(false);
+        setEmailError('이미 사용 중인 이메일입니다.');
+      } else {
         setIsEmailChecked(true);
         setEmailError('');
         alert('사용 가능한 이메일입니다.');
-      } else {
-        setIsEmailChecked(false);
-        setEmailError('이미 사용 중인 이메일입니다.');
       }
     } catch {
       setIsEmailChecked(false);
@@ -117,8 +117,8 @@ const Signup = () => {
 
   const handleNicknameCheck = async () => {
     try {
-      const response = await api.post('/auth/check-nickname', { nickname });
-      if (response.data.isAvailable) {
+      const response = await api.checkNickname(nickname);
+      if (response.isAvailable) {
         setIsNicknameChecked(true);
         setNicknameError('');
         alert('사용 가능한 닉네임입니다.');

@@ -11,7 +11,7 @@ import {
 import { useNavigation } from '@react-navigation/native';
 
 import myprofile from '../../components/MyProfile/myprofileInfo.json';
-import { logout } from '../../utils/api';
+import { logout } from '../../utils/loginlogout_api';
 
 const Setting = () => {
   const navigation = useNavigation();

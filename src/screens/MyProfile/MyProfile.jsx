@@ -5,25 +5,57 @@ import ProfileBox from '../../components/MyProfile/ProfileBox';
 import Tabs from '../../components/MyProfile/Tabs';
 import RecordView from '../../components/MyProfile/RecordView';
 import ActivityView from '../../components/MyProfile/ActivityView';
-import record from '../../components/MyProfile/record.json';
-import { getProfile } from '../../utils/api';
+import { getProfile, getBadges } from '../../utils/api';
 import Skeleton from '../../components/MyProfile/Skeleton';
+import { getMonthlyRecords } from '../../utils/records_monthly_api';
 
 const MyProfile = () => {
   const [activeTab, setActiveTab] = useState('record');
   const [selectedRecord, setSelectedRecord] = useState(null);
   const [profileData, setProfileData] = useState({ loading: true, data: null });
+  const [badges, setBadges] = useState([]);
+  const [badgesLoading, setBadgesLoading] = useState(true);
+  const [monthlyRecords, setMonthlyRecords] = useState([]);
+  const [recordsLoading, setRecordsLoading] = useState(true);
+
+  const fetchMonthlyRecords = async yearMonth => {
+    setRecordsLoading(true);
+    const result = await getMonthlyRecords(yearMonth);
+    if (result.success) {
+      setMonthlyRecords(result.data);
+    }
+    setRecordsLoading(false);
+  };
 
   useEffect(() => {
     const fetchProfile = async () => {
       const result = await getProfile();
       setProfileData(result);
     };
+
+    const fetchBadges = async () => {
+      setBadgesLoading(true);
+      const result = await getBadges();
+      if (result.success) {
+        setBadges(result.data);
+      }
+      setBadgesLoading(false);
+    };
+
+    const today = new Date();
+    const yearMonth = `${today.getFullYear()}-${String(
+      today.getMonth() + 1,
+    ).padStart(2, '0')}`;
+
     fetchProfile();
+    fetchBadges();
+    fetchMonthlyRecords(yearMonth);
   }, []);
 
   const handleDayPress = day => {
-    const recordForDay = record.find(item => item.date === day.dateString);
+    const recordForDay = monthlyRecords.find(
+      record => record.startTime.split('T')[0] === day.dateString,
+    );
     setSelectedRecord(
       recordForDay || { message: '해당 날짜는 러닝 기록이 없어요!' },
     );
@@ -39,13 +71,20 @@ const MyProfile = () => {
       <Tabs activeTab={activeTab} setActiveTab={setActiveTab} />
       <ScrollView contentContainerStyle={styles.contentContainer}>
         {activeTab === 'record' ? (
-          <RecordView
-            RecordView
-            handleDayPress={handleDayPress}
-            selectedRecord={selectedRecord}
-          />
+          recordsLoading ? (
+            <Skeleton />
+          ) : (
+            <RecordView
+              handleDayPress={handleDayPress}
+              selectedRecord={selectedRecord}
+              records={monthlyRecords}
+              fetchMonthlyRecords={fetchMonthlyRecords}
+            />
+          )
+        ) : badgesLoading ? (
+          <Skeleton />
         ) : (
-          <ActivityView />
+          <ActivityView badges={badges} />
         )}
       </ScrollView>
     </View>
