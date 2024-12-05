@@ -42,6 +42,16 @@ const RunningScreen = () => {
     const [time, setTime] = useState(moment.duration(0, 'seconds'));
     const [focus, setFocus] = useState(true);
     const [isRunning, setIsRunning] = useState(true);
+    const [end, setEnd] = useState(null);
+
+    const handleEnd = () => {
+        if (end !== null) {
+            // 이미 정보가 표시된 상태라면, 정보 초기화 (토글 효과)
+            setEnd(null);
+        } else {
+            setEnd(true)
+        }
+    }
 
 
     const tick = () => {
@@ -366,7 +376,7 @@ const RunningScreen = () => {
                         </View>
                         <View>
                             <Text style={{ alignSelf: 'center' }}>칼로리</Text>
-                            <Text style={{ color: 'black', fontSize: 16, alignSelf: 'center' }}>{0.0055*time}</Text>
+                            <Text style={{ color: 'black', fontSize: 16, alignSelf: 'center' }}>{(0.0055*distance).toFixed(2)}</Text>
                         </View>
                     </View>
                 </View>
@@ -374,7 +384,7 @@ const RunningScreen = () => {
                     <TouchableOpacity onPress={toggleTimer}>
                         <Image style={{ height: 55, width: 55 }} source={isRunning ? stopbutton : playbutton} />
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={() => navigation.navigate('Savingcourse')}>
+                    <TouchableOpacity onPress={handleEnd}>
                         <Image style={{ height: 55, width: 55, marginLeft: 20 }} source={endbutton} />
                     </TouchableOpacity>
                 </View>
@@ -389,6 +399,27 @@ const RunningScreen = () => {
                     <Text style={styles.infoText}>두 번째 지점 고도: {elevation2} 미터</Text>
                     <Text style={styles.infoText}>두 지점 간의 거리: {distance} km</Text>
                     <Text style={styles.infoText}>두 지점 간의 고도 차이: {elevation2 - elevation1} m</Text>
+                </View>
+            )}
+            {end !== null && (
+                <View style={{ backgroundColor: ' rgba(0, 0, 0, 0.5)', height: '100%', width: '100%', position: 'absolute', justifyContent: 'center' }}>
+                    <View style={{ backgroundColor: 'white', height: '18%', width: '60%', alignSelf: 'center', justifyContent: 'space-between', borderRadius: 15 }}>
+                        <Text style={{ height: '50%', width: '70%', color: 'black', alignSelf: 'center', textAlign: 'center', textAlignVertical: 'center', color: 'grey', fontSize: 12, fontWeight: 'bold', marginTop: '9%' }}>종료 후에는 변경이 불가합니다. 해당 코스로 등록하시겠습니까?</Text>
+                        <View style={{ flexDirection: 'row', height: '35%', width: '100%' }}>
+                            <TouchableOpacity onPress={handleEnd} style={{ width: '50%', height: '100%', justifyContent: 'center' }}>
+                                <View style={{ alignSelf: 'center', justifyContent: 'center' }}>
+                                    <Text style={{ color: 'black', alignSelf: 'center', fontWeight: 'bold' }}>Cancel</Text>
+                                </View>
+                            </TouchableOpacity>
+                            <TouchableOpacity onPress={() => navigation.navigate('Savingcourse')}
+                                style={{ width: '50%', height: '100%', justifyContent: 'center' }}>
+                                <View style={{ alignSelf: 'center', justifyContent: 'center' }}>
+                                    <Text style={{ color: 'black', alignSelf: 'center', fontWeight: 'bold', color: 'red' }}>Finish</Text>
+                                </View>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+
                 </View>
             )}
         </View>

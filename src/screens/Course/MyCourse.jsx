@@ -56,10 +56,6 @@ const MyCourse = () => {
           <View style={{ flexWrap: 'wrap', flexDirection: 'row', justifyContent: 'space-between' }}>
             <View style={{ flexWrap: 'wrap', flexDirection: 'row' }}>
               <Text style={{ color: 'black', fontSize: 16, marginLeft: 22 }}>월미도 해안길</Text>
-              <Image
-                style={{ width: 18, height: 18, alignSelf: 'flex-end', marginLeft: 5 }}
-                source={subscribe}
-              />
             </View>
             <View style={{ flexWrap: 'wrap', flexDirection: 'row' }}>
               <View style={{ flexWrap: 'wrap', flexDirection: 'row', marginRight: 7, marginTop: 3 }}>
@@ -104,10 +100,7 @@ const MyCourse = () => {
           <View style={{ flexWrap: 'wrap', flexDirection: 'row', justifyContent: 'space-between' }}>
             <View style={{ flexWrap: 'wrap', flexDirection: 'row' }}>
               <Text style={{ color: 'black', fontSize: 16, marginLeft: 22 }}>송도 센트럴파크</Text>
-              <Image
-                style={{ width: 18, height: 18, alignSelf: 'flex-end', marginLeft: 5 }}
-                source={subscribe}
-              />
+              
             </View>
             <View style={{ flexWrap: 'wrap', flexDirection: 'row' }}>
               <View style={{ flexWrap: 'wrap', flexDirection: 'row', marginRight: 7, marginTop: 3 }}>
@@ -153,10 +146,7 @@ const MyCourse = () => {
           <View style={{ flexWrap: 'wrap', flexDirection: 'row', justifyContent: 'space-between' }}>
             <View style={{ flexWrap: 'wrap', flexDirection: 'row' }}>
               <Text style={{ color: 'black', fontSize: 16, marginLeft: 22 }}>계양산 둘레길</Text>
-              <Image
-                style={{ width: 18, height: 18, alignSelf: 'flex-end', marginLeft: 5 }}
-                source={subscribe}
-              />
+              
             </View>
             <View style={{ flexWrap: 'wrap', flexDirection: 'row' }}>
               <View style={{ flexWrap: 'wrap', flexDirection: 'row', marginRight: 7, marginTop: 3 }}>

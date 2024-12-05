@@ -31,7 +31,7 @@ const ProfileBox = ({ data }) => {
   return (
     <View style={styles.container}>
       <View style={styles.infoContainer}>
-        <View style={{ alignItems: 'center', marginBottom: 7 }}>
+        <View style={{ alignItems: 'center' }}>
           <Image
             source={
               data.profile_url && data.profile_url !== null
@@ -45,6 +45,9 @@ const ProfileBox = ({ data }) => {
               flexDirection: 'row',
               justifyContent: 'center',
               alignItems: 'center',
+              marginVertical :5,
+              marginLeft:50
+
             }}
           >
             <Text style={styles.nickname}>{data.nickname}</Text>
@@ -126,7 +129,7 @@ const ProfileBox = ({ data }) => {
           style={{
             flexDirection: 'row',
             justifyContent: 'space-between',
-            marginTop: 12,
+            marginTop: 1,
           }}
         >
           <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
@@ -155,7 +158,7 @@ const ProfileBox = ({ data }) => {
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
-    padding: 16,
+    padding: 13,
     borderWidth: 1,
     borderRadius: 15,
     borderColor: '#DDDDDD',

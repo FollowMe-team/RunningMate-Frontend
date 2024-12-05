@@ -1,7 +1,8 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { TextInput, TouchableOpacity, StyleSheet, View, Text, Alert, Pressable, Image, ImageBackground, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { Dropdown } from 'react-native-element-dropdown';
 
 import blacklocation from '../../assets/images/Course/blacklocation.png';
 import location from '../../assets/images/Course/location.png';
@@ -63,29 +64,77 @@ const styles = StyleSheet.create({
         borderRadius: 15,
         alignItems: "center", justifyContent: "center",
     },
-    starsize: { height: 30, width: 30, marginLeft: 20, marginRight: 10 },
+    starsize: { height: 30, width: 30, marginLeft: 20, marginRight: 10, marginTop:5 },
 
-    inputbar: { borderRadius: 10, width: "78%", height: 32, backgroundColor: 'white', elevation: 7, alignSelf: 'center', paddingLeft: 10, textAlignVertical: 'center' },
-    inputbar2: { borderRadius: 10, width: "87%", height: 32, backgroundColor: 'white', elevation: 7, alignSelf: 'center', paddingLeft: 10, textAlignVertical: 'center', marginTop: 15 }
+    inputbar: { borderRadius: 10, width: "78%", height: 40, backgroundColor: 'white', elevation: 7, alignSelf: 'center', paddingLeft: 10, textAlignVertical: 'center', fontSize: 14, color: 'grey' },
+    inputbar2: { borderRadius: 10, width: "87%", height: 32, backgroundColor: 'white', elevation: 7, alignSelf: 'center', paddingLeft: 10, textAlignVertical: 'center', marginTop: 15, justifyContent: 'center' },
 
 });
 
 
 
-const Courserecommend = () => {
+const Courserecommend = ({ route }) => {
     const navigation = useNavigation();
-
+    const [Leveldata, setLevel] = useState('');
+    const [Goaldata, setGoal] = useState('');
+    const Goaldatas = [
+        { label: "체중 감량", value: 'WEIGHT_LOSS' },
+        { label: "속도 증가", value: 'ENDURANCE' },
+        { label: "지구력 상승", value: 'SPEED' }
+    ]
+    const Leveldatas = [
+        { label: "쉬움", value: 'EASY' },
+        { label: "보통", value: 'NORMAL' },
+        { label: "어려움", value: 'HARD' }
+    ]
+    const selectedLocation = route.params?.selectedLocation || {
+        address: '주소를 검색해주세요',
+        latitude: null,
+        longitude: null
+    };
     return (
         <ScrollView>
             <View style={styles.space}></View>
-            <View style={{ flexDirection: 'row' }}>
-                <Image style={styles.starsize} source={blacklocation} />
-                <Text style={styles.inputbar}>위치 선택</Text>
+            <TouchableOpacity onPress={() => navigation.navigate('RecommendLocation')}>
+                <View style={{ flexDirection: 'row' }}>
+                    <Image style={styles.starsize} source={blacklocation} />
+                    <Text style={styles.inputbar}>{selectedLocation.address}</Text>
+                </View>
+            </TouchableOpacity>
+            <View style={styles.inputbar2}>
+                <Dropdown
+                    data={Leveldatas}
+                    labelField="label"
+                    valueField="value"
+                    placeholder="난이도 선택"
+                    value={Leveldata}
+                    onChange={item => {
+                        setLevel(item.value);
+                    }}
+
+                    placeholderStyle={{ fontSize: 14, color: 'grey', marginLeft: 3 }} // 글자색 수정
+                    itemTextStyle={{ fontSize: 14, color: 'grey' }} // 드롭다운 리스트 글자색 수정
+                    selectedTextStyle={{ fontSize: 14, color: 'grey', marginLeft: 3 }} // 선택된 항목 글자색 수정
+                />
             </View>
-            <Text style={styles.inputbar2}>난이도 선택</Text>
-            <Text style={styles.inputbar2}>러닝 목표 선택</Text>
+            <View style={styles.inputbar2}>
+                <Dropdown
+                    data={Goaldatas}
+                    labelField="label"
+                    valueField="value"
+                    placeholder="러닝 목표 선택"
+                    value={Goaldata}
+                    onChange={item => {
+                        setGoal(item.value);
+                    }}
+
+                    placeholderStyle={{ fontSize: 14, color: 'grey', marginLeft: 3 }} // 글자색 수정
+                    itemTextStyle={{ fontSize: 14, color: 'grey' }} // 드롭다운 리스트 글자색 수정
+                    selectedTextStyle={{ fontSize: 14, color: 'grey', marginLeft: 3 }} // 선택된 항목 글자색 수정
+                />
+            </View>
             <View style={{ borderRadius: 15, width: "90%", height: 'auto', backgroundColor: 'white', elevation: 7, alignSelf: 'center', marginTop: 30, paddingBottom: 15 }}>
-                <TouchableOpacity style={{ borderRadius: 15, width: "90%", height: 'auto', backgroundColor: 'white', elevation: 7, alignSelf: 'center', marginTop: 20 }} onPress={() => navigation.navigate('Reviewed')}>
+                <TouchableOpacity style={{ borderRadius: 15, width: "90%", height: 'auto', backgroundColor: 'white', elevation: 7, alignSelf: 'center', marginTop: 20 }} onPress={() => navigation.navigate('Courserecommend_map')}>
                     <View style={{ flexWrap: 'wrap', flexDirection: 'row' }}>
                         <Image
                             style={{ width: 40, height: 40, marginLeft: 20, marginTop: 15 }}

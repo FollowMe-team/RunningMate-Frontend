@@ -38,7 +38,7 @@ const styles = StyleSheet.create({
         borderColor: 'white',
         backgroundColor: '#73D393',
         borderWidth: 0,
-        borderRadius: 15, FlexDirection: 'row',
+        borderRadius: 15, FlexDirection: 'row',marginBottom:20,
         alignItems: "center", justifyContent: "center", alignSelf: "center"
     },
 
@@ -209,7 +209,7 @@ const Reviewed = () => {
                 </View>
                 <View style={styles.smallboxlist2}>
                     <View style={{ flexDirection: 'row' }}>
-                        <TouchableOpacity onPress={() => navigation.navigate('Othersprofile')}>
+                        <TouchableOpacity onPress={() => navigation.navigate('Othersprofile_notteam')}>
 
                             <Image
                                 style={{ width: 42, height: 42, alignSelf: 'center', marginLeft: 10, marginRight: 5, marginTop: 7 }}

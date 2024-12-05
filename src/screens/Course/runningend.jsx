@@ -79,7 +79,7 @@ const Runningend = () => {
       <View style={styles.space}></View>
       <View style={{ flexDirection: 'row', justifyContent: "space-around" }}>
         <TouchableOpacity
-          style={styles.whitebutton} onPress={() => navigation.navigate('Course_basic')}>
+          style={styles.whitebutton} onPress={() => navigation.navigate('Main')}>
           <View style={{ flexDirection: 'row', justifyContent: "space-between" }}>
 
             <Text style={styles.greentext}>
@@ -93,7 +93,7 @@ const Runningend = () => {
         </TouchableOpacity>
         <TouchableOpacity style={styles.greenbutton} onPress={() => navigation.navigate('Reviewing')}>
           <View style={{ flexDirection: 'row', justifyContent: "space-around" }}>
-            <Text style={styles.whitetext}>글 쓰기</Text>
+            <Text style={styles.whitetext}>리뷰 작성</Text>
 
             <Image
               style={{ width: 30, height: 30 }}

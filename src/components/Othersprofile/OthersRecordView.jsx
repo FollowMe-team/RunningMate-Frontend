@@ -4,11 +4,13 @@ import PropTypes from 'prop-types';
 
 import Calendars from '../Calendars';
 import RecordDetails from './OthersRecordDetails';
+import records from '../MyProfile/record.json';
+
 
 const RecordView = ({ handleDayPress, selectedRecord }) => {
   return (
     <View style={styles.recordView}>
-      <Calendars onDayPress={handleDayPress} />
+      <Calendars onDayPress={handleDayPress}  dataSource={records}/>
       <RecordDetails selectedRecord={selectedRecord} />
     </View>
   );

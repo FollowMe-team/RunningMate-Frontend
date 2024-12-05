@@ -30,14 +30,14 @@ const MyProfile = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
       {profileData.loading ? (
         <Skeleton />
       ) : (
         profileData.data && <ProfileBox data={profileData.data} />
       )}
       <Tabs activeTab={activeTab} setActiveTab={setActiveTab} />
-      <ScrollView contentContainerStyle={styles.contentContainer}>
+      <View contentContainerStyle={styles.contentContainer}>
         {activeTab === 'record' ? (
           <RecordView
             RecordView
@@ -47,8 +47,8 @@ const MyProfile = () => {
         ) : (
           <ActivityView />
         )}
-      </ScrollView>
-    </View>
+      </View>
+    </ScrollView>
   );
 };
 

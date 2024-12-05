@@ -25,6 +25,8 @@ import runningtimesaving from '../../src/screens/Course/runningtimesaving';
 import runningtime from '../../src/screens/Course/runningtime';
 import savingcourse from '../../src/screens/Course/savingcourse';
 import runningend from '../../src/screens/Course/runningend';
+import SearchLocation from '../../src/screens/Course/SearchLocation';
+import RecommendLocation from '../../src/screens/Course/RecommendLocation';
 import Othersprofile from '../../src/screens/Othersprofile/Othersprofile';
 import Othersprofile_notteam from '../../src/screens/Othersprofile/Othersprofile_notteam';
 import Othersfootprinting from '../../src/screens/Othersprofile/OthersFootprinting';
@@ -108,67 +110,134 @@ const StackNavigator = () => (
     <Stack.Screen
       name="Course_basic"
       component={Course_basic}
-      options={{ title: '러닝 코스' }}
+      options={{ title: '러닝 코스' ,
+        header: ({ navigation }) => (
+        <Header title="러닝 코스" navigation={navigation}  />
+        
+      ),
+      headerShown: true,}}
     />
     <Stack.Screen
       name="Course_with_record"
       component={Course_with_record}
-      options={{ title: '러닝 코스_기록' }}
+      options={{ title: '러닝 코스_기록' ,
+        header: ({ navigation }) => (
+        <Header title="러닝 코스" navigation={navigation}  />
+      ),
+      headerShown: true, }}
     />
     <Stack.Screen
       name="Course_with_record_choosed"
       component={Course_with_record_choosed}
-      options={{ title: '코스 추천_선택' }}
+      options={{ title: '코스 추천_선택',
+        header: ({ navigation }) => (
+          <Header title="코스 추천" navigation={navigation} 
+          hideSettingButton/>
+        ),
+        headerShown: true, }}
     />
     <Stack.Screen
       name="Courserecommend"
       component={courserecommend}
-      options={{ title: '코스 추천' }}
+      options={{ title: '코스 추천',
+        header: ({ navigation }) => (
+          <Header title="코스 추천" navigation={navigation} 
+          hideSettingButton/>
+        ),
+        headerShown: true, }}
     />
     <Stack.Screen
       name="Courserecommend_map"
       component={courserecommend_map}
-      options={{ title: '코스 추천_지도' }}
+      options={{ title: '코스 추천_지도',
+        header: ({ navigation }) => (
+          <Header title="코스 추천" navigation={navigation} 
+          hideSettingButton/>
+        ),
+        headerShown: true, }}
     />
     <Stack.Screen
       name="Coursesearch"
       component={coursesearch}
-      options={{ title: '코스 검색' }}
+      options={{ title: '코스 검색',
+        header: ({ navigation }) => (
+          <Header title="코스 검색" navigation={navigation} 
+          hideSettingButton/>
+        ),
+        headerShown: true, }}
     />
     <Stack.Screen
       name="Coursesearchmaplist"
       component={coursesearchmaplist}
-      options={{ title: '러닝 검색 리스트' }}
+      options={{ title: '러닝 검색 리스트',
+        header: ({ navigation }) => (
+          <Header title="코스 검색" navigation={navigation} 
+          hideSettingButton/>
+        ),
+        headerShown: true, }}
     />
     <Stack.Screen
       name="Coursesearchmapview"
       component={coursesearchmapview}
-      options={{ title: '코스 검색 선택 뷰' }}
+      options={{ title: '코스 검색 선택 뷰',
+        header: ({ navigation }) => (
+          <Header title="코스 검색" navigation={navigation} 
+          hideSettingButton/>
+        ),
+        headerShown: false, }}
     />
     <Stack.Screen
       name="MyCourse"
       component={MyCourse}
-      options={{ title: '내 코스' }}
+      options={{ title: '내 코스',
+        header: ({ navigation }) => (
+          <Header
+            title="내 코스"
+            navigation={navigation}
+            hideSettingButton
+          />
+        ),
+        headerShown: true, }}
     />
     <Stack.Screen
       name="MyCourse_none"
       component={MyCourse_none}
-      options={{ title: '내 코스 없음' }}
+      options={{ title: '내 코스 없음',
+        header: ({ navigation }) => (
+          <Header title="내 코스" navigation={navigation} 
+          hideSettingButton/>
+        ),
+        headerShown: true, }}
     />
     <Stack.Screen
       name="Reviewed"
       component={reviewed}
-      options={{ title: '리뷰' }}
+      options={{ title: '리뷰',
+        header: ({ navigation }) => (
+          <Header title="선택한 코스" navigation={navigation} 
+          hideSettingButton/>
+        ),
+        headerShown: true, }}
     />
     <Stack.Screen
       name="Reviewing"
       component={reviewing}
-      options={{ title: '리뷰 작성' }}
+      options={{ title: '리뷰 작성',
+        header: ({ navigation }) => (
+          <Header title="리뷰 작성" navigation={navigation}
+          hideSettingButton />
+        ),
+        headerShown: true, }}
     />
     <Stack.Screen
       name="Reviewlist"
       component={reviewlist}
-      options={{ title: '리뷰 리스트' }}
+      options={{ title: '리뷰 리스트',
+        header: ({ navigation }) => (
+          <Header title="작성된 리뷰" navigation={navigation} 
+          hideSettingButton/>
+        ),
+        headerShown: true, }}
     />
     <Stack.Screen
       name="Runningtimesaving"
@@ -183,27 +252,52 @@ const StackNavigator = () => (
     <Stack.Screen
       name="Savingcourse"
       component={savingcourse}
-      options={{ title: '코스 저장' }}
+      options={{ title: '코스 저장',
+        header: ({ navigation }) => (
+          <Header title="코스 저장" navigation={navigation} hideBackButton
+          hideSettingButton />
+        ),
+        headerShown: true, }}
     />
     <Stack.Screen
       name="Runningend"
       component={runningend}
-      options={{ title: '달리기 완료' }}
+      options={{ title: '달리기 완료',
+        header: ({ navigation }) => (
+          <Header title="달리기 완료" navigation={navigation} 
+          hideBackButton hideSettingButton/>
+        ),
+        headerShown: true, }}
     />
     <Stack.Screen
       name="Othersprofile"
       component={Othersprofile}
-      options={{ title: '타인 프로필 기본' }}
+      options={{ title: '타인 프로필 기본',
+        header: ({ navigation }) => (
+          <Header title="타인 프로필" navigation={navigation} 
+          hideSettingButton/>
+        ),
+        headerShown: true, }}
     />
     <Stack.Screen
       name="Othersprofile_notteam"
       component={Othersprofile_notteam}
-      options={{ title: '타인 프로필 기본' }}
+      options={{ title: '타인 프로필 기본',
+        header: ({ navigation }) => (
+          <Header title="타인 프로필" navigation={navigation} 
+          hideSettingButton/>
+        ),
+        headerShown: true, }}
     />
     <Stack.Screen
       name="Othersfootprinting"
       component={Othersfootprinting}
-      options={{ title: '발자국 평가' }}
+      options={{ title: '발자국 평가',
+        header: ({ navigation }) => (
+          <Header title="발자국 평가" navigation={navigation} 
+          hideSettingButton/>
+        ),
+        headerShown: true, }}
     />
     <Stack.Screen
       name="CreateCrew"
@@ -319,7 +413,7 @@ const StackNavigator = () => (
       options={{
         title: '설정',
         header: ({ navigation }) => (
-          <Header title="설정" navigation={navigation} hideSettingButton />
+          <Header title="설정" navigation={navigation} hideSettingButton/>
         ),
         headerShown: true,
       }}
@@ -383,6 +477,36 @@ const StackNavigator = () => (
         title: '계정 탈퇴',
         header: ({ navigation }) => (
           <Header title="계정 탈퇴" navigation={navigation} hideSettingButton />
+        ),
+        headerShown: true,
+      }}
+    />
+    <Stack.Screen
+      name="SearchLocation"
+      component={SearchLocation}
+      options={{
+        title: '위치 선택',
+        header: ({ navigation }) => (
+          <Header
+            title="위치 선택"
+            navigation={navigation}
+            hideSettingButton
+          />
+        ),
+        headerShown: true,
+      }}
+    />
+    <Stack.Screen
+      name="RecommendLocation"
+      component={RecommendLocation}
+      options={{
+        title: '위치 선택',
+        header: ({ navigation }) => (
+          <Header
+            title="위치 선택"
+            navigation={navigation}
+            hideSettingButton
+          />
         ),
         headerShown: true,
       }}
