@@ -1,0 +1,37 @@
+[
+  {
+    "id": 1,
+    "nickname": "reviewer1",
+    "date": "2024-11-24 12:30",
+    "isGood": true,
+    "review": "조아용"
+  },
+  {
+    "id": 2,
+    "nickname": "reviewer2",
+    "date": "2024-11-27 14:45",
+    "isGood": false,
+    "review": "별로에요"
+  },
+  {
+    "id": 3,
+    "nickname": "reviewer3",
+    "date": "2024-12-01 09:15",
+    "isGood": true,
+    "review": "좋아요"
+  },
+  {
+    "id": 4,
+    "nickname": "reviewer4",
+    "date": "2024-12-05 11:20",
+    "isGood": false,
+    "review": "그저 그래요"
+  },
+  {
+    "id": 5,
+    "nickname": "reviewer5",
+    "date": "2024-12-05 16:00",
+    "isGood": true,
+    "review": "최고에요"
+  }
+]

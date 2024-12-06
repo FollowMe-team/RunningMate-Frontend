@@ -99,11 +99,12 @@ const updateProfile = async (profileData, profileImage) => {
 const checkNickname = async nickname => {
   try {
     const response = await api.get(
-      `/members/check/nickname?nickname=${nickname}`,
+      `/members/check/nickname=?nickname=${nickname}`,
       {
         headers: { accept: 'application/json' },
       },
     );
+    console.log('Nickname check successful:', response.data);
     return response.data;
   } catch (error) {
     if (error.response) {
@@ -117,9 +118,10 @@ const checkNickname = async nickname => {
 
 const checkEmail = async email => {
   try {
-    const response = await api.get(`/members/check/email?email=${email}`, {
+    const response = await api.get(`/members/check/email=?email=${email}`, {
       headers: { accept: 'application/json' },
     });
+    console.log('Email check successful:', response.data);
     return response.data;
   } catch (error) {
     if (error.response) {
@@ -221,6 +223,80 @@ const getFollowers = async () => {
   }
 };
 
+const getProfileSummary = async () => {
+  try {
+    const accessToken = await AsyncStorage.getItem('accessToken');
+    if (!accessToken) {
+      console.error('No access token found');
+      return { loading: false, data: null };
+    }
+    const response = await api.get('/members/summary', {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+    if (response.status === 200) {
+      console.log('Profile summary fetch successful:', response.data);
+      return {
+        loading: false,
+        data: response.data.data,
+      };
+    }
+  } catch (error) {
+    if (error.response) {
+      console.error('Profile summary fetch failed', error.response.data);
+    } else {
+      console.error('Profile summary fetch failed', error.message);
+    }
+    return { loading: false, data: null };
+  }
+};
+
+const changePassword = async (currentPassword, newPassword) => {
+  try {
+    const accessToken = await AsyncStorage.getItem('accessToken');
+    if (!accessToken) {
+      console.error('No access token found');
+      return { success: false, message: '인증되지 않은 사용자입니다.' };
+    }
+
+    const response = await api.patch(
+      '/members/password',
+      { currentPassword, newPassword },
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+        },
+      },
+    );
+
+    if (response.status === 200) {
+      console.log('Password change successful:', response.data);
+      return { success: true };
+    }
+  } catch (error) {
+    console.error('Password change failed:', error);
+    if (error.response) {
+      const { data } = error.response;
+      if (data.code === 'AUTH001') {
+        return { success: false, message: '인증되지 않은 사용자입니다.' };
+      } else if (data.code === 'MEMBER003') {
+        return {
+          success: false,
+          message: '현재 비밀번호가 일치하지 않습니다.',
+        };
+      } else if (data.code === 'MEMBER004') {
+        return {
+          success: false,
+          message: '새 비밀번호가 현재 비밀번호와 동일합니다.',
+        };
+      } else if (data.code === 'MEMBER001') {
+        return { success: false, message: '회원을 찾을 수 없습니다.' };
+      }
+    }
+    return { success: false, message: '비밀번호 변경에 실패했습니다.' };
+  }
+};
+
 export {
   getProfile,
   updateProfile,
@@ -229,6 +305,8 @@ export {
   checkEmail,
   getFollowings,
   getFollowers,
+  getProfileSummary,
+  changePassword,
 };
 
 export default api;

@@ -11,11 +11,10 @@ import {
 import PasswordInput, { validatePassword } from '../../components/Password';
 import { useNavigation } from '@react-navigation/native';
 
-import myprofile from '../../components/MyProfile/myprofileInfo.json';
-
 import bad from '../../assets/images/Settings/delete.png';
 import eye from '../../assets/images/Settings/show.png';
 import eyeOff from '../../assets/images/Settings/hide.png';
+import { changePassword } from '../../utils/api';
 
 const PasswordChange = () => {
   const [currentPassword, setCurrentPassword] = useState('');
@@ -30,18 +29,13 @@ const PasswordChange = () => {
     useState(false);
   const navigation = useNavigation();
 
-  const validateCurrentPassword = password => {
-    if (password !== myprofile.password) {
-      setCurrentPasswordError('기존 비밀번호와 일치하지 않습니다.');
+  const handlePasswordChange = async () => {
+    const result = await changePassword(currentPassword, newPassword);
+    if (result.success) {
+      setModalVisible(true);
     } else {
-      setCurrentPasswordError('');
+      setCurrentPasswordError(result.message);
     }
-    setCurrentPassword(password);
-  };
-
-  const handlePasswordChange = () => {
-    // 비밀번호 변경 로직 추가
-    setModalVisible(true);
   };
 
   const closeModal = () => {
@@ -53,7 +47,9 @@ const PasswordChange = () => {
     passwordError !== '' ||
     confirmPasswordError !== '' ||
     currentPasswordError !== '' ||
-    !currentPassword;
+    !currentPassword ||
+    !newPassword ||
+    !confirmPassword;
 
   return (
     <View style={styles.container}>
@@ -64,7 +60,7 @@ const PasswordChange = () => {
             style={styles.input}
             secureTextEntry={!showCurrentPassword}
             value={currentPassword}
-            onChangeText={validateCurrentPassword}
+            onChangeText={setCurrentPassword}
             onFocus={() => setIsCurrentPasswordFocused(true)}
             onBlur={() => setIsCurrentPasswordFocused(false)}
             placeholder="기존 비밀번호를 입력해주세요"

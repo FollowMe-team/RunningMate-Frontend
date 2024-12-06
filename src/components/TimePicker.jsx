@@ -18,7 +18,7 @@ const TimePicker = ({ time, setTime, placeholder }) => {
         style={styles.input}
       >
         <Text style={styles.inputText}>
-          {time
+          {time instanceof Date
             ? time.toLocaleTimeString('ko-KR', {
                 hour: '2-digit',
                 minute: '2-digit',
@@ -33,7 +33,7 @@ const TimePicker = ({ time, setTime, placeholder }) => {
           mode="time"
           locale="ko"
           minuteInterval={5}
-          date={time || new Date()}
+          date={time instanceof Date ? time : new Date()}
           onConfirm={handleDateChange}
           onCancel={() => {
             setShowPicker(false);

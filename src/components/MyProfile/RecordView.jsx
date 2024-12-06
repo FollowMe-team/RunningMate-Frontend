@@ -2,7 +2,6 @@ import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import PropTypes from 'prop-types';
 
-import Calendars from '../Calendars';
 import RecordDetails from './RecordDetails';
 
 const RecordView = ({
@@ -10,6 +9,7 @@ const RecordView = ({
   selectedRecord,
   records,
   fetchMonthlyRecords,
+  Calendars, // Calendars 컴포넌트를 props로 받음
 }) => {
   return (
     <View style={styles.recordView}>
@@ -28,6 +28,7 @@ RecordView.propTypes = {
   selectedRecord: PropTypes.object,
   records: PropTypes.array.isRequired,
   fetchMonthlyRecords: PropTypes.func.isRequired,
+  Calendars: PropTypes.elementType.isRequired,
 };
 
 const styles = StyleSheet.create({

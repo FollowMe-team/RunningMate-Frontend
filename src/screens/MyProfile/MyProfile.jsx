@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, ScrollView, StyleSheet } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 
 import ProfileBox from '../../components/MyProfile/ProfileBox';
 import Tabs from '../../components/MyProfile/Tabs';
@@ -8,6 +9,8 @@ import ActivityView from '../../components/MyProfile/ActivityView';
 import { getProfile, getBadges } from '../../utils/api';
 import Skeleton from '../../components/MyProfile/Skeleton';
 import { getMonthlyRecords } from '../../utils/records_monthly_api';
+import FootprintFigure from '../../components/MyProfile/FootprintFigure';
+import Calendars from '../../components/Calendars';
 
 const MyProfile = () => {
   const [activeTab, setActiveTab] = useState('record');
@@ -17,6 +20,7 @@ const MyProfile = () => {
   const [badgesLoading, setBadgesLoading] = useState(true);
   const [monthlyRecords, setMonthlyRecords] = useState([]);
   const [recordsLoading, setRecordsLoading] = useState(true);
+  const [isFootprintFigureVisible, setFootprintFigureVisible] = useState(false);
 
   const fetchMonthlyRecords = async yearMonth => {
     setRecordsLoading(true);
@@ -26,6 +30,17 @@ const MyProfile = () => {
     }
     setRecordsLoading(false);
   };
+
+  useFocusEffect(
+    React.useCallback(() => {
+      const fetchProfile = async () => {
+        const result = await getProfile();
+        setProfileData(result);
+      };
+
+      fetchProfile();
+    }, []),
+  );
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -66,7 +81,12 @@ const MyProfile = () => {
       {profileData.loading ? (
         <Skeleton />
       ) : (
-        profileData.data && <ProfileBox data={profileData.data} />
+        profileData.data && (
+          <ProfileBox
+            data={profileData.data}
+            setFootprintFigureVisible={setFootprintFigureVisible}
+          />
+        )
       )}
       <Tabs activeTab={activeTab} setActiveTab={setActiveTab} />
       <ScrollView contentContainerStyle={styles.contentContainer}>
@@ -79,6 +99,7 @@ const MyProfile = () => {
               selectedRecord={selectedRecord}
               records={monthlyRecords}
               fetchMonthlyRecords={fetchMonthlyRecords}
+              Calendars={Calendars} // Calendars 컴포넌트를 RecordView에 전달
             />
           )
         ) : badgesLoading ? (
@@ -87,6 +108,9 @@ const MyProfile = () => {
           <ActivityView badges={badges} />
         )}
       </ScrollView>
+      {isFootprintFigureVisible && (
+        <FootprintFigure onClose={() => setFootprintFigureVisible(false)} />
+      )}
     </View>
   );
 };
@@ -100,6 +124,16 @@ const styles = StyleSheet.create({
   contentContainer: {
     flexGrow: 1,
     width: '100%',
+  },
+  closeButton: {
+    marginTop: 10,
+    padding: 10,
+    backgroundColor: '#fff',
+    borderRadius: 5,
+  },
+  closeButtonText: {
+    color: '#000',
+    fontWeight: 'bold',
   },
 });
 

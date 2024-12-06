@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -7,48 +7,23 @@ import {
   StyleSheet,
   TouchableOpacity,
 } from 'react-native';
-import { getFollowings } from '../../utils/api';
-import { followUser, unfollowUser } from '../../utils/follow';
+import { useRoute } from '@react-navigation/native';
 
+import defaultProfile from '../../assets/images/Settings/profile.png';
 import follow from '../../assets/images/MyProfile/free-icon-add-3683218.png';
 import unfollow from '../../assets/images/MyProfile/free-icon-delete-friend-3683211.png';
 
-import defaultProfile from '../../assets/images/Settings/profile.png';
+const CrewList = () => {
+  const route = useRoute();
+  const { members } = route.params;
+  const [memberList, setMemberList] = useState(members);
 
-const FollowingList = () => {
-  const [following, setFollowing] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchFollowings = async () => {
-      const result = await getFollowings();
-      if (result.success) {
-        setFollowing(result.data);
-      } else {
-        console.error(result.message);
-      }
-      setLoading(false);
-    };
-    fetchFollowings();
-  }, []);
-
-  const handleFollowToggle = async (id, isFollowing) => {
-    let result;
-    if (isFollowing) {
-      result = await unfollowUser(id);
-    } else {
-      result = await followUser(id);
-    }
-
-    if (result.success) {
-      setFollowing(prevState =>
-        prevState.map(user =>
-          user.id === id ? { ...user, isFollowing: !isFollowing } : user,
-        ),
-      );
-    } else {
-      console.error(result.message);
-    }
+  const toggleFollow = id => {
+    setMemberList(prevState =>
+      prevState.map(member =>
+        member.id === id ? { ...member, is_follow: !member.is_follow } : member,
+      ),
+    );
   };
 
   const renderItem = ({ item }) => (
@@ -62,39 +37,24 @@ const FollowingList = () => {
         <Text style={styles.info}>{item.info}</Text>
       </View>
       <TouchableOpacity
-        onPress={() => handleFollowToggle(item.id, item.isFollowing)}
+        style={{ marginTop: 5, marginLeft: '50%' }}
+        onPress={() => toggleFollow(item.id)}
       >
         <Image
-          source={item.isFollowing ? unfollow : follow}
+          source={item.is_follow ? unfollow : follow}
           style={styles.followButton}
         />
       </TouchableOpacity>
     </View>
   );
 
-  const renderSkeleton = () => (
-    <View style={styles.itemContainer}>
-      <View style={styles.skeletonProfileImage} />
-      <View style={styles.infoLayout}>
-        <View style={styles.skeletonNickname} />
-        <View style={styles.skeletonInfo} />
-      </View>
-    </View>
-  );
-
   return (
     <View style={styles.container}>
-      {loading ? (
-        <>
-          {renderSkeleton()}
-          {renderSkeleton()}
-          {renderSkeleton()}
-        </>
-      ) : following.length === 0 ? (
-        <Text style={styles.emptyMessage}>팔로잉한 러너가 없습니다...ㅠㅠ</Text>
+      {memberList.length === 0 ? (
+        <Text style={styles.emptyMessage}>크루 멤버가 없습니다.</Text>
       ) : (
         <FlatList
-          data={following}
+          data={memberList}
           renderItem={renderItem}
           keyExtractor={item => item.id.toString()}
         />
@@ -124,13 +84,13 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
   },
   nickname: {
-    fontSize: 16,
     color: 'black',
+    fontSize: 16,
     fontWeight: 'bold',
   },
   info: {
-    fontSize: 14,
     color: '#666',
+    fontSize: 14,
   },
   emptyMessage: {
     fontSize: 18,
@@ -161,4 +121,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default FollowingList;
+export default CrewList;

@@ -18,7 +18,9 @@ const Calendars = ({ onDayPress, dataSource, fetchMonthlyRecords }) => {
   useEffect(() => {
     const marks = {};
     dataSource.forEach(record => {
-      const date = record.startTime.split('T')[0];
+      const date = record.startTime
+        ? record.startTime.split('T')[0]
+        : record.date;
       marks[date] = {
         marked: true,
         dotColor: selectedDate === date ? 'white' : 'black',
@@ -62,7 +64,9 @@ const Calendars = ({ onDayPress, dataSource, fetchMonthlyRecords }) => {
     setCurrentMonth({ year: month.year, month: month.month });
     const yearMonth = `${month.year}-${String(month.month).padStart(2, '0')}`;
     console.log(`Fetching records for ${yearMonth}`);
-    fetchMonthlyRecords(yearMonth);
+    if (fetchMonthlyRecords) {
+      fetchMonthlyRecords(yearMonth);
+    }
   };
 
   return (
@@ -97,7 +101,7 @@ const Calendars = ({ onDayPress, dataSource, fetchMonthlyRecords }) => {
 Calendars.propTypes = {
   onDayPress: PropTypes.func.isRequired,
   dataSource: PropTypes.array.isRequired,
-  fetchMonthlyRecords: PropTypes.func.isRequired,
+  fetchMonthlyRecords: PropTypes.func,
 };
 
 const styles = StyleSheet.create({

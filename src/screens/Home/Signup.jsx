@@ -11,10 +11,11 @@ import {
 import { Dropdown } from 'react-native-element-dropdown';
 import PasswordInput, { validatePassword } from '../../components/Password';
 import AddressInput from '../../components/AddressInput';
-import api from '../../utils/api';
 import { useNavigation } from '@react-navigation/native';
 
 import ProfilePhotoPicker from '../../screens/setting/ProfilePhotoPicker';
+import { signup } from '../../utils/loginlogout_api';
+import { checkEmail, checkNickname } from '../../utils/api';
 
 const runningCareer = [
   { label: '시작', value: 'BEGINNER' },
@@ -34,6 +35,7 @@ const Signup = () => {
   const [emailError, setEmailError] = useState('');
   const [isNicknameChecked, setIsNicknameChecked] = useState(false);
   const [nicknameError, setNicknameError] = useState('');
+  const [modalMessage, setModalMessage] = useState('');
 
   const [address, setAddress] = useState('');
   const [year, setYear] = useState('');
@@ -46,6 +48,8 @@ const Signup = () => {
   const [info, setInfo] = useState('');
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  // const [latitude, setLatitude] = useState(0);
+  // const [longitude, setLongitude] = useState(0);
   const navigation = useNavigation();
 
   useEffect(() => {
@@ -100,14 +104,15 @@ const Signup = () => {
 
   const handleEmailCheck = async () => {
     try {
-      const response = await api.checkEmail(email);
-      if (response.data.isDuplicated) {
+      const response = await checkEmail(email);
+      if (response.isDuplicated) {
         setIsEmailChecked(false);
         setEmailError('이미 사용 중인 이메일입니다.');
       } else {
         setIsEmailChecked(true);
         setEmailError('');
-        alert('사용 가능한 이메일입니다.');
+        setModalMessage('사용 가능한 이메일입니다.');
+        setIsModalVisible(true);
       }
     } catch {
       setIsEmailChecked(false);
@@ -117,11 +122,12 @@ const Signup = () => {
 
   const handleNicknameCheck = async () => {
     try {
-      const response = await api.checkNickname(nickname);
-      if (response.isAvailable) {
+      const response = await checkNickname(nickname);
+      if (!response.isDuplicated) {
         setIsNicknameChecked(true);
         setNicknameError('');
-        alert('사용 가능한 닉네임입니다.');
+        setModalMessage('사용 가능한 닉네임입니다.');
+        setIsModalVisible(true);
       } else {
         setIsNicknameChecked(false);
         setNicknameError('이미 사용 중인 닉네임입니다.');
@@ -133,30 +139,37 @@ const Signup = () => {
   };
 
   const handleSignup = async () => {
-    const birth = `${year}-${month}-${day}`;
+    const birth = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
     const gender = selectedGender === '남' ? 'MALE' : 'FEMALE';
 
-    try {
-      const response = await api.post('/auth/signup', {
-        profileUrl: photo,
-        email,
-        password,
-        name,
-        gender,
-        birth,
-        nickname,
-        runningCareer: experience,
-      });
+    const signupData = {
+      email,
+      password,
+      name,
+      gender,
+      birth,
+      nickname,
+      introduce: info,
+      locationInfo: {
+        address,
+        latitude: 0, // 실제 값으로 변경 필요
+        longitude: 0, // 실제 값으로 변경 필요
+      },
+      runningCareer: experience,
+    };
 
-      if (response.status === 200) {
-        setIsModalVisible(true);
-      }
-    } catch (error) {
-      if (error.response.data.code === 'VALID001') {
-        alert('잘못된 입력값입니다.');
-      } else {
-        alert('회원가입에 실패했습니다.');
-      }
+    console.log('Signup data:', signupData);
+
+    const result = await signup(signupData, photo);
+
+    if (result.success) {
+      console.log('Signup successful');
+      setModalMessage('회원 가입에 성공하였습니다!');
+      setIsModalVisible(true);
+    } else {
+      console.log('Signup failed:', result.message);
+      setModalMessage(result.message);
+      setIsModalVisible(true);
     }
   };
 
@@ -236,7 +249,7 @@ const Signup = () => {
               }}
               placeholderStyle={{ color: '#101010' }} // 글자색 수정
               itemTextStyle={{ color: '#101010' }} // 드롭다운 리스트 글자색 수정
-              selectedTextStyle={{ color: '#101010' }} // 선택된 항목 글자색 수정
+              selectedTextStyle={{ color: '#101010' }} // 선���된 항목 글자색 수정
             />
             <Dropdown
               style={styles.dropdown}
@@ -395,11 +408,13 @@ const Signup = () => {
       >
         <View style={styles.modalBackground}>
           <View style={styles.modalContainer}>
-            <Text style={styles.modalText}>회원 가입에 성공하였습니다!</Text>
+            <Text style={styles.modalText}>{modalMessage}</Text>
             <TouchableOpacity
               onPress={() => {
                 setIsModalVisible(false);
-                navigation.navigate('Login');
+                if (modalMessage === '회원 가입에 성공하였습니다!') {
+                  navigation.navigate('Login');
+                }
               }}
             >
               <Text style={styles.modalButtonText}>OK</Text>

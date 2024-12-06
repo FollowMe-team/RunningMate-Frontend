@@ -1,7 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, Image, StyleSheet } from 'react-native';
+import {
+  View,
+  Text,
+  FlatList,
+  Image,
+  StyleSheet,
+  TouchableOpacity,
+} from 'react-native';
 import { getFollowers } from '../../utils/api';
 import defaultProfile from '../../assets/images/Settings/profile.png';
+import follow from '../../assets/images/MyProfile/free-icon-add-3683218.png';
+import unfollow from '../../assets/images/MyProfile/free-icon-delete-friend-3683211.png';
+import { followUser, unfollowUser } from '../../utils/follow';
 
 const FollowerList = () => {
   const [followers, setFollowers] = useState([]);
@@ -20,6 +30,25 @@ const FollowerList = () => {
     fetchFollowers();
   }, []);
 
+  const handleFollowToggle = async (id, isFollowing) => {
+    let result;
+    if (isFollowing) {
+      result = await unfollowUser(id);
+    } else {
+      result = await followUser(id);
+    }
+
+    if (result.success) {
+      setFollowers(prevState =>
+        prevState.map(user =>
+          user.id === id ? { ...user, isFollowing: !isFollowing } : user,
+        ),
+      );
+    } else {
+      console.error(result.message);
+    }
+  };
+
   const renderItem = ({ item }) => (
     <View style={styles.itemContainer}>
       <Image
@@ -30,6 +59,14 @@ const FollowerList = () => {
         <Text style={styles.nickname}>{item.nickname}</Text>
         <Text style={styles.info}>{item.info}</Text>
       </View>
+      <TouchableOpacity
+        onPress={() => handleFollowToggle(item.id, item.isFollowing)}
+      >
+        <Image
+          source={item.isFollowing ? unfollow : follow}
+          style={styles.followButton}
+        />
+      </TouchableOpacity>
     </View>
   );
 
@@ -115,6 +152,10 @@ const styles = StyleSheet.create({
     width: 150,
     height: 14,
     backgroundColor: '#e0e0e0',
+  },
+  followButton: {
+    width: 24,
+    height: 24,
   },
 });
 
