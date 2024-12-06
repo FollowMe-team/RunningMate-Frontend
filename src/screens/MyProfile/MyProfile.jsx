@@ -77,7 +77,7 @@ const MyProfile = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
       {profileData.loading ? (
         <Skeleton />
       ) : (
@@ -89,7 +89,7 @@ const MyProfile = () => {
         )
       )}
       <Tabs activeTab={activeTab} setActiveTab={setActiveTab} />
-      <ScrollView contentContainerStyle={styles.contentContainer}>
+      <View contentContainerStyle={styles.contentContainer}>
         {activeTab === 'record' ? (
           recordsLoading ? (
             <Skeleton />
@@ -107,11 +107,12 @@ const MyProfile = () => {
         ) : (
           <ActivityView badges={badges} />
         )}
-      </ScrollView>
+
+      </View>
       {isFootprintFigureVisible && (
         <FootprintFigure onClose={() => setFootprintFigureVisible(false)} />
       )}
-    </View>
+    </ScrollView>
   );
 };
 

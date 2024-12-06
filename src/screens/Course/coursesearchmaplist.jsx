@@ -49,7 +49,7 @@ const styles = StyleSheet.create({
     },
 
     greenbutton: {
-        width: 350, height: 60,
+        width: '87%', height: 40,
         borderColor: 'white',
         backgroundColor: '#73D393',
         borderWidth: 0,
@@ -57,7 +57,7 @@ const styles = StyleSheet.create({
         alignItems: "center", justifyContent: "center", alignSelf: "center"
     },
 
-    whitetext: { color: 'white', fontSize: 22, fontWeight: 'bold', textAlign: 'center', textAlignVertical: 'center', marginLeft: 60, marginRight: 60 },
+    whitetext: { color: 'white', fontSize: 20, fontWeight: 'bold', textAlign: 'center', textAlignVertical: 'center', marginLeft: 60, marginRight: 60 },
 
     titletext: { color: 'black', fontSize: 15, marginLeft: 30, fontWeight: 'bold', marginVertical: 12 },
 
@@ -83,7 +83,7 @@ const styles = StyleSheet.create({
 
     inputbar: { borderRadius: 10, width: "78%", height: 32, backgroundColor: 'white', elevation: 7, alignSelf: 'center', paddingLeft: 10, textAlignVertical: 'center' },
     inputbar2: { borderRadius: 10, width: "87%", height: 32, backgroundColor: 'white', elevation: 7, alignSelf: 'center', paddingLeft: 10, textAlignVertical: 'center', marginTop: 15 },
-    inputbarsearch: { borderRadius: 10, width: "87%", height: 40, backgroundColor: 'white', elevation: 7, alignSelf: 'center', paddingLeft: 10, marginTop: 15, flexDirection: 'row' }
+    inputbarsearch: { borderRadius: 10, width: "87%", height: 40, backgroundColor: 'white', elevation: 7, alignSelf: 'center', paddingLeft: 10, marginTop: 15, flexDirection: 'row', marginBottom: 10 }
 
 });
 
@@ -92,15 +92,21 @@ const Coursesearchmaplist = () => {
     const navigation = useNavigation();
     return (
         <ScrollView>
-            <View style={styles.inputbarsearch}>
-                <TouchableOpacity style={{ alignSelf: 'center' }} onPress={() => navigation.navigate('Coursesearchmaplist')}>
+            <TouchableOpacity style={{ alignSelf: 'center', flexDirection: 'row' }} onPress={() => navigation.navigate('Coursesearch')}>
+                <View style={styles.inputbarsearch}>
                     <Image style={{ width: 20, height: 20, alignSelf: 'center', marginRight: 5 }} source={Qmark} />
-                </TouchableOpacity>
-                <TextInput style={{ textAlignVertical: 'center' }}>코스명 또는 지역명</TextInput>
+
+                    <Text style={{ textAlignVertical: 'center' }}>코스명 또는 지역명</Text>
+
+                </View>
+            </TouchableOpacity>
+            <View style={{ flexWrap: 'wrap', flexDirection: 'row', marginLeft: 30 }}>
+                <Text style={styles.whitesharptext}># 3KM 미만</Text>
+                <Text style={styles.whitesharptext}># 숲길</Text>
             </View>
-            <View style={{ borderRadius: 15, width: "90%", height: 'auto', backgroundColor: 'white', elevation: 7, alignSelf: 'center', marginTop: 30, paddingBottom: 15 }}>
+            <View style={{ borderRadius: 15, width: "90%", height: 'auto', backgroundColor: 'white', elevation: 7, alignSelf: 'center', marginTop: 10, paddingBottom: 15 }}>
                 <TouchableOpacity style={{ borderRadius: 15, width: "90%", height: 'auto', backgroundColor: 'white', elevation: 7, alignSelf: 'center', marginTop: 20 }}
-                    onPress={() => navigation.navigate('Reviewed')}>
+                    onPress={() => navigation.navigate('Coursesearchmapview')}>
                     <View style={{ flexWrap: 'wrap', flexDirection: 'row' }}>
                         <Image
                             style={{ width: 40, height: 40, marginLeft: 20, marginTop: 15 }}

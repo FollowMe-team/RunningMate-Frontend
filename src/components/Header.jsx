@@ -46,6 +46,7 @@ const Header = ({
 
   return (
     <View style={styles.header}>
+      <Text style={styles.headerTitle}>{title}</Text>
       <View style={styles.leftContainer}>
         {!hideBackButton && (
           <TouchableOpacity
@@ -66,7 +67,6 @@ const Header = ({
           </TouchableOpacity>
         )}
       </View>
-      <Text style={styles.headerTitle}>{title}</Text>
       <View style={styles.rightContainer}>
         {showApplyButton && (
           <TouchableOpacity

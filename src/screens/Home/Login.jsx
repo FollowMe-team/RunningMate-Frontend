@@ -83,9 +83,11 @@ const Login = ({ navigation }) => {
             <Image source={right} style={{ width: 15, height: 15 }} />
           </TouchableOpacity>
         </View>
-        <View style={styles.changeButton}>
-          <TouchableOpacity onPress={handleLogin}>
-            <Text style={styles.button}>로그인</Text>
+        <View >
+          <TouchableOpacity style={styles.changeButton} onPress={handleLogin}>
+            <View>
+              <Text style={styles.button}>로그인</Text>
+            </View>
           </TouchableOpacity>
         </View>
       </View>

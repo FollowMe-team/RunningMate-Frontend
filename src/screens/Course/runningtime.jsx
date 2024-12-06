@@ -1,269 +1,3 @@
-/*
-import { Image, ImageBackground } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import React, { useState, useEffect, useRef } from 'react';
-import { View, StyleSheet, Alert, TouchableOpacity, Text, TextInput, Modal } from 'react-native';
-import moment from 'moment';
-import { useInterval } from 'react-use';
-
-// Google Maps Directions API 키가 필요합니다
-const GOOGLE_MAPS_API_KEY = 'AIzaSyCQdugA7ICLSYCnuAvsf_pfgtJYzM0sfTs';
-
-import mapforrun from '../../assets/images/Course/mapforrun.png';
-import stopbutton from '../../assets/images/Course/stopbutton.png';
-import playbutton from '../../assets/images/Course/playbutton.png';
-import endbutton from '../../assets/images/Course/endbutton.png';
-
-let runpause = false
-
-const styles = StyleSheet.create({
-    space: { height: 15 },
-
-
-
-});
-
-
-
-
-const Runningtime = () => {
-    const navigation = useNavigation();
-    const [playImg, setplayImg] = useState(stopbutton);
-    const [time, setTime] = useState(moment.duration(0, 'seconds'));
-    const [focus, setFocus] = useState(true);
-    const [isRunning, setIsRunning] = useState(true);
-
-    const tick = () => {
-        setTime(prevTime => prevTime.clone().add(1, 'seconds'));
-    };
-
-    const timer = useInterval(() => {
-        if (isRunning && focus) {
-          tick();
-        }
-      }, 1000);
-    
-
-    const toggleTimer = () => {
-        setIsRunning(!isRunning);
-      };
-
-    if (!focus) {
-        clearInterval(timer);
-    }
-
-    useEffect(() => {
-        const focusListener = navigation.addListener('focus', () => {
-          setFocus(true);
-          //getLocationUpdates(); // 위치 업데이트 시작
-        });
-    
-        const blurListener = navigation.addListener('blur', () => {
-          setFocus(false);
-          setIsRunning(false);
-          //removeLocationUpdates(); // 위치 업데이트 중지
-        });
-    
-        // 클린업 함수
-        return () => {
-          //focusListener();
-          //blurListener();
-        };
-      }, [navigation]);
-    
-    const formatTime = (duration) => {
-        const hours = duration.hours().toString().padStart(2, '0');
-        const minutes = duration.minutes().toString().padStart(2, '0');
-        const seconds = duration.seconds().toString().padStart(2, '0');
-        return `${hours}:${minutes}:${seconds}`;
-    };
-
-    return (
-        <View style={{ flexDirection: 'column' }}>
-            <ImageBackground
-                style={{ width: "100%", height: "100%", justifyContent: 'flex-end' }}
-                source={mapforrun}
-            >
-                <View style={{ borderTopLeftRadius: 32, borderTopRightRadius: 32, width: "100%", height: 260, backgroundColor: 'white', elevation: 7 }}>
-                    <View style={{ borderRadius: 15, width: "20%", height: 5, backgroundColor: '#E5E5EB', alignSelf: 'center', marginTop: 7, marginBottom: 25 }}></View>
-                    <View style={{ borderRadius: 15, width: "85%", height: 120, backgroundColor: 'white', elevation: 7, alignSelf: 'center' }}>
-                        <Text style={{ fontSize: 30, color: 'black', alignSelf: 'center' }}>{formatTime(time)}</Text>
-                        <View style={{ flexDirection: 'row', marginTop: 20, justifyContent: 'space-around' }}>
-                            <View>
-                                <Text style={{ alignSelf: 'center' }}>거리</Text>
-                                <Text style={{ color: 'black', fontSize: 16, alignSelf: 'center' }}>5.3KM</Text>
-                            </View>
-                            <View>
-                                <Text style={{ alignSelf: 'center' }}>평균 페이스</Text>
-                                <Text style={{ color: 'black', fontSize: 16, alignSelf: 'center' }}>5'33"</Text>
-                            </View>
-                            <View>
-                                <Text style={{ alignSelf: 'center' }}>칼로리</Text>
-                                <Text style={{ color: 'black', fontSize: 16, alignSelf: 'center' }}>245</Text>
-                            </View>
-                        </View>
-                    </View>
-                    <View style={{ flexDirection: 'row', justifyContent: 'center', marginTop: 30 }}>
-                        <TouchableOpacity onPress={toggleTimer}>
-                            <Image style={{ height: 55, width: 55 }} source={isRunning ? stopbutton : playbutton} />
-                        </TouchableOpacity>
-                        <TouchableOpacity onPress={() => navigation.navigate('Runningend')}>
-                            <Image style={{ height: 55, width: 55, marginLeft: 20 }} source={endbutton} />
-                        </TouchableOpacity>
-                    </View>
-                </View>
-            </ImageBackground>
-
-        </View>
-    );
-}
-
-export default Runningtime;
-*/
-
-/*import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import moment from 'moment';
-import { useInterval } from './useInterval'; // 별도의 custom hook 필요
-
-const TimerComponent = ({ navigation }) => {
-  const [time, setTime] = useState(moment.duration(0, 'seconds'));
-  const [isRunning, setIsRunning] = useState(false);
-  const [focus, setFocus] = useState(true);
-
-  // 1초씩 시간 증가 함수
-  const tick = () => {
-    setTime(prevTime => moment.duration(prevTime.asMilliseconds() + 1000));
-  };
-
-  // 인터벌 타이머 설정
-  const timer = useInterval(() => {
-    if (isRunning && focus) {
-      tick();
-    }
-  }, 1000);
-
-  // 타이머 토글 함수
-  const toggleTimer = () => {
-    setIsRunning(!isRunning);
-  };
-
-  // 타이머 초기화 함수
-  const resetTimer = () => {
-    setTime(moment.duration(0, 'seconds'));
-    setIsRunning(false);
-  };
-
-  // 네비게이션 이벤트 리스너 설정
-  useEffect(() => {
-    const focusListener = navigation.addListener('focus', () => {
-      setFocus(true);
-      getLocationUpdates(); // 위치 업데이트 시작
-    });
-
-    const blurListener = navigation.addListener('blur', () => {
-      setFocus(false);
-      setIsRunning(false);
-      removeLocationUpdates(); // 위치 업데이트 중지
-    });
-
-    // 클린업 함수
-    return () => {
-      focusListener();
-      blurListener();
-    };
-  }, [navigation]);
-
-  // 시간 포맷팅 함수
-  const formatTime = (duration) => {
-    const hours = duration.hours().toString().padStart(2, '0');
-    const minutes = duration.minutes().toString().padStart(2, '0');
-    const seconds = duration.seconds().toString().padStart(2, '0');
-    return `${hours}:${minutes}:${seconds}`;
-  };
-
-  return (
-    <View style={styles.container}>
-      <Text style={styles.timerText}>
-        {formatTime(time)}
-      </Text>
-      
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity 
-          style={styles.button} 
-          onPress={toggleTimer}
-        >
-          <Text style={styles.buttonText}>
-            {isRunning ? '일시정지' : '시작'}
-          </Text>
-        </TouchableOpacity>
-        
-        <TouchableOpacity 
-          style={styles.button} 
-          onPress={resetTimer}
-        >
-          <Text style={styles.buttonText}>
-            초기화
-          </Text>
-        </TouchableOpacity>
-      </View>
-    </View>
-  );
-};
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  timerText: {
-    fontSize: 48,
-    fontWeight: 'bold',
-    marginBottom: 20,
-  },
-  buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  button: {
-    backgroundColor: '#4CAF50',
-    padding: 10,
-    margin: 10,
-    borderRadius: 5,
-  },
-  buttonText: {
-    color: 'white',
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-});
-
-export default TimerComponent;
-
-// useInterval.js (이전과 동일)
-import { useEffect, useRef } from 'react';
-
-export function useInterval(callback, delay) {
-  const savedCallback = useRef();
-
-  useEffect(() => {
-    savedCallback.current = callback;
-  }, [callback]);
-
-  useEffect(() => {
-    function tick() {
-      savedCallback.current();
-    }
-    if (delay !== null) {
-      let id = setInterval(tick, delay);
-      return () => clearInterval(id);
-    }
-  }, [delay]);
-}*/
-
-
 import React, { useState, useEffect, useRef } from 'react';
 import { View, StyleSheet, Alert, TouchableOpacity, Text, TextInput, Modal } from 'react-native';
 import MapView, { PROVIDER_GOOGLE, Marker, Polyline } from 'react-native-maps';
@@ -294,6 +28,7 @@ const RunningScreen = () => {
     const [isRouteModalVisible, setIsRouteModalVisible] = useState(false);
     const mapRef = useRef(null);
     const [slope, setSlope] = useState(null);
+    const [end, setEnd] = useState(null);
     const [distance, setDistance] = useState(null);
     const [elevation1, setElevation1] = useState(null);
     const [elevation2, setElevation2] = useState(null);
@@ -302,7 +37,6 @@ const RunningScreen = () => {
     const [lat2, setLat2] = useState(null);
     const [lon2, setLon2] = useState(null);
     const navigation = useNavigation();
-    const [playImg, setplayImg] = useState(stopbutton);
     const [time, setTime] = useState(moment.duration(0, 'seconds'));
     const [focus, setFocus] = useState(true);
     const [isRunning, setIsRunning] = useState(true);
@@ -403,6 +137,16 @@ const RunningScreen = () => {
             calculateSlope(lat1, lon1, lat2, lon2);
         }
     };
+
+    const handleEnd = () => {
+        if (end !== null) {
+            // 이미 정보가 표시된 상태라면, 정보 초기화 (토글 효과)
+            setEnd(null);
+        } else {
+            setEnd(true)
+        }
+    }
+
 
     // 거리 계산 함수
     const getDistance = async (lat1, lon1, lat2, lon2) => {
@@ -583,6 +327,7 @@ const RunningScreen = () => {
             </Modal>
 
             {/* 버튼 */}
+
             <TouchableOpacity
                 style={styles.routeButton}
                 onPress={() => setIsRouteModalVisible(true)}
@@ -630,7 +375,7 @@ const RunningScreen = () => {
                         </View>
                         <View>
                             <Text style={{ alignSelf: 'center' }}>칼로리</Text>
-                            <Text style={{ color: 'black', fontSize: 16, alignSelf: 'center' }}>{0.0055 * time}</Text>
+                            <Text style={{ color: 'black', fontSize: 16, alignSelf: 'center' }}>{(0.0055 * distance).toFixed(2)}</Text>
                         </View>
                     </View>
                 </View>
@@ -638,7 +383,7 @@ const RunningScreen = () => {
                     <TouchableOpacity onPress={toggleTimer}>
                         <Image style={{ height: 55, width: 55 }} source={isRunning ? stopbutton : playbutton} />
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={() => navigation.navigate('Runningend')}>
+                    <TouchableOpacity onPress={handleEnd}>
                         <Image style={{ height: 55, width: 55, marginLeft: 20 }} source={endbutton} />
                     </TouchableOpacity>
                 </View>
@@ -653,6 +398,27 @@ const RunningScreen = () => {
                     <Text style={styles.infoText}>두 번째 지점 고도: {elevation2} 미터</Text>
                     <Text style={styles.infoText}>두 지점 간의 거리: {distance} km</Text>
                     <Text style={styles.infoText}>두 지점 간의 고도 차이: {elevation2 - elevation1} m</Text>
+                </View>
+            )}
+            {end !== null && (
+                <View style={{ backgroundColor: ' rgba(0, 0, 0, 0.5)', height: '100%', width: '100%', position: 'absolute', justifyContent: 'center' }}>
+                    <View style={{ backgroundColor: 'white', height: '18%', width: '60%', alignSelf: 'center', justifyContent: 'space-between', borderRadius: 15 }}>
+                        <Text style={{ height: '50%', width: '75%', color: 'black', alignSelf: 'center', textAlign: 'center', textAlignVertical: 'center', color: 'grey', fontSize: 12, fontWeight: 'bold', marginTop: '9%' }}>종료 후 이어하기가 불가능합니다. 러닝을 그만두시겠습니까?</Text>
+                        <View style={{ flexDirection: 'row', height: '35%', width: '100%' }}>
+                            <TouchableOpacity onPress={handleEnd} style={{ width: '50%', height: '100%', justifyContent: 'center' }}>
+                                <View style={{ alignSelf: 'center', justifyContent: 'center' }}>
+                                    <Text style={{ color: 'black', alignSelf: 'center', fontWeight: 'bold' }}>Cancel</Text>
+                                </View>
+                            </TouchableOpacity>
+                            <TouchableOpacity onPress={() => navigation.navigate('Runningend')}
+                                style={{ width: '50%', height: '100%', justifyContent: 'center' }}>
+                                <View style={{ alignSelf: 'center', justifyContent: 'center' }}>
+                                    <Text style={{ color: 'black', alignSelf: 'center', fontWeight: 'bold', color: 'red' }}>Finish</Text>
+                                </View>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+
                 </View>
             )}
         </View>

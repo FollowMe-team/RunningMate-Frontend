@@ -1,5 +1,6 @@
-import React from 'react';
+import React, {useState} from 'react';
 import { TextInput, StyleSheet, View, Text, Alert, Pressable, Image, ScrollView } from 'react-native';
+import { Dropdown } from 'react-native-element-dropdown';
 
 
 import mapview from '../../assets/images/Course/mapforcourseview.png';
@@ -84,6 +85,13 @@ const styles = StyleSheet.create({
 
 
 export default function Course() {
+    const [Aligndata, setAlign] = useState('');
+    const Aligndatas = [
+        { label: "최신 순", value: 'LATEST' },
+        { label: "오래된 순", value: 'OLDEST' },
+        { label: "별점 높은 순", value: 'HIGHEST_RATING' },
+        { label: "별점 낮은 순", value: 'LOWEST_RATING' }
+    ]
     return (
         <ScrollView>
             <View>
@@ -157,8 +165,22 @@ export default function Course() {
                 <View style={{ flexDirection: 'row' }}>
                     <Text style={{ marginLeft: 22, marginBottom: 10 }}>
                         리뷰(999+)</Text>
-                    <Text style={{ marginLeft: 5, fontSize: 12, backgroundColor: '#E4E4E4', color: 'black', width: 70, height: 25, textAlign: 'center', textAlignVertical: 'center', borderRadius: 20 }}>
-                        최신 순</Text>
+                    <View style={{ marginLeft: 5, fontSize: 12, backgroundColor: '#E4E4E4', color: 'black', width: 90, height: 25, textAlign: 'center', textAlignVertical: 'center', borderRadius: 20 }}>
+                        <Dropdown
+                            data={Aligndatas}
+                            labelField="label"
+                            valueField="value"
+                            placeholder="최신 순"
+                            value={Aligndata}
+                            onChange={item => {
+                                setAlign(item.value);
+                            }}
+
+                            placeholderStyle={{ fontSize: 10, color: 'black', marginLeft: 10, marginTop:3 }} // 글자색 수정
+                            itemTextStyle={{ fontSize: 10, color: 'black' }} // 드롭다운 리스트 글자색 수정
+                            selectedTextStyle={{ fontSize: 10, color: 'black', marginLeft: 10, marginTop:3 }} // 선택된 항목 글자색 수정
+                        />
+                        </View>
                 </View>
                 <View style={styles.space}></View>
                 <View style={styles.smallboxlist2}>

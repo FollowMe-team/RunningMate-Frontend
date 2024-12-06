@@ -572,7 +572,6 @@ const styles = StyleSheet.create({
     borderRadius: 32,
     paddingVertical: 10,
     paddingHorizontal: 15,
-    marginLeft: 10,
   },
   emailCheckButtonText: {
     color: 'white',
@@ -585,7 +584,6 @@ const styles = StyleSheet.create({
     borderRadius: 32,
     paddingVertical: 10,
     paddingHorizontal: 15,
-    marginLeft: 10,
   },
   nicknameCheckButtonText: {
     color: 'white',

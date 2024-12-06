@@ -23,7 +23,7 @@ const styles = StyleSheet.create({
         borderColor: 'white',
         backgroundColor: '#73D393',
         borderWidth: 0,
-        borderRadius: 15, FlexDirection: 'row',
+        borderRadius: 15, FlexDirection: 'row',marginBottom:20,
         alignItems: "center", justifyContent: "center", alignSelf: "center"
     },
 
@@ -57,6 +57,16 @@ const styles = StyleSheet.create({
 const Savingcourse = () => {
     const navigation = useNavigation();
     const [Coursedata, setCourse] = useState('');
+    const [end, setEnd] = useState(null);
+
+    const handleEnd = () => {
+        if (end !== null) {
+            // 이미 정보가 표시된 상태라면, 정보 초기화 (토글 효과)
+            setEnd(null);
+        } else {
+            setEnd(true)
+        }
+    }
     const CourseDatas = [
         { label: "숲길", value: '숲길' },
         { label: "강변", value: '강변' },
@@ -141,12 +151,13 @@ const Savingcourse = () => {
                         valueField="value"
                         placeholder="주변 환경"
                         value={Coursedata}
+                        dropdownPosition='top'
                         onChange={item => {
                             setCourse(item.value);
                         }}
 
                         placeholderStyle={{ color: '#101010', fontSize: 10, marginLeft: 10 }} // 글자색 수정
-                        itemTextStyle={{ color: '#101010', fontSize: 15 }} // 드롭다운 리스트 글자색 수정
+                        itemTextStyle={{ color: '#101010', fontSize: 12 }} // 드롭다운 리스트 글자색 수정
                         selectedTextStyle={{ color: '#101010', fontSize: 10, marginLeft: 10 }} // 선택된 항목 글자색 수정
                     />
                 </View>
@@ -158,12 +169,13 @@ const Savingcourse = () => {
                         valueField="value"
                         placeholder="계단 유무"
                         value={Stairsdata}
+                        dropdownPosition='top'
                         onChange={item => {
                             setStairs(item.value);
                         }}
 
                         placeholderStyle={{ color: '#101010', fontSize: 10, marginLeft: 10 }} // 글자색 수정
-                        itemTextStyle={{ color: '#101010', fontSize: 15 }} // 드롭다운 리스트 글자색 수정
+                        itemTextStyle={{ color: '#101010', fontSize: 12 }} // 드롭다운 리스트 글자색 수정
                         selectedTextStyle={{ color: '#101010', fontSize: 10, marginLeft: 10 }} // 선택된 항목 글자색 수정
                     />
                 </View>
@@ -175,17 +187,18 @@ const Savingcourse = () => {
                         valueField="value"
                         placeholder="추가 옵션"
                         value={Optiondata}
+                        dropdownPosition='top'
                         onChange={item => {
                             setOption(item.value);
                         }}
 
                         placeholderStyle={{ color: '#101010', fontSize: 10, marginLeft: 10 }} // 글자색 수정
-                        itemTextStyle={{ color: '#101010', fontSize: 15 }} // 드롭다운 리스트 글자색 수정
+                        itemTextStyle={{ color: '#101010', fontSize: 12 }} // 드롭다운 리스트 글자색 수정
                         selectedTextStyle={{ color: '#101010', fontSize: 10, marginLeft: 10 }} // 선택된 항목 글자색 수정
                     />
                 </View>
             </View>
-            <TouchableOpacity onPress={() => navigation.navigate('MyCourse')}
+            <TouchableOpacity onPress={handleEnd}
                 style={styles.greenbutton}>
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                     <Image
@@ -200,7 +213,28 @@ const Savingcourse = () => {
                         source={whiteplus}
                     />
                 </View>
-            </TouchableOpacity>
+            </TouchableOpacity> 
+            {end !== null && (
+                <View style={{ backgroundColor: ' rgba(0, 0, 0, 0.5)', height: '100%', width: '100%', position: 'absolute', justifyContent: 'center' }}>
+                    <View style={{ backgroundColor: 'white', height: '18%', width: '60%', alignSelf: 'center', justifyContent: 'space-between', borderRadius: 15 }}>
+                        <Text style={{ height: '50%', width: '70%', color: 'black', alignSelf: 'center', textAlign: 'center', textAlignVertical: 'center', color: 'grey', fontSize: 12, fontWeight: 'bold', marginTop: '9%' }}>종료 후에는 변경이 불가합니다. 해당 내용으로 등록하시겠습니까?</Text>
+                        <View style={{ flexDirection: 'row', height: '35%', width: '100%' }}>
+                            <TouchableOpacity onPress={handleEnd} style={{ width: '50%', height: '100%', justifyContent: 'center' }}>
+                                <View style={{ alignSelf: 'center', justifyContent: 'center' }}>
+                                    <Text style={{ color: 'black', alignSelf: 'center', fontWeight: 'bold' }}>Cancel</Text>
+                                </View>
+                            </TouchableOpacity>
+                            <TouchableOpacity onPress={() => navigation.navigate('MyCourse')}
+                                style={{ width: '50%', height: '100%', justifyContent: 'center' }}>
+                                <View style={{ alignSelf: 'center', justifyContent: 'center' }}>
+                                    <Text style={{ color: 'black', alignSelf: 'center', fontWeight: 'bold', color: 'red' }}>Finish</Text>
+                                </View>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+
+                </View>
+            )}
         </ScrollView>
     );
 }

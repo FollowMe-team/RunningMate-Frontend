@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { TextInput, TouchableOpacity, StyleSheet, View, Text, Alert, Pressable, Image, ImageBackground, ScrollView } from 'react-native';
+import { TextInput, TouchableOpacity, StyleSheet, View, Text, Alert, Pressable, Image, ImageBackground, ScrollView, Modal } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
 import Qmark from '../../assets/images/Course/Qmark.png';
@@ -10,6 +10,7 @@ import greystar from '../../assets/images/Course/greystar.png';
 import blackplus from '../../assets/images/Course/pictureplus.png';
 
 import ReviewPhotoPicker from './reviewphotochange';
+
 
 let stars = false
 let stars2 = false
@@ -73,10 +74,19 @@ const Reviewing = () => {
     const [starImg3, setStar3] = useState(yellowstar);
     const [starImg4, setStar4] = useState(yellowstar);
     const [starImg5, setStar5] = useState(yellowstar);
+    const [end, setEnd] = useState(null);
 
+    const handleEnd = () => {
+        if (end !== null) {
+            // 이미 정보가 표시된 상태라면, 정보 초기화 (토글 효과)
+            setEnd(null);
+        } else {
+            setEnd(true)
+        }
+    }
     const [photo, setPhoto] = useState(null);
     return (
-        <View>
+        <View style={{ height: '100%' }}>
             <Text style={styles.blacktext}>별점</Text>
             <View style={{ flexDirection: 'row' }}>
                 <TouchableOpacity onPress={() => { stars = !stars; stars ? setStar(yellowstar) : setStar(greystar) }}>
@@ -100,13 +110,13 @@ const Reviewing = () => {
             <View style={styles.smallspace}></View>
             <View style={styles.smallspace}></View>
             <Text style={styles.blacktext}>리뷰 이미지(선택)</Text>
-            <View style={{marginLeft:22}}>
-            <ReviewPhotoPicker photo={photo} setPhoto={setPhoto}/>
+            <View style={{ marginLeft: 22 }}>
+                <ReviewPhotoPicker photo={photo} setPhoto={setPhoto} />
             </View>
             <View style={styles.space}></View>
             <View style={styles.smallspace}></View>
             <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
-                <TouchableOpacity style={styles.greenbutton} onPress={() => navigation.navigate('Course_basic')}>
+                <TouchableOpacity style={styles.greenbutton} onPress={handleEnd}>
                     <View style={{ flexDirection: 'row' }}>
                         <Text style={styles.whitetext}>작성하기</Text>
                         <Image
@@ -116,7 +126,29 @@ const Reviewing = () => {
                     </View>
                 </TouchableOpacity>
             </View>
-        </View>
+            {end !== null && (
+                <View style={{ backgroundColor: ' rgba(0, 0, 0, 0.5)', height: '100%', width: '100%', position: 'absolute', justifyContent: 'center' }}>
+                    <View style={{ backgroundColor: 'white', height: '18%', width: '60%', alignSelf: 'center', justifyContent: 'space-between', borderRadius: 15 }}>
+                        <Text style={{ height: '50%', width: '70%', color: 'black', alignSelf: 'center', textAlign: 'center', textAlignVertical: 'center', color: 'grey', fontSize: 12, fontWeight: 'bold', marginTop: '9%' }}>종료 후에는 변경이 불가합니다. 해당 내용으로 등록하시겠습니까?</Text>
+                        <View style={{ flexDirection: 'row', height: '35%', width: '100%' }}>
+                            <TouchableOpacity onPress={handleEnd} style={{ width: '50%', height: '100%', justifyContent: 'center' }}>
+                                <View style={{ alignSelf: 'center', justifyContent: 'center' }}>
+                                    <Text style={{ color: 'black', alignSelf: 'center', fontWeight: 'bold' }}>Cancel</Text>
+                                </View>
+                            </TouchableOpacity>
+                            <TouchableOpacity onPress={() => navigation.navigate('Main')}
+                                style={{ width: '50%', height: '100%', justifyContent: 'center' }}>
+                                <View style={{ alignSelf: 'center', justifyContent: 'center' }}>
+                                    <Text style={{ color: 'black', alignSelf: 'center', fontWeight: 'bold', color: 'red' }}>Finish</Text>
+                                </View>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </View>
+            )
+            }
+        </View >
+
     );
 }
 
