@@ -21,8 +21,8 @@ import MyCourse_none from '../../src/screens/Course/MyCourse_none';
 import reviewed from '../../src/screens/Course/reviewed';
 import reviewing from '../../src/screens/Course/reviewing';
 import reviewlist from '../../src/screens/Course/reviewlist';
-import runningtimesaving from '../../src/screens/Course/runningtimesaving';
-import runningtime from '../../src/screens/Course/runningtime';
+// import runningtimesaving from '../../src/screens/Course/runningtimesaving';
+// import runningtime from '../../src/screens/Course/runningtime';
 import savingcourse from '../../src/screens/Course/savingcourse';
 import runningend from '../../src/screens/Course/runningend';
 import Othersprofile from '../../src/screens/Othersprofile/Othersprofile';
@@ -45,6 +45,8 @@ import SearchAddress from '../screens/setting/SearchAddress';
 import PasswordChange from '../screens/setting/PasswordChange';
 import Withdrawal from '../screens/setting/Withdrawal';
 import WithdrawalComplete from '../screens/setting/WithdrawalComplete';
+import MyCrewModification from '../screens/Crew/MyCrewModification';
+import CrewList from '../screens/Crew/CrewList';
 
 const WebViewScreen = ({ route }) => {
   const { url } = route.params;
@@ -170,7 +172,7 @@ const StackNavigator = () => (
       component={reviewlist}
       options={{ title: '리뷰 리스트' }}
     />
-    <Stack.Screen
+    {/* <Stack.Screen
       name="Runningtimesaving"
       component={runningtimesaving}
       options={{ title: '코스 기록' }}
@@ -179,7 +181,7 @@ const StackNavigator = () => (
       name="Runningtime"
       component={runningtime}
       options={{ title: '달리기' }}
-    />
+    /> */}
     <Stack.Screen
       name="Savingcourse"
       component={savingcourse}
@@ -389,9 +391,31 @@ const StackNavigator = () => (
     />
     <Stack.Screen name="CrewSearch" component={CrewSearch} />
     <Stack.Screen
+      name="Modification"
+      component={MyCrewModification}
+      options={{
+        title: '크루 정보 수정',
+        header: ({ navigation }) => (
+          <Header title="크루 정보 수정" navigation={navigation} />
+        ),
+        headerShown: true,
+      }}
+    />
+    <Stack.Screen
       name="WebViewScreen"
       component={WebViewScreen}
       options={{ headerShown: false }}
+    />
+    <Stack.Screen
+      name="CrewList"
+      component={CrewList}
+      options={{
+        title: '크루 멤버 목록',
+        header: ({ navigation }) => (
+          <Header title="크루 멤버 목록" navigation={navigation} />
+        ),
+        headerShown: true,
+      }}
     />
   </Stack.Navigator>
 );

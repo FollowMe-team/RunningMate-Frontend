@@ -9,7 +9,7 @@ import {
   TouchableOpacity,
   ScrollView,
 } from 'react-native';
-import { login } from '../../utils/api';
+import { login } from '../../utils/loginlogout_api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import logo from '../../assets/images/Home/logo.png';

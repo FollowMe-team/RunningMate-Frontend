@@ -14,7 +14,11 @@ import PropTypes from 'prop-types';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Dropdown } from 'react-native-element-dropdown';
-import api from '../../utils/api';
+import {
+  updateProfile,
+  checkNickname,
+  getProfileSummary,
+} from '../../utils/api';
 
 import ProfilePhotoPicker from './ProfilePhotoPicker';
 import calendarIcon from '../../assets/images/Settings/free-icon-calendar-8786347.png';
@@ -22,6 +26,7 @@ import AddressInput from '../../components/AddressInput';
 
 const MyProfileChange = () => {
   const navigation = useNavigation();
+
   const [photo, setPhoto] = useState(null);
   const [nickname, setNickname] = useState('');
   const [info, setInfo] = useState('');
@@ -32,18 +37,18 @@ const MyProfileChange = () => {
   const [nicknameError, setNicknameError] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
   const [isNicknameChecked, setIsNicknameChecked] = useState(false);
+  const [modalMessage, setModalMessage] = useState('');
 
   useEffect(() => {
     const loadProfile = async () => {
-      const profile = await AsyncStorage.getItem('myprofile');
-      if (profile) {
-        const parsedProfile = JSON.parse(profile);
-        setPhoto(parsedProfile.profile_url || null);
-        setNickname(parsedProfile.nickname);
-        setInfo(parsedProfile.info);
-        setBirthday(parsedProfile.birthday);
-        setGender(parsedProfile.gender);
-        setAddress(parsedProfile.address);
+      const response = await getProfileSummary();
+      if (response.data) {
+        setPhoto(response.data.profileImageUrl || null);
+        setNickname(response.data.nickname);
+        setInfo(response.data.introduce);
+        setBirthday(response.data.birth.replace(/-/g, '.'));
+        setGender(response.data.gender === 'MALE' ? '남' : '여');
+        setAddress(response.data.locationInfo.address);
       }
     };
     loadProfile();
@@ -61,18 +66,23 @@ const MyProfileChange = () => {
 
   const handleNicknameCheck = async () => {
     try {
-      const response = await api.post('/auth/check-nickname', { nickname });
-      if (response.data.isAvailable) {
+      const response = await checkNickname(nickname);
+      if (!response.isDuplicated) {
         setIsNicknameChecked(true);
         setNicknameError('');
-        alert('사용 가능한 닉네임입니다.');
+        setModalMessage('사용 가능한 닉네임입니다.');
+        setModalVisible(true);
       } else {
         setIsNicknameChecked(false);
         setNicknameError('이미 사용 중인 닉네임입니다.');
+        setModalMessage('이미 사용 중인 닉네임입니다.');
+        setModalVisible(true);
       }
     } catch {
       setIsNicknameChecked(false);
       setNicknameError('닉네임 확인 중 오류가 발생했습니다.');
+      setModalMessage('닉네임 확인 중 오류가 발생했습니다.');
+      setModalVisible(true);
     }
   };
 
@@ -90,25 +100,39 @@ const MyProfileChange = () => {
   const handleProfileChange = async () => {
     if (!isNicknameChecked) {
       setNicknameError('닉네임 중복 체크를 해주세요.');
+      setModalMessage('닉네임 중복 체크를 해주세요.');
+      setModalVisible(true);
       return;
     }
-    const updatedProfile = {
-      profile_url: photo,
-      nickname,
-      info,
-      birthday,
-      gender,
-      address,
-    };
-    await AsyncStorage.setItem('myprofile', JSON.stringify(updatedProfile));
 
-    // 변경 완료 메시지 출력
-    setModalVisible(true);
+    const profileData = {
+      gender: gender === '남' ? 'MALE' : 'FEMALE',
+      nickname,
+      birth: birthday.replace(/\./g, '-'),
+      introduce: info,
+      locationInfo: {
+        address,
+        latitude: 0,
+        longitude: 0,
+      },
+    };
+
+    const result = await updateProfile(profileData, photo);
+    if (result.success) {
+      await AsyncStorage.setItem('myprofile', JSON.stringify(profileData));
+      setModalMessage('마이 프로필 변경이 완료되었어요!');
+      setModalVisible(true);
+    } else {
+      setModalMessage(result.message);
+      setModalVisible(true);
+    }
   };
 
   const closeModal = () => {
     setModalVisible(false);
-    navigation.goBack();
+    if (modalMessage === '마이 프로필 변경이 완료되었어요!') {
+      navigation.navigate('Setting');
+    }
   };
 
   return (
@@ -193,9 +217,7 @@ const MyProfileChange = () => {
       >
         <View style={styles.modalBackground}>
           <View style={styles.modalContainer}>
-            <Text style={styles.modalText}>
-              마이 프로필 변경이 완료되었어요!
-            </Text>
+            <Text style={styles.modalText}>{modalMessage}</Text>
             <TouchableOpacity onPress={closeModal}>
               <Text style={styles.modalButtonText}>확인</Text>
             </TouchableOpacity>

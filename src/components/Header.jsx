@@ -24,6 +24,7 @@ const Header = ({
   openChatUrl,
   showModificationButton,
   applyCount,
+  crew,
 }) => {
   const scaleValue = useRef(new Animated.Value(1)).current;
 
@@ -92,7 +93,9 @@ const Header = ({
         )}
         {showModificationButton && (
           <TouchableOpacity
-            onPress={() => navigation.navigate('Modification')}
+            onPress={() =>
+              navigation.navigate('Modification', { crewId: crew.id })
+            }
             onPressIn={handlePressIn}
             onPressOut={handlePressOut}
             style={styles.rightButton}

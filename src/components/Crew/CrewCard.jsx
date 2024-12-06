@@ -25,7 +25,7 @@ const CrewCard = ({ crew, onPress }) => {
       </View>
       <View style={styles.groupSet}>
         <Image source={groups} style={{ width: 10, height: 10 }} />
-        <Text style={styles.count}>{crew.number}</Text>
+        <Text style={styles.count}>{crew.members.length}</Text>
       </View>
     </TouchableOpacity>
   );
@@ -78,6 +78,14 @@ CrewCard.propTypes = {
     name: PropTypes.string.isRequired,
     footprint: PropTypes.number.isRequired,
     brief: PropTypes.string.isRequired,
+    members: PropTypes.arrayOf(
+      PropTypes.shape({
+        id: PropTypes.number.isRequired,
+        nickname: PropTypes.string.isRequired,
+        info: PropTypes.string.isRequired,
+        profile_url: PropTypes.string.isRequired,
+      }),
+    ).isRequired,
     number: PropTypes.number.isRequired,
   }).isRequired,
   onPress: PropTypes.func.isRequired,

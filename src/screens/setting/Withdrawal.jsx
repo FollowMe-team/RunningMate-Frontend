@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 
 import profile from '../../components/MyProfile/myprofileInfo.json';
+import { withdraw } from '../../utils/loginlogout_api';
 
 import down from '../../assets/images/Settings/free-icon-down-arrow-748063.png';
 import up from '../../assets/images/Settings/free-icon-up-14984331.png';
@@ -98,6 +99,17 @@ const Withdrawal = ({ navigation }) => {
     (selectedReason !== '기타' ||
       (selectedReason === '기타' && otherReason.trim()));
 
+  const handleWithdrawal = async () => {
+    const type = selectedReason === '기타' ? 'OTHER' : 'TOO_MANY_USE';
+    const reason = selectedReason === '기타' ? otherReason : selectedReason;
+    const result = await withdraw(type, reason);
+    if (result.success) {
+      navigation.navigate('WithdrawalComplete');
+    } else {
+      alert(result.message);
+    }
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView style={styles.scrollView}>
@@ -109,7 +121,7 @@ const Withdrawal = ({ navigation }) => {
             !isConfirmEnabled && styles.confirmButtonDisabled,
           ]}
           disabled={!isConfirmEnabled}
-          onPress={() => navigation.navigate('WithdrawalComplete')}
+          onPress={handleWithdrawal}
         >
           <Text style={styles.confirmButtonText}>탈퇴하기</Text>
         </TouchableOpacity>
