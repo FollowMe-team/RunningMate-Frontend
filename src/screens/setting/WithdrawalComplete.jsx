@@ -34,7 +34,7 @@ const WithdrawalComplete = ({ navigation }) => {
 
         <TouchableOpacity
           style={styles.confirmButton}
-          onPress={() => navigation.navigate('Home')}
+          onPress={() => navigation.navigate('Login')}
         >
           <Text style={styles.confirmButtonText}>확인</Text>
         </TouchableOpacity>

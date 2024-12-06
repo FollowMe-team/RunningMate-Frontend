@@ -10,7 +10,79 @@
       ],
       "footprint": 86,
       "brief": "The captain is the leader of the crew.",
-      "number": 15,
+      "number": 10,
+      "members": [
+        {
+          "id": 1,
+          "nickname": "user1",
+          "info": "안녕하세요~!",
+          "profile_url": "../../assets/images/Settings/profile.png",
+          "is_follow": false
+        },
+        {
+          "id": 2,
+          "nickname": "user2",
+          "info": "안녕하세요~!",
+          "profile_url": "../../assets/images/Settings/profile.png",
+          "is_follow": false
+        },
+        {
+          "id": 3,
+          "nickname": "user3",
+          "info": "안녕하세요~!",
+          "profile_url": "../../assets/images/Settings/profile.png",
+          "is_follow": false
+        },
+        {
+          "id": 4,
+          "nickname": "user4",
+          "info": "안녕하세요~!",
+          "profile_url": "../../assets/images/Settings/profile.png",
+          "is_follow": false
+        },
+        {
+          "id": 5,
+          "nickname": "user5",
+          "info": "안녕하세요~!",
+          "profile_url": "../../assets/images/Settings/profile.png",
+          "is_follow": false
+        },
+        {
+          "id": 6,
+          "nickname": "user6",
+          "info": "안녕하세요~!",
+          "profile_url": "../../assets/images/Settings/profile.png",
+          "is_follow": false
+        },
+        {
+          "id": 7,
+          "nickname": "user7",
+          "info": "안녕하세요~!",
+          "profile_url": "../../assets/images/Settings/profile.png",
+          "is_follow": false
+        },
+        {
+          "id": 8,
+          "nickname": "user8",
+          "info": "안녕하세요~!",
+          "profile_url": "../../assets/images/Settings/profile.png",
+          "is_follow": false
+        },
+        {
+          "id": 9,
+          "nickname": "user9",
+          "info": "안녕하세요~!",
+          "profile_url": "../../assets/images/Settings/profile.png",
+          "is_follow": false
+        },
+        {
+          "id": 10,
+          "nickname": "user10",
+          "info": "안녕하세요~!",
+          "profile_url": "../../assets/images/Settings/profile.png",
+          "is_follow": false
+        }
+      ],
       "description": "The captain is the leader of the crew. They are responsible for the safety of the crew and the ship.",
       "city": "경기도 안양시",
       "district": "동안구",
@@ -34,6 +106,78 @@
       "footprint": 71,
       "brief": "The first mate is the captain's right-hand person.",
       "number": 10,
+      "members": [
+        {
+          "id": 1,
+          "nickname": "user1",
+          "info": "안녕하세요~!",
+          "profile_url": "../../assets/images/Settings/profile.png",
+          "is_follow": false
+        },
+        {
+          "id": 2,
+          "nickname": "user2",
+          "info": "안녕하세요~!",
+          "profile_url": "../../assets/images/Settings/profile.png",
+          "is_follow": false
+        },
+        {
+          "id": 3,
+          "nickname": "user3",
+          "info": "안녕하세요~!",
+          "profile_url": "../../assets/images/Settings/profile.png",
+          "is_follow": false
+        },
+        {
+          "id": 4,
+          "nickname": "user4",
+          "info": "안녕하세요~!",
+          "profile_url": "../../assets/images/Settings/profile.png",
+          "is_follow": false
+        },
+        {
+          "id": 5,
+          "nickname": "user5",
+          "info": "안녕하세요~!",
+          "profile_url": "../../assets/images/Settings/profile.png",
+          "is_follow": false
+        },
+        {
+          "id": 6,
+          "nickname": "user6",
+          "info": "안녕하세요~!",
+          "profile_url": "../../assets/images/Settings/profile.png",
+          "is_follow": false
+        },
+        {
+          "id": 7,
+          "nickname": "user7",
+          "info": "안녕하세요~!",
+          "profile_url": "../../assets/images/Settings/profile.png",
+          "is_follow": false
+        },
+        {
+          "id": 8,
+          "nickname": "user8",
+          "info": "안녕하세요~!",
+          "profile_url": "../../assets/images/Settings/profile.png",
+          "is_follow": false
+        },
+        {
+          "id": 9,
+          "nickname": "user9",
+          "info": "안녕하세요~!",
+          "profile_url": "../../assets/images/Settings/profile.png",
+          "is_follow": false
+        },
+        {
+          "id": 10,
+          "nickname": "user10",
+          "info": "안녕하세요~!",
+          "profile_url": "../../assets/images/Settings/profile.png",
+          "is_follow": false
+        }
+      ],
       "description": "The first mate is the captain's right-hand person. They are responsible for the crew when the captain is not around.",
       "city": "서울특별시",
       "district": "강남구",
@@ -56,7 +200,79 @@
       ],
       "footprint": 65,
       "brief": "The second mate is the captain's left-hand person.",
-      "number": 5,
+      "number": 10,
+      "members": [
+        {
+          "id": 1,
+          "nickname": "user1",
+          "info": "안녕하세요~!",
+          "profile_url": "../../assets/images/Settings/profile.png",
+          "is_follow": false
+        },
+        {
+          "id": 2,
+          "nickname": "user2",
+          "info": "안녕하세요~!",
+          "profile_url": "../../assets/images/Settings/profile.png",
+          "is_follow": false
+        },
+        {
+          "id": 3,
+          "nickname": "user3",
+          "info": "안녕하세요~!",
+          "profile_url": "../../assets/images/Settings/profile.png",
+          "is_follow": false
+        },
+        {
+          "id": 4,
+          "nickname": "user4",
+          "info": "안녕하세요~!",
+          "profile_url": "../../assets/images/Settings/profile.png",
+          "is_follow": false
+        },
+        {
+          "id": 5,
+          "nickname": "user5",
+          "info": "안녕하세요~!",
+          "profile_url": "../../assets/images/Settings/profile.png",
+          "is_follow": false
+        },
+        {
+          "id": 6,
+          "nickname": "user6",
+          "info": "안녕하세요~!",
+          "profile_url": "../../assets/images/Settings/profile.png",
+          "is_follow": false
+        },
+        {
+          "id": 7,
+          "nickname": "user7",
+          "info": "안녕하세요~!",
+          "profile_url": "../../assets/images/Settings/profile.png",
+          "is_follow": false
+        },
+        {
+          "id": 8,
+          "nickname": "user8",
+          "info": "안녕하세요~!",
+          "profile_url": "../../assets/images/Settings/profile.png",
+          "is_follow": false
+        },
+        {
+          "id": 9,
+          "nickname": "user9",
+          "info": "안녕하세요~!",
+          "profile_url": "../../assets/images/Settings/profile.png",
+          "is_follow": false
+        },
+        {
+          "id": 10,
+          "nickname": "user10",
+          "info": "안녕하세요~!",
+          "profile_url": "../../assets/images/Settings/profile.png",
+          "is_follow": false
+        }
+      ],
       "description": "The second mate is the captain's left-hand person. They are responsible for the crew when the captain and first mate are not around.",
       "city": "경기도 성남시",
       "district": "분당구",
@@ -80,7 +296,79 @@
         "https://techrecipe.co.kr/wp-content/uploads/2019/11/191110_jogging_running_001.jpg"
       ],
       "brief": "The boatswain is responsible for the ship's equipment.",
-      "number": 20,
+      "number": 10,
+      "members": [
+        {
+          "id": 1,
+          "nickname": "user1",
+          "info": "안녕하세요~!",
+          "profile_url": "../../assets/images/Settings/profile.png",
+          "is_follow": false
+        },
+        {
+          "id": 2,
+          "nickname": "user2",
+          "info": "안녕하세요~!",
+          "profile_url": "../../assets/images/Settings/profile.png",
+          "is_follow": false
+        },
+        {
+          "id": 3,
+          "nickname": "user3",
+          "info": "안녕하세요~!",
+          "profile_url": "../../assets/images/Settings/profile.png",
+          "is_follow": false
+        },
+        {
+          "id": 4,
+          "nickname": "user4",
+          "info": "안녕하세요~!",
+          "profile_url": "../../assets/images/Settings/profile.png",
+          "is_follow": false
+        },
+        {
+          "id": 5,
+          "nickname": "user5",
+          "info": "안녕하세요~!",
+          "profile_url": "../../assets/images/Settings/profile.png",
+          "is_follow": false
+        },
+        {
+          "id": 6,
+          "nickname": "user6",
+          "info": "안녕하세요~!",
+          "profile_url": "../../assets/images/Settings/profile.png",
+          "is_follow": false
+        },
+        {
+          "id": 7,
+          "nickname": "user7",
+          "info": "안녕하세요~!",
+          "profile_url": "../../assets/images/Settings/profile.png",
+          "is_follow": false
+        },
+        {
+          "id": 8,
+          "nickname": "user8",
+          "info": "안녕하세요~!",
+          "profile_url": "../../assets/images/Settings/profile.png",
+          "is_follow": false
+        },
+        {
+          "id": 9,
+          "nickname": "user9",
+          "info": "안녕하세요~!",
+          "profile_url": "../../assets/images/Settings/profile.png",
+          "is_follow": false
+        },
+        {
+          "id": 10,
+          "nickname": "user10",
+          "info": "안녕하세요~!",
+          "profile_url": "../../assets/images/Settings/profile.png",
+          "is_follow": false
+        }
+      ],
       "description": "The boatswain is responsible for the ship's equipment. They are in charge of the crew's safety equipment.",
       "city": "서울특별시",
       "district": "강동구",
@@ -106,6 +394,78 @@
       "footprint": 73,
       "brief": "The carpenter is responsible for the ship's structure.",
       "number": 10,
+      "members": [
+        {
+          "id": 1,
+          "nickname": "user1",
+          "info": "안녕하세요~!",
+          "profile_url": "../../assets/images/Settings/profile.png",
+          "is_follow": false
+        },
+        {
+          "id": 2,
+          "nickname": "user2",
+          "info": "안녕하세요~!",
+          "profile_url": "../../assets/images/Settings/profile.png",
+          "is_follow": false
+        },
+        {
+          "id": 3,
+          "nickname": "user3",
+          "info": "안녕하세요~!",
+          "profile_url": "../../assets/images/Settings/profile.png",
+          "is_follow": false
+        },
+        {
+          "id": 4,
+          "nickname": "user4",
+          "info": "안녕하세요~!",
+          "profile_url": "../../assets/images/Settings/profile.png",
+          "is_follow": false
+        },
+        {
+          "id": 5,
+          "nickname": "user5",
+          "info": "안녕하세요~!",
+          "profile_url": "../../assets/images/Settings/profile.png",
+          "is_follow": false
+        },
+        {
+          "id": 6,
+          "nickname": "user6",
+          "info": "안녕하세요~!",
+          "profile_url": "../../assets/images/Settings/profile.png",
+          "is_follow": false
+        },
+        {
+          "id": 7,
+          "nickname": "user7",
+          "info": "안녕하세요~!",
+          "profile_url": "../../assets/images/Settings/profile.png",
+          "is_follow": false
+        },
+        {
+          "id": 8,
+          "nickname": "user8",
+          "info": "안녕하세요~!",
+          "profile_url": "../../assets/images/Settings/profile.png",
+          "is_follow": false
+        },
+        {
+          "id": 9,
+          "nickname": "user9",
+          "info": "안녕하세요~!",
+          "profile_url": "../../assets/images/Settings/profile.png",
+          "is_follow": false
+        },
+        {
+          "id": 10,
+          "nickname": "user10",
+          "info": "안녕하세요~!",
+          "profile_url": "../../assets/images/Settings/profile.png",
+          "is_follow": false
+        }
+      ],
       "description": "The carpenter is responsible for the ship's structure. They are in charge of the ship's maintenance and repair.",
       "city": "경기도 수원시",
       "district": "영통구",

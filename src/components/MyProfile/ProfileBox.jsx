@@ -26,8 +26,9 @@ const formatNumber = num => {
   return num.toString();
 };
 
-const ProfileBox = ({ data }) => {
+const ProfileBox = ({ data, setFootprintFigureVisible }) => {
   const navigation = useNavigation();
+
   return (
     <View style={styles.container}>
       <View style={styles.infoContainer}>
@@ -134,7 +135,9 @@ const ProfileBox = ({ data }) => {
         >
           <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
             <Text style={styles.detailValue}>나의 발걸음 지수</Text>
-            <Image source={detail} style={styles.icon} />
+            <TouchableOpacity onPress={() => setFootprintFigureVisible(true)}>
+              <Image source={detail} style={styles.icon} />
+            </TouchableOpacity>
           </View>
           <Footprint experience={data.footprint} />
         </View>
@@ -231,6 +234,26 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 10,
   },
+  popupContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  closeButton: {
+    marginTop: 10,
+    padding: 10,
+    backgroundColor: '#fff',
+    borderRadius: 5,
+  },
+  closeButtonText: {
+    color: '#000',
+    fontWeight: 'bold',
+  },
 });
 
 ProfileBox.propTypes = {
@@ -249,6 +272,7 @@ ProfileBox.propTypes = {
     footprint: PropTypes.number,
     ranking: PropTypes.string,
   }).isRequired,
+  setFootprintFigureVisible: PropTypes.func.isRequired,
 };
 
 export default ProfileBox;

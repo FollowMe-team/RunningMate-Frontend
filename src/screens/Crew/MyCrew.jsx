@@ -17,11 +17,18 @@ import schedule from '../../components/Crew/schedule.json';
 import applyMembers from './applyMember.json';
 
 import add from '../../assets/images/Crew/icons8-help.png';
+import more from '../../assets/images/Crew/free-icon-more-options-17764.png';
+import members from '../../assets/images/Crew/groups.png';
+import picture from '../../assets/images/Settings/photo-gallery1.png';
+
 import CrewActivityPicture from '../../components/Crew/CrewActivityPicture';
+import EditCrewActivityPicture from '../../components/Crew/EditCrewActivityPicture';
 
 const MyCrew = () => {
   const route = useRoute();
   const navigation = useNavigation();
+  const crew = route.params?.crew;
+
   const [selectedSchedule, setSelectedSchedule] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [confirmationModalVisible, setConfirmationModalVisible] =
@@ -29,8 +36,7 @@ const MyCrew = () => {
   const [fadeAnim] = useState(new Animated.Value(0));
   const [confirmationFadeAnim] = useState(new Animated.Value(0));
   const [applyCount, setApplyCount] = useState(0);
-
-  const crew = route.params?.crew;
+  const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
     const count = applyMembers.length;
@@ -38,24 +44,26 @@ const MyCrew = () => {
   }, []);
 
   React.useLayoutEffect(() => {
-    navigation.setOptions({
-      header: ({ navigation }) => (
-        <Header
-          title={crew.name}
-          navigation={navigation}
-          showApplyButton={crew.is_master}
-          openChatUrl={crew.open_chat}
-          showModificationButton={crew.is_master}
-          applyCount={applyCount}
-        />
-      ),
-    });
+    if (crew) {
+      navigation.setOptions({
+        header: ({ navigation }) => (
+          <Header
+            title={crew.name}
+            navigation={navigation}
+            showApplyButton={crew.is_master}
+            openChatUrl={crew.open_chat}
+            showModificationButton={crew.is_master}
+            applyCount={applyCount}
+          />
+        ),
+      });
+    }
   }, [navigation, crew, applyCount]);
 
   if (!crew) {
     return (
       <View style={styles.errorContainer}>
-        <Text style={styles.errorText}>크루 정보를 불러올 수 없습니다.</Text>
+        <Text style={styles.errorText}>���루 정보를 불러올 수 없습니다.</Text>
       </View>
     );
   }
@@ -104,13 +112,63 @@ const MyCrew = () => {
     });
   };
 
+  const handleViewMembers = () => {
+    navigation.navigate('CrewList', { members: crew.members });
+  };
+
+  const handleEditGallery = () => {
+    setIsEditing(true);
+  };
+
+  const handleSaveGallery = () => {
+    setIsEditing(false);
+    // 편집된 이미지를 저장하는 로직 추가
+  };
+
   return (
     <ScrollView>
-      <CrewActivityPicture profileUrls={crew.profile_url} />
+      {isEditing ? (
+        <EditCrewActivityPicture profileUrls={crew.profile_urls || []} />
+      ) : (
+        <CrewActivityPicture profileUrls={crew.profile_urls || []} />
+      )}
       <View style={styles.container}>
         <View style={{ marginHorizontal: 20 }}>
           <View style={styles.crewScheduleLayout}>
-            <Text style={styles.mainTitle}>크루 일정</Text>
+            <View style={styles.crewScheduleTitleHeader}>
+              <Text style={styles.mainTitle}>크루 일정</Text>
+              <View style={{ flexDirection: 'row' }}>
+                {crew.is_my_crew && (
+                  <TouchableOpacity
+                    onPress={handleViewMembers}
+                    style={styles.membersButton}
+                  >
+                    <Image source={members} style={styles.icon} />
+                    <Text style={{ fontSize: 18, fontWeight: 'bold' }}>
+                      멤버 조회
+                    </Text>
+                  </TouchableOpacity>
+                )}
+                {crew.is_master &&
+                  (isEditing ? (
+                    <TouchableOpacity
+                      onPress={handleSaveGallery}
+                      style={styles.galleryButton}
+                    >
+                      <Image source={picture} style={styles.icon} />
+                      <Text style={styles.galleryButtonText}>저장하기</Text>
+                    </TouchableOpacity>
+                  ) : (
+                    <TouchableOpacity
+                      onPress={handleEditGallery}
+                      style={styles.galleryButton}
+                    >
+                      <Image source={picture} style={styles.icon} />
+                      <Text style={styles.galleryButtonText}>갤러리 편집</Text>
+                    </TouchableOpacity>
+                  ))}
+              </View>
+            </View>
             <View style={{ alignItems: 'center', width: '100%' }}>
               <Calendars dataSource={schedule} onDayPress={handleDayPress} />
             </View>
@@ -143,61 +201,58 @@ const MyCrew = () => {
               </View>
             </View>
             <View style={styles.crewScheduleBox}>
-              <Text style={styles.crewScheduleText}>코스 즐겨찾기</Text>
+              <View style={styles.crewScheduleHeader}>
+                <Text style={styles.crewScheduleText}>코스 즐겨찾기</Text>
+                {crew.is_master && (
+                  <TouchableOpacity>
+                    <Image source={more} style={{ width: 20, height: 20 }} />
+                  </TouchableOpacity>
+                )}
+              </View>
               {}
             </View>
           </View>
           <TouchableOpacity onPress={handleLeaveCrew} style={styles.button}>
             <Text style={styles.buttonText}>크루 탈퇴</Text>
           </TouchableOpacity>
-
-          <Modal
-            transparent={true}
-            visible={modalVisible}
-            onRequestClose={closeModal}
-          >
-            <View style={styles.modalBackground}>
-              <Animated.View
-                style={[styles.modalContainer, { opacity: fadeAnim }]}
-              >
-                <Text style={styles.modalText}>
-                  해당 크루를 탈퇴하시겠습니까?
-                </Text>
-                <View style={styles.modalButtonContainer}>
-                  <TouchableOpacity onPress={closeModal}>
-                    <Text style={styles.modalNoButtonText}>No</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity onPress={confirmLeaveCrew}>
-                    <Text style={styles.modalYesButtonText}>Yes</Text>
-                  </TouchableOpacity>
-                </View>
-              </Animated.View>
-            </View>
-          </Modal>
-
-          <Modal
-            transparent={true}
-            visible={confirmationModalVisible}
-            onRequestClose={closeConfirmationModal}
-          >
-            <View style={styles.modalBackground}>
-              <Animated.View
-                style={[
-                  styles.modalContainer,
-                  { opacity: confirmationFadeAnim },
-                ]}
-              >
-                <Text style={styles.modalText}>
-                  해당 크루를 탈퇴하셨습니다.
-                </Text>
-                <TouchableOpacity onPress={closeConfirmationModal}>
-                  <Text style={styles.modalYesButtonText}>OK</Text>
-                </TouchableOpacity>
-              </Animated.View>
-            </View>
-          </Modal>
         </View>
       </View>
+
+      <Modal
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={closeModal}
+      >
+        <View style={styles.modalBackground}>
+          <Animated.View style={[styles.modalContainer, { opacity: fadeAnim }]}>
+            <Text style={styles.modalText}>해당 크루를 탈퇴하시겠습니까?</Text>
+            <View style={styles.modalButtonContainer}>
+              <TouchableOpacity onPress={closeModal}>
+                <Text style={styles.modalNoButtonText}>No</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={confirmLeaveCrew}>
+                <Text style={styles.modalYesButtonText}>Yes</Text>
+              </TouchableOpacity>
+            </View>
+          </Animated.View>
+        </View>
+      </Modal>
+      <Modal
+        transparent={true}
+        visible={confirmationModalVisible}
+        onRequestClose={closeConfirmationModal}
+      >
+        <View style={styles.modalBackground}>
+          <Animated.View
+            style={[styles.modalContainer, { opacity: confirmationFadeAnim }]}
+          >
+            <Text style={styles.modalText}>해당 크루를 탈퇴하셨습니다.</Text>
+            <TouchableOpacity onPress={closeConfirmationModal}>
+              <Text style={styles.modalYesButtonText}>OK</Text>
+            </TouchableOpacity>
+          </Animated.View>
+        </View>
+      </Modal>
     </ScrollView>
   );
 };
@@ -221,11 +276,49 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     marginBottom: 13,
   },
+  crewScheduleTitleHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    width: '100%',
+    marginTop: 10,
+    marginBottom: 25,
+  },
   mainTitle: {
     fontSize: 24,
     fontWeight: 'bold',
     color: '#352555',
-    marginBottom: 25,
+  },
+  membersButton: {
+    padding: 7,
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    borderRadius: 13,
+    backgroundColor: '#73D393',
+  },
+  membersButtonText: {
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
+  galleryButton: {
+    padding: 7,
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    borderRadius: 13,
+    borderWidth: 1,
+    borderColor: '#73D393',
+    marginLeft: 10,
+  },
+  galleryButtonText: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#73D393',
+  },
+  icon: {
+    width: 20,
+    height: 20,
   },
   boxLayout: {
     width: '100%',
@@ -250,6 +343,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     color: 'black',
+    textAlign: 'center',
   },
   crewScheduleDetailText: {
     fontSize: 13,
@@ -290,7 +384,8 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   modalContainer: {
-    width: 250,
+    width: 300,
+    height: '80%',
     paddingHorizontal: 20,
     paddingVertical: 30,
     backgroundColor: 'white',
@@ -298,9 +393,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   modalText: {
+    color: 'black',
     fontSize: 12,
     fontWeight: 'bold',
-    color: '#959393',
     textAlign: 'center',
     marginBottom: 50,
   },

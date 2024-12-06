@@ -13,13 +13,13 @@ const RecordDetails = ({ selectedRecord }) => {
             <View>
               <Text style={styles.recordDetailTitle}>일자</Text>
               <Text style={styles.recordDetailValue}>
-                {selectedRecord.date}
+                {selectedRecord.startTime.split('T')[0]}
               </Text>
             </View>
             <View>
               <Text style={styles.recordDetailTitle}>러닝 코스</Text>
               <Text style={styles.recordDetailValue}>
-                {selectedRecord.running_course}
+                {selectedRecord.course.courseName}
               </Text>
             </View>
             <View
@@ -29,13 +29,13 @@ const RecordDetails = ({ selectedRecord }) => {
                 <View>
                   <Text style={styles.recordDetailTitle}>러닝 뛴 거리</Text>
                   <Text style={styles.recordDetailValue}>
-                    {selectedRecord.running_distance} km
+                    {selectedRecord.distance} km
                   </Text>
                 </View>
                 <View>
                   <Text style={styles.recordDetailTitle}>칼로리 소모량</Text>
                   <Text style={styles.recordDetailValue}>
-                    {selectedRecord.calorie} kcal
+                    {selectedRecord.caloriesBurned} kcal
                   </Text>
                 </View>
               </View>
@@ -43,13 +43,13 @@ const RecordDetails = ({ selectedRecord }) => {
                 <View>
                   <Text style={styles.recordDetailTitle}>시간</Text>
                   <Text style={styles.recordDetailValue}>
-                    {selectedRecord.time}
+                    {selectedRecord.duration}
                   </Text>
                 </View>
                 <View>
                   <Text style={styles.recordDetailTitle}>속도</Text>
                   <Text style={styles.recordDetailValue}>
-                    {selectedRecord.velocity} km/h
+                    {selectedRecord.averagePace} km/h
                   </Text>
                 </View>
               </View>

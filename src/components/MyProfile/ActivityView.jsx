@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import PropTypes from 'prop-types';
 import {
   View,
   Text,
@@ -8,12 +9,10 @@ import {
   Modal,
 } from 'react-native';
 
-import badgeData from './badge.json';
-
 import BadgeGetIcon from '../../assets/images/MyProfile/free-icon-success-14658892.png';
 import BadgeNotGetIcon from '../../assets/images/MyProfile/free-icon-nonsuccess-14658892.png';
 
-const ActivityView = () => {
+const ActivityView = ({ badges }) => {
   const [selectedBadge, setSelectedBadge] = useState(null);
 
   const handleBadgePress = badge => {
@@ -29,22 +28,22 @@ const ActivityView = () => {
       <View style={styles.badgeTextContainer}>
         <Text style={styles.badgeTextTitle}>획득한 배지 수</Text>
         <Text style={styles.badgeCount}>
-          {badgeData.badge.filter(badge => badge.isGotten).length}
+          {badges.filter(badge => badge.isAcquired).length}
         </Text>
         <View style={styles.badgeTotalContainer}>
           <Text style={styles.badgeTotalText}>/</Text>
-          <Text style={styles.badgeTotalText}>{badgeData.badge.length}</Text>
+          <Text style={styles.badgeTotalText}>{badges.length}</Text>
         </View>
       </View>
       <View style={styles.badgeContainer}>
-        {badgeData.badge.map((badge, index) => (
+        {badges.map((badge, index) => (
           <TouchableOpacity
             key={index}
             style={styles.badgeIconContainer}
             onPress={() => handleBadgePress(badge)}
           >
             <Image
-              source={badge.isGotten ? BadgeGetIcon : BadgeNotGetIcon}
+              source={badge.isAcquired ? BadgeGetIcon : BadgeNotGetIcon}
               style={styles.badgeIcon}
             />
           </TouchableOpacity>
@@ -62,7 +61,7 @@ const ActivityView = () => {
               <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                 <Image
                   source={
-                    selectedBadge.isGotten ? BadgeGetIcon : BadgeNotGetIcon
+                    selectedBadge.isAcquired ? BadgeGetIcon : BadgeNotGetIcon
                   }
                   style={styles.badgeIcon}
                 />
@@ -119,7 +118,6 @@ const styles = StyleSheet.create({
   badgeContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    justifyContent: 'space-between',
     padding: 16,
     borderWidth: 1,
     borderRadius: 15,
@@ -171,5 +169,15 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
 });
+
+ActivityView.propTypes = {
+  badges: PropTypes.arrayOf(
+    PropTypes.shape({
+      isAcquired: PropTypes.bool.isRequired,
+      name: PropTypes.string.isRequired,
+      description: PropTypes.string.isRequired,
+    }),
+  ).isRequired,
+};
 
 export default ActivityView;
