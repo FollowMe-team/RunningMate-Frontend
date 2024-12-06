@@ -200,12 +200,6 @@ const Reviewed = () => {
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                     <Text style={{ marginLeft: 22, marginBottom: 10 }}>
                         리뷰(999+)</Text>
-                    <TouchableOpacity onPress={() => navigation.navigate('Reviewing')}>
-                        <Image
-                            style={{ width: 20, height: 20, marginRight: 25 }}
-                            source={reviewbutton}
-                        />
-                    </TouchableOpacity>
                 </View>
                 <View style={styles.smallboxlist2}>
                     <View style={{ flexDirection: 'row' }}>
