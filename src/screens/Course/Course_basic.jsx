@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { TextInput, TouchableOpacity, StyleSheet, View, Text, Alert, Pressable, Image } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useIsFocused } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import Qmark from '../../assets/images/Course/Qmark.png';
 import rightarrow from '../../assets/images/Course/rightarrow.png';
@@ -9,9 +10,11 @@ import subscribe from '../../assets/images/Course/subscribe.png';
 import location from '../../assets/images/Course/location.png';
 import time from '../../assets/images/Course/time.png';
 import subscribed from '../../assets/images/Course/subscribed.png'
+import { getRecentCourse, getBookedCourse } from '../../utils/courseapi';
 
-import SimpleNoCourse from '../../components/Course/SimpleNoCourse';
-import SimpleCourse from '../../components/Course/SimpleCourse';
+import Recentcourse from '../../components/Course/recentcourse';
+
+import { ScrollView } from 'react-native-gesture-handler';
 
 const styles = StyleSheet.create({
   container: {
@@ -72,37 +75,29 @@ const styles = StyleSheet.create({
 
 });
 
-const datas = {
-  name: '월미도 해안길',
-  distance: '3.8KM',
-  time: '30~40분',
-  location: '인천 중구',
-  distancetoCourse: '5.3KM',
-  level: '쉬움'
-}
-const datass = {
-  name: '송도 센트럴파크',
-  distance: '3.8KM',
-  time: '30~40분',
-  location: '인천 연수구',
-  distancetoCourse: '3.8KM',
-  level: '쉬움'
-}
-const datasss = {
-  name: '계양산 둘레길',
-  distance: '8.5KM',
-  time: '1시간 이상',
-  location: '인천 계양구',
-  distancetoCourse: '8.5KM',
-  level: '어려움'
-}
 
 
 const Course_basic = () => {
   const navigation = useNavigation();
+  const [recentCourse, setrecentCourse] = useState([]);
+  const [bookedCourse, setbookedCourse] = useState([]);
+
+  const isFocused = useIsFocused();
+  useEffect(() => {
+    const fetchrecentCourse = async () => {
+      result = await getRecentCourse();
+      setrecentCourse(result.data);
+    };
+    fetchrecentCourse();
+    const fetchbookedCourse = async () => {
+      const result = await getBookedCourse();
+      setbookedCourse(result.data);
+    };
+    fetchbookedCourse();
+  }, [/*bookedCourse*/]);
 
   return (
-    <View>
+    <ScrollView>
       <View style={{ height: 15 }}></View>
       <TouchableOpacity onPress={() => navigation.navigate('Coursesearch')}
         style={styles.searchbox}>
@@ -140,19 +135,18 @@ const Course_basic = () => {
       <View style={styles.space}></View>
       <View style={styles.bigbox}>
         <Text style={styles.blacktext}>최근 코스</Text>
-        <SimpleCourse data={datas} />
-        <SimpleCourse data={datass} />
-        <SimpleCourse data={datasss} />
+        <Recentcourse data={recentCourse} />
       </View>
       <View style={{ height: 30 }}></View>
       <View style={styles.bigbox}>
         <Text
           style={styles.blacktext}
         >즐겨찾기</Text>
-        <SimpleNoCourse />
-      </View>
+        <Recentcourse data={bookedCourse} />
 
-    </View>
+      </View>
+      <View style={{ height: 100 }}></View>
+    </ScrollView>
   );
 }
 

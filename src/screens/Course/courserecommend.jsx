@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { TextInput, TouchableOpacity, StyleSheet, View, Text, Alert, Pressable, Image, ImageBackground, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Dropdown } from 'react-native-element-dropdown';
@@ -12,6 +12,8 @@ import runner from '../../assets/images/Course/runner.png';
 import mapview from '../../assets/images/Course/mapforcourseview.png';
 
 import Courses from '../../components/Course/Courses';
+import { getCourseRecommend, getbasicCourseRecommend } from '../../utils/courseapi';
+import Recommendcourses from '../../components/Course/recommentcourses';
 
 
 const styles = StyleSheet.create({
@@ -37,10 +39,10 @@ const styles = StyleSheet.create({
     },
 
     greenbutton: {
-        width: 350, height: 60,
+        width: 350, height: 45,
         borderColor: 'white',
         backgroundColor: '#73D393',
-        borderWidth: 0,
+        borderWidth: 0, marginTop: 15,
         borderRadius: 15, FlexDirection: 'row',
         alignItems: "center", justifyContent: "center", alignSelf: "center"
     },
@@ -67,24 +69,12 @@ const styles = StyleSheet.create({
         borderRadius: 15,
         alignItems: "center", justifyContent: "center",
     },
-    starsize: { height: 30, width: 30, marginLeft: 20, marginRight: 10, marginTop:5 },
+    starsize: { height: 30, width: 30, marginLeft: 20, marginRight: 10, marginTop: 5 },
 
     inputbar: { borderRadius: 10, width: "78%", height: 40, backgroundColor: 'white', elevation: 7, alignSelf: 'center', paddingLeft: 10, textAlignVertical: 'center', fontSize: 14, color: 'grey' },
     inputbar2: { borderRadius: 10, width: "87%", height: 32, backgroundColor: 'white', elevation: 7, alignSelf: 'center', paddingLeft: 10, textAlignVertical: 'center', marginTop: 15, justifyContent: 'center' },
 
 });
-
-const datas = {
-    name: '문학산 등산로',
-    distance: '7.5KM',
-    time: '1시간 이상',
-    location: '인천 미추홀구',
-    level: '어려움',
-    discription : '산을 따라서 달리는 하드코어 러닝 코스입니다. 숙련자만 하길 권장드립니다.',
-    star : '4.5',
-    runners : '1000명',
-    options : ['#산', '#숲', '계단 있음']
-  }
 
 const Courserecommend = ({ route }) => {
     const navigation = useNavigation();
@@ -105,6 +95,20 @@ const Courserecommend = ({ route }) => {
         latitude: null,
         longitude: null
     };
+
+    const fetchrecommenedCourse = async (latitude, longitude, difficulty, runningGoal) => {
+        const result = await getCourseRecommend(latitude, longitude, difficulty, runningGoal);
+        setrecommendedCourse(result.data);
+    };
+    const [recommendedCourse, setrecommendedCourse] = useState([]);
+    useEffect(() => {
+        const fetchbasicrecommenedCourse = async () => {
+            const result = await getbasicCourseRecommend();
+            setrecommendedCourse(result.data);
+        };
+        fetchbasicrecommenedCourse();
+    }, []);
+
     return (
         <ScrollView>
             <View style={styles.space}></View>
@@ -146,11 +150,16 @@ const Courserecommend = ({ route }) => {
                     selectedTextStyle={{ fontSize: 14, color: 'grey', marginLeft: 3 }} // 선택된 항목 글자색 수정
                 />
             </View>
-            <View style={{ borderRadius: 15, width: "90%", height: 'auto', backgroundColor: 'white', elevation: 7, alignSelf: 'center', marginTop: 30, paddingBottom: 15, marginBottom:30 }}>
-                <Courses data={datas}/>
-                <Courses data={datas}/>
-                <Courses data={datas}/>
-                <Courses data={datas}/>
+            {selectedLocation.latitude && selectedLocation.longitude && Leveldata && Goaldata &&
+                <TouchableOpacity onPress={() => fetchrecommenedCourse(selectedLocation.latitude, selectedLocation.longitude, Leveldata, Goaldata)}
+                    style={styles.greenbutton}>
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                        <Text style={styles.whitetext}>
+                            조건에 맞추어 추천</Text>
+                    </View>
+                </TouchableOpacity>}
+            <View style={{ borderRadius: 15, width: "90%", height: 'auto', backgroundColor: 'white', elevation: 7, alignSelf: 'center', marginTop: 15, paddingBottom: 15, marginBottom: 30, paddingTop:15}}>
+                <Recommendcourses data={recommendedCourse} />
             </View>
 
         </ScrollView>
