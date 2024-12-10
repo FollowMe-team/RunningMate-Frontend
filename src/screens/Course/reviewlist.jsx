@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import { TextInput, StyleSheet, View, Text, Alert, Pressable, Image, ScrollView } from 'react-native';
 import { Dropdown } from 'react-native-element-dropdown';
 
@@ -15,8 +15,11 @@ import sprinter from '../../assets/images/Course/sprinter.png';
 import profileimage from '../../assets/images/Course/profileimage.png';
 import qmark from '../../assets/images/Course/Qmark.png';
 import more from '../../assets/images/Course/more.png';
+import greystar from '../../assets/images/Course/greystar.png';
+import { getReview } from '../../utils/courseapi';
 
 import examplepic from '../../assets/images/Course/marathonpic.png';
+import Reviews from '../../components/Course/reviews';
 
 const styles = StyleSheet.create({
     space: { height: 15 },
@@ -84,28 +87,50 @@ const styles = StyleSheet.create({
 
 
 
-export default function Course() {
+const Reviewed = ({ route, navigated }) => {
+    const data = route.params;
     const [Aligndata, setAlign] = useState('');
+    const five = data.data.reviews.filter(rating => rating.rating === 5).length;
+    const four = data.data.reviews.filter(rating => rating.rating === 4).length;
+    const three = data.data.reviews.filter(rating => rating.rating === 3).length;
+    const two = data.data.reviews.filter(rating => rating.rating === 2).length;
+    const one = data.data.reviews.filter(rating => rating.rating === 1).length;
+    const all = five + four + three + two + one;
+    const point = ((5 * five + 4* four + 3*three+2*two+one)/all).toFixed(1);
+    const fiverating = five / all * 140;
+    const fourrating = four / all * 140;
+    const threerating = three / all * 140;
+    const tworating = two / all * 140;
+    const onerating = one / all * 140;
     const Aligndatas = [
         { label: "최신 순", value: 'LATEST' },
         { label: "오래된 순", value: 'OLDEST' },
         { label: "별점 높은 순", value: 'HIGHEST_RATING' },
         { label: "별점 낮은 순", value: 'LOWEST_RATING' }
     ]
+
+
+    const [Coursedetails, setCoursedetails] = useState();
+    const [Coursesuccess, setCoursesuccess] = useState(false);
+    const fetchReviews = async (idss, value) => {
+        const result = await getReview(idss, value);
+        setCoursedetails(result.data);
+        setCoursesuccess(result.success);
+    };
     return (
         <ScrollView>
             <View>
-                <Text style={styles.mapname}>인천 미추홀구</Text>
+                <Text style={styles.mapname}>{data.data.name}</Text>
                 <View style={styles.space}></View>
                 <View style={{ flexDirection: "row" }}>
                     <View style={{ marginLeft: 60, marginTop: 5 }}>
-                        <Text style={{ fontSize: 40, color: 'black', alignSelf: 'center' }}>4.0</Text>
+                        <Text style={{ fontSize: 40, color: 'black', alignSelf: 'center' }}>{point}</Text>
                         <View style={{ flexWrap: 'wrap', flexDirection: 'row', justifyContent: 'flex-start', marginBottom: 3, marginTop: 3, alignSelf: 'center' }}>
-                            <Image style={styles.starsize} source={yellowstar} />
-                            <Image style={styles.starsize} source={yellowstar} />
-                            <Image style={styles.starsize} source={yellowstar} />
-                            <Image style={styles.starsize} source={yellowstar} />
-                            <Image style={styles.starsize} source={yellowstar} />
+                            <Image style={styles.starsize} source={point > 0 ? yellowstar : greystar} />
+                            <Image style={styles.starsize} source={point > 1 ? yellowstar : greystar} />
+                            <Image style={styles.starsize} source={point > 2 ? yellowstar : greystar} />
+                            <Image style={styles.starsize} source={point > 3 ? yellowstar : greystar} />
+                            <Image style={styles.starsize} source={point > 4 ? yellowstar : greystar} />
                         </View>
                     </View>
                     <View>
@@ -114,9 +139,10 @@ export default function Course() {
                                 5점
                             </Text>
                             <View style={{ height: 5, width: 140, position: 'absolute', right: -150, top: 7, backgroundColor: '#A8A5AF' }}></View>
-                            <View style={{ height: 5, width: 50, position: 'absolute', right: -60, top: 7, backgroundColor: '#FFAD20' }}></View>
+                            <View style={{ height: 5, width: fiverating, position: 'absolute', right: -10-fiverating, top: 7, backgroundColor: '#FFAD20' }}></View>
                             <Text style={{ position: 'absolute', right: -180, fontSize: 12 }}>
-                                222
+                                {data.data.reviews.filter(rating => rating.rating === 5).length}
+
                             </Text>
                         </View>
                         <View style={{ flexDirection: 'row', marginLeft: 30 }}>
@@ -124,211 +150,84 @@ export default function Course() {
                                 4점
                             </Text>
                             <View style={{ height: 5, width: 140, position: 'absolute', right: -150, top: 7, backgroundColor: '#A8A5AF' }}></View>
-                            <View style={{ height: 5, width: 50, position: 'absolute', right: -60, top: 7, backgroundColor: '#FFAD20' }}></View>
-                            <Text style={{ position: 'absolute', right: -180, fontSize: 12 }}>
-                                222
-                            </Text>
-                        </View>
-                        <View style={{ flexDirection: 'row', marginLeft: 30 }}>
-                            <Text style={{ fontSize: 12 }}>
-                                3점
-                            </Text>
-                            <View style={{ height: 5, width: 140, position: 'absolute', right: -150, top: 7, backgroundColor: '#A8A5AF' }}></View>
-                            <View style={{ height: 5, width: 50, position: 'absolute', right: -60, top: 7, backgroundColor: '#FFAD20' }}></View>
-                            <Text style={{ position: 'absolute', right: -180, fontSize: 12 }}>
-                                222
-                            </Text>
-                        </View>
-                        <View style={{ flexDirection: 'row', marginLeft: 30 }}>
-                            <Text style={{ fontSize: 12 }}>
-                                2점
-                            </Text>
-                            <View style={{ height: 5, width: 140, position: 'absolute', right: -150, top: 7, backgroundColor: '#A8A5AF' }}></View>
-                            <View style={{ height: 5, width: 50, position: 'absolute', right: -60, top: 7, backgroundColor: '#FFAD20' }}></View>
-                            <Text style={{ position: 'absolute', right: -180, fontSize: 12 }}>
-                                222
-                            </Text>
-                        </View>
-                        <View style={{ flexDirection: 'row', marginLeft: 30 }}>
-                            <Text style={{ fontSize: 12 }}>
-                                1점
-                            </Text>
-                            <View style={{ height: 5, width: 140, position: 'absolute', right: -150, top: 7, backgroundColor: '#A8A5AF' }}></View>
-                            <View style={{ height: 5, width: 50, position: 'absolute', right: -60, top: 7, backgroundColor: '#FFAD20' }}></View>
-                            <Text style={{ position: 'absolute', right: -180, fontSize: 12 }}>
-                                222
-                            </Text>
-                        </View>
+                            <View style={{ height: 5, width: fourrating, position: 'absolute', right: -10-fourrating, top: 7, backgroundColor: '#FFAD20' }}></View>
+                        <Text style={{ position: 'absolute', right: -180, fontSize: 12 }}>
+                            {data.data.reviews.filter(rating => rating.rating === 4).length}
+                        </Text>
+                    </View>
+                    <View style={{ flexDirection: 'row', marginLeft: 30 }}>
+                        <Text style={{ fontSize: 12 }}>
+                            3점
+                        </Text>
+                        <View style={{ height: 5, width: 140, position: 'absolute', right: -150, top: 7, backgroundColor: '#A8A5AF' }}></View>
+                        <View style={{ height: 5, width: threerating, position: 'absolute', right: -10-threerating, top: 7, backgroundColor: '#FFAD20' }}></View>
+                        <Text style={{ position: 'absolute', right: -180, fontSize: 12 }}>
+                            {data.data.reviews.filter(rating => rating.rating === 3).length}
+
+                        </Text>
+                    </View>
+                    <View style={{ flexDirection: 'row', marginLeft: 30 }}>
+                        <Text style={{ fontSize: 12 }}>
+                            2점
+                        </Text>
+                        <View style={{ height: 5, width: 140, position: 'absolute', right: -150, top: 7, backgroundColor: '#A8A5AF' }}></View>
+                        <View style={{ height: 5, width: tworating, position: 'absolute', right: -10-tworating, top: 7, backgroundColor: '#FFAD20' }}></View>
+                        <Text style={{ position: 'absolute', right: -180, fontSize: 12 }}>
+                            {data.data.reviews.filter(rating => rating.rating === 2).length}
+
+                        </Text>
+                    </View>
+                    <View style={{ flexDirection: 'row', marginLeft: 30 }}>
+                        <Text style={{ fontSize: 12 }}>
+                            1점
+                        </Text>
+                        <View style={{ height: 5, width: 140, position: 'absolute', right: -150, top: 7, backgroundColor: '#A8A5AF' }}></View>
+                        <View style={{ height: 5, width: onerating, position: 'absolute', right: -10-onerating, top: 7, backgroundColor: '#FFAD20' }}></View>
+                        <Text style={{ position: 'absolute', right: -180, fontSize: 12 }}>
+                            {data.data.reviews.filter(rating => rating.rating === 1).length}
+
+                        </Text>
                     </View>
                 </View>
-                <View style={styles.space}></View>
-                <View style={{ flexDirection: 'row' }}>
-                    <Text style={{ marginLeft: 22, marginBottom: 10 }}>
-                        리뷰(999+)</Text>
-                    <View style={{ marginLeft: 5, fontSize: 12, backgroundColor: '#E4E4E4', color: 'black', width: 90, height: 25, textAlign: 'center', textAlignVertical: 'center', borderRadius: 20 }}>
-                        <Dropdown
-                            data={Aligndatas}
-                            labelField="label"
-                            valueField="value"
-                            placeholder="최신 순"
-                            value={Aligndata}
-                            onChange={item => {
-                                setAlign(item.value);
-                            }}
-
-                            placeholderStyle={{ fontSize: 10, color: 'black', marginLeft: 10, marginTop:3 }} // 글자색 수정
-                            itemTextStyle={{ fontSize: 10, color: 'black' }} // 드롭다운 리스트 글자색 수정
-                            selectedTextStyle={{ fontSize: 10, color: 'black', marginLeft: 10, marginTop:3 }} // 선택된 항목 글자색 수정
-                        />
-                        </View>
-                </View>
-                <View style={styles.space}></View>
-                <View style={styles.smallboxlist2}>
-                    <View style={{ flexDirection: 'row' }}>
-                        <Image
-                            style={{ width: 42, height: 42, alignSelf: 'center', marginLeft: 10, marginRight: 5, marginTop: 7 }}
-                            source={profileimage}
-                        />
-                        <View style={{ justifyContent: 'center', width: "84%" }}>
-                            <View style={{ flexWrap: 'wrap', justifyContent: 'space-between' }}>
-                                <View style={{ flexWrap: 'wrap', flexDirection: 'row', justifyContent: 'space-between' }}>
-                                    <View style={{ flexWrap: 'wrap', flexDirection: 'row' }}>
-                                        <Text style={{ color: 'black', fontSize: 16 }}>
-                                            최재혁</Text>
-                                        <Image
-                                            style={{ width: 45, height: 18, alignSelf: 'center', marginLeft: 5 }}
-                                            source={sprinter}
-                                        />
-                                        <Image
-                                            style={{ width: 16, height: 16, alignSelf: 'center', marginLeft: 5 }}
-                                            source={yellowstar}
-                                        />
-                                        <Text style={{ color: '#A8A5AF', fontSize: 9, marginLeft: 5, verticalAlign: 'middle' }}>
-                                            1시간 전</Text>
-                                    </View>
-                                    <View style={{ flexWrap: 'wrap', flexDirection: 'row' }}>
-                                        <Image
-                                            style={{ width: 10, height: 2.5, alignSelf: 'flex-end', marginRight: 15, marginTop: 5 }}
-                                            source={more}
-                                        />
-                                    </View>
-                                </View>
-                                <View style={{ flexWrap: 'wrap', flexDirection: 'row', justifyContent: 'flex-start', marginBottom: 3, marginTop: 3 }}>
-                                    <Image style={styles.starsize} source={yellowstar} />
-                                    <Image style={styles.starsize} source={yellowstar} />
-                                    <Image style={styles.starsize} source={yellowstar} />
-                                    <Image style={styles.starsize} source={yellowstar} />
-                                    <Image style={styles.starsize} source={yellowstar} />
-                                </View>
-                            </View>
-                        </View>
-                    </View>
-                    <View style={{ flexWrap: 'wrap', flexDirection: 'row', justifyContent: 'space-between', marginBottom: 3 }}>
-                        <Text
-                            style={{ color: 'grey', fontSize: 10, textAlignVertical: 'center', marginLeft: 10, marginBottom: 5 }}
-                        >인하대학교 컴퓨터공학과 러닝 크루입니다.</Text>
-
-
-                    </View>
-                </View>
-                <View style={styles.smallboxlist2}>
-                    <View style={{ flexDirection: 'row' }}>
-                        <Image
-                            style={{ width: 42, height: 42, alignSelf: 'center', marginLeft: 10, marginRight: 5, marginTop: 7 }}
-                            source={profileimage}
-                        />
-                        <View style={{ justifyContent: 'center', width: "84%" }}>
-                            <View style={{ flexWrap: 'wrap', justifyContent: 'space-between' }}>
-                                <View style={{ flexWrap: 'wrap', flexDirection: 'row', justifyContent: 'space-between' }}>
-                                    <View style={{ flexWrap: 'wrap', flexDirection: 'row' }}>
-                                        <Text style={{ color: 'black', fontSize: 16 }}>
-                                            최재혁</Text>
-                                        <Image
-                                            style={{ width: 45, height: 18, alignSelf: 'center', marginLeft: 5 }}
-                                            source={sprinter}
-                                        />
-                                        <Image
-                                            style={{ width: 16, height: 16, alignSelf: 'center', marginLeft: 5 }}
-                                            source={yellowstar}
-                                        />
-                                        <Text style={{ color: '#A8A5AF', fontSize: 9, marginLeft: 5, verticalAlign: 'middle' }}>
-                                            1시간 전</Text>
-                                    </View>
-                                    <View style={{ flexWrap: 'wrap', flexDirection: 'row' }}>
-                                        <Image
-                                            style={{ width: 10, height: 2.5, alignSelf: 'flex-end', marginRight: 15, marginTop: 5 }}
-                                            source={more}
-                                        />
-                                    </View>
-                                </View>
-                                <View style={{ flexWrap: 'wrap', flexDirection: 'row', justifyContent: 'flex-start', marginBottom: 3, marginTop: 3 }}>
-                                    <Image style={styles.starsize} source={yellowstar} />
-                                    <Image style={styles.starsize} source={yellowstar} />
-                                    <Image style={styles.starsize} source={yellowstar} />
-                                    <Image style={styles.starsize} source={yellowstar} />
-                                    <Image style={styles.starsize} source={yellowstar} />
-                                </View>
-                            </View>
-                        </View>
-                    </View>
-                    <View style={{ flexWrap: 'wrap', marginBottom: 3 }}>
-                        <Text
-                            style={{ color: 'grey', fontSize: 10, textAlignVertical: 'center', marginLeft: 10, marginBottom: 5 }}
-                        >인하대학교 컴퓨터공학과 러닝 크루입니다.</Text>
-                        <Image style={{ width: 200, height: 200, marginLeft: 10, marginBottom: 13, marginTop: 7 }} source={examplepic} />
-
-                    </View>
-                </View>
-                <View style={styles.smallboxlist2}>
-                    <View style={{ flexDirection: 'row' }}>
-                        <Image
-                            style={{ width: 42, height: 42, alignSelf: 'center', marginLeft: 10, marginRight: 5, marginTop: 7 }}
-                            source={profileimage}
-                        />
-                        <View style={{ justifyContent: 'center', width: "84%" }}>
-                            <View style={{ flexWrap: 'wrap', justifyContent: 'space-between' }}>
-                                <View style={{ flexWrap: 'wrap', flexDirection: 'row', justifyContent: 'space-between' }}>
-                                    <View style={{ flexWrap: 'wrap', flexDirection: 'row' }}>
-                                        <Text style={{ color: 'black', fontSize: 16 }}>
-                                            최재혁</Text>
-                                        <Image
-                                            style={{ width: 45, height: 18, alignSelf: 'center', marginLeft: 5 }}
-                                            source={sprinter}
-                                        />
-                                        <Image
-                                            style={{ width: 16, height: 16, alignSelf: 'center', marginLeft: 5 }}
-                                            source={yellowstar}
-                                        />
-                                        <Text style={{ color: '#A8A5AF', fontSize: 9, marginLeft: 5, verticalAlign: 'middle' }}>
-                                            1시간 전</Text>
-                                    </View>
-                                    <View style={{ flexWrap: 'wrap', flexDirection: 'row' }}>
-                                        <Image
-                                            style={{ width: 10, height: 2.5, alignSelf: 'flex-end', marginRight: 15, marginTop: 5 }}
-                                            source={more}
-                                        />
-                                    </View>
-                                </View>
-                                <View style={{ flexWrap: 'wrap', flexDirection: 'row', justifyContent: 'flex-start', marginBottom: 3, marginTop: 3 }}>
-                                    <Image style={styles.starsize} source={yellowstar} />
-                                    <Image style={styles.starsize} source={yellowstar} />
-                                    <Image style={styles.starsize} source={yellowstar} />
-                                    <Image style={styles.starsize} source={yellowstar} />
-                                    <Image style={styles.starsize} source={yellowstar} />
-                                </View>
-                            </View>
-                        </View>
-                    </View>
-                    <View style={{ flexWrap: 'wrap', flexDirection: 'row', justifyContent: 'space-between', marginBottom: 3 }}>
-                        <Text
-                            style={{ color: 'grey', fontSize: 10, textAlignVertical: 'center', marginLeft: 10, marginBottom: 5 }}
-                        >인하대학교 컴퓨터공학과 러닝 크루입니다.</Text>
-
-
-                    </View>
-                </View>
-
             </View>
-        </ScrollView>
+            <View style={styles.space}></View>
+            <View style={{ flexDirection: 'row' }}>
+                <Text style={{ marginLeft: 22, marginBottom: 10 }}>
+                    리뷰({data.data.reviewCount})</Text>
+                <View style={{ marginLeft: 5, fontSize: 12, backgroundColor: '#E4E4E4', color: 'black', width: 90, height: 25, textAlign: 'center', textAlignVertical: 'center', borderRadius: 20 }}>
+                    <Dropdown
+                        data={Aligndatas}
+                        labelField="label"
+                        valueField="value"
+                        placeholder="최신 순"
+                        value={Aligndata}
+                        onChange={item => {
+                            setAlign(item.value);
+                            fetchReviews(data.data.id, Aligndata);
+                        }}
+
+                        placeholderStyle={{ fontSize: 10, color: 'black', marginLeft: 10, marginTop: 3 }} // 글자색 수정
+                        itemTextStyle={{ fontSize: 10, color: 'black' }} // 드롭다운 리스트 글자색 수정
+                        selectedTextStyle={{ fontSize: 10, color: 'black', marginLeft: 10, marginTop: 3 }} // 선택된 항목 글자색 수정
+                    />
+                </View>
+            </View>
+            <View style={styles.space}></View>
+
+            {   !Coursesuccess &&
+                data.data.reviews.map((reviewer) => (
+                    <Reviews data={reviewer} />
+                ))
+            }
+            {   Coursesuccess &&
+                Coursedetails.reviews.map((reviewer) => (
+                    <Reviews data={reviewer} />
+                ))
+            }
+
+        </View>
+        </ScrollView >
     );
 }
+
+export default Reviewed;

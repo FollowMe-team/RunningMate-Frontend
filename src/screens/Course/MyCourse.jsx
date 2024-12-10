@@ -1,5 +1,5 @@
-import React from 'react';
-import { TextInput,TouchableOpacity, StyleSheet, View, Text, Alert, Pressable, Image } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { TextInput, TouchableOpacity, StyleSheet, View, Text, Alert, Pressable, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
 import Qmark from '../../assets/images/Course/Qmark.png';
@@ -10,9 +10,9 @@ import location from '../../assets/images/Course/location.png';
 import time from '../../assets/images/Course/time.png';
 import subscribed from '../../assets/images/Course/subscribed.png';
 import runningman from '../../assets/images/Course/runningmanforchoosebutton.png';
+import { getMyCourse } from '../../utils/courseapi';
+import MySaveCourse from '../../components/Course/mySaveCourse';
 
-import SimpleNoCourse from '../../components/Course/SimpleNoCourse';
-import SimpleCourse from '../../components/Course/SimpleCourseSave';
 
 
 const styles = StyleSheet.create({
@@ -30,11 +30,11 @@ const styles = StyleSheet.create({
   whitetext: { color: 'white', fontSize: 22, fontWeight: 'bold', textAlign: 'center', textAlignVertical: 'center', marginLeft: 50, marginRight: 50 },
 
   bigbox: {
-    borderRadius: 15, width: 350, height: 240, backgroundColor: 'white', alignSelf: 'center',
+    borderRadius: 15, width: 350, height: 'auto', paddingTop: 8, backgroundColor: 'white', alignSelf: 'center',
     elevation: 5, alignItems: 'center', justifyContent: "space-around"
   },
 
-  blacktext: { color: 'black', fontSize: 18, fontWeight: 'bold' },
+  blacktext: { color: 'black', fontSize: 18, fontWeight: 'bold', marginBottom: 8 },
 
   smallbox: {
     borderRadius: 15, width: 320, height: 50, backgroundColor: 'white', alignSelf: 'center',
@@ -44,44 +44,27 @@ const styles = StyleSheet.create({
 
 });
 
-const datas = {
-  name: '월미도 해안길',
-  distance: '3.8KM',
-  time: '30~40분',
-  location: '인천 중구',
-  distancetoCourse: '5.3KM',
-  level: '승인 완료'
-}
-const datass = {
-  name: '송도 센트럴파크',
-  distance: '3.8KM',
-  time: '30~40분',
-  location: '인천 연수구',
-  distancetoCourse: '3.8KM',
-  level: '승인 대기중'
-}
-const datasss = {
-  name: '계양산 둘레길',
-  distance: '8.5KM',
-  time: '1시간 이상',
-  location: '인천 계양구',
-  distancetoCourse: '8.5KM',
-  level: '승인 거부'
-}
 
 const MyCourse = () => {
   const navigation = useNavigation();
+  const [myCourse, setmyCourse] = useState([]);
 
+  useEffect(() => {
+    const fetchmyCourse = async () => {
+      const result = await getMyCourse();
+      setmyCourse(result.data);
+    };
+
+    fetchmyCourse();
+  }, []);
   return (
     <View>
       <View style={styles.space}></View>
       <View style={styles.space}></View>
       <View style={styles.bigbox}>
         <Text style={styles.blacktext}>내가 등록한 코스</Text>
-        <SimpleCourse data={datas}/>
-        <SimpleCourse data={datass}/>
-        <SimpleCourse data={datasss}/>
-        </View>
+        <MySaveCourse data={myCourse}/>
+      </View>
       <View style={styles.space}></View>
       <TouchableOpacity onPress={() => navigation.navigate('Runningtimesaving')}
         style={styles.greenbutton}>
