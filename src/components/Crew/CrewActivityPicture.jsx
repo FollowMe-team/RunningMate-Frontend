@@ -1,6 +1,15 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { View, StyleSheet, Image, ScrollView, Dimensions } from 'react-native';
+import {
+  View,
+  StyleSheet,
+  Image,
+  ScrollView,
+  Dimensions,
+  Text,
+} from 'react-native';
+
+import gallery from '../../assets/images/Crew/free-icon-image-gallery-3342137.png';
 
 const { width } = Dimensions.get('window');
 
@@ -15,27 +24,45 @@ const CrewActivityPicture = ({ profileUrls }) => {
 
   return (
     <View>
-      <ScrollView
-        horizontal
-        pagingEnabled
-        onScroll={handleScroll}
-        scrollEventThrottle={16}
-        showsHorizontalScrollIndicator={false}
-      >
-        {profileUrls.map((url, index) => (
-          <View key={index} style={styles.imageContainer}>
-            <Image source={{ uri: url }} style={styles.crewActivityPicture} />
+      {profileUrls.length === 0 ? (
+        <View style={styles.emptyContainer}>
+          <Image source={gallery} style={styles.crewActivityPicture} />
+          <Text style={styles.emptyText}>
+            아직 크루 활동 사진이 없어요...{'\n'}
+            아래의 갤러리 편집 버튼을 눌러 업로드해주세요!
+          </Text>
+        </View>
+      ) : (
+        <>
+          <ScrollView
+            horizontal
+            pagingEnabled
+            onScroll={handleScroll}
+            scrollEventThrottle={16}
+            showsHorizontalScrollIndicator={false}
+          >
+            {profileUrls.map((url, index) => (
+              <View key={index} style={styles.imageContainer}>
+                <Image
+                  source={{ uri: url }}
+                  style={styles.crewActivityPicture}
+                />
+              </View>
+            ))}
+          </ScrollView>
+          <View style={styles.pagination}>
+            {profileUrls.map((_, index) => (
+              <View
+                key={index}
+                style={[
+                  styles.dot,
+                  { opacity: index === activeIndex ? 1 : 0.3 },
+                ]}
+              />
+            ))}
           </View>
-        ))}
-      </ScrollView>
-      <View style={styles.pagination}>
-        {profileUrls.map((_, index) => (
-          <View
-            key={index}
-            style={[styles.dot, { opacity: index === activeIndex ? 1 : 0.3 }]}
-          />
-        ))}
-      </View>
+        </>
+      )}
     </View>
   );
 };
@@ -47,8 +74,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   crewActivityPicture: {
-    width: '100%',
-    height: 300,
+    width: 75,
+    height: 75,
+    marginBottom: 10,
   },
   pagination: {
     flexDirection: 'row',
@@ -61,6 +89,18 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     backgroundColor: '#595959',
     marginHorizontal: 4,
+  },
+  emptyContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: 300,
+    backgroundColor: '#595959',
+    borderRadius: 10,
+  },
+  emptyText: {
+    textAlign: 'center',
+    color: 'white',
+    marginTop: 10,
   },
 });
 

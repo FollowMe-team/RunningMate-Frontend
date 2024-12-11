@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   Image,
   ScrollView,
@@ -9,14 +9,16 @@ import {
   StyleSheet,
   Modal,
 } from 'react-native';
-import { Dropdown } from 'react-native-element-dropdown';
+import DropDownPicker from 'react-native-dropdown-picker';
 import PropTypes from 'prop-types';
 import CrewPhotoPicker from '../../components/Crew/CrewPhotoPicker';
-import TimePicker from '../../components/TimePicker';
+import { createCrew, checkCrewName } from '../../utils/crew/crew';
+import cityData from '../../components/Crew/city.json';
+import { rankImages } from '../../components/Rank';
+import ActivitySelector from '../../components/ActivitySelector';
 
 // import plus from '../../assets/images/Crew/plus.png';
 // import minus from '../../assets/images/Crew/minus.png';
-import wave from '../../assets/images/Crew/wave.png';
 
 const CreateCrew = ({ navigation }) => {
   const [name, setName] = useState('');
@@ -24,40 +26,156 @@ const CreateCrew = ({ navigation }) => {
   const [detailDescription, setDetailDescription] = useState('');
   const [city, setCity] = useState('');
   const [district, setDistrict] = useState('');
-  const cityOptions = [
-    { label: '서울', value: '서울' },
-    { label: '부산', value: '부산' },
-    // ... 다른 도시들 ...
-  ];
-  const districtOptions = [
-    { label: '강남구', value: '강남구' },
-    { label: '서초구', value: '서초구' },
-    // ... 다른 구/군들 ...
-  ];
+  const cityOptions = cityData.cities.map(city =>
+    typeof city === 'string'
+      ? { label: city, value: city }
+      : { label: city.name, value: city.name },
+  );
+  const districtOptions = cityData.cities
+    .find(city => city.name === '인천광역시')
+    .districts.map(district => ({
+      label: district,
+      value: district,
+    }));
+  const [ranking, setRanking] = useState('');
   const [openChatUrl, setOpenChatUrl] = useState('');
-  const [activityTime, setActivityTime] = useState({
-    startTime: null,
-    endTime: null,
-  });
   const [selectedDays, setSelectedDays] = useState([]);
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
   const [modalVisible, setModalVisible] = useState(false);
-  const [photos, setPhotos] = useState([]);
+  const [photo, setPhoto] = useState();
+  const [nameCheckModalVisible, setNameCheckModalVisible] = useState(false);
+  const rankOptions = [
+    {
+      label: '스피드 데몬',
+      value: 'SPEED_DEMON',
+      image: rankImages.SPEED_DEMON,
+    },
+    { label: '아이언 레그', value: 'IRON_LEGS', image: rankImages.IRON_LEGS },
+    {
+      label: '울트라 러너',
+      value: 'ULTRA_RUNNER',
+      image: rankImages.ULTRA_RUNNER,
+    },
+    { label: '마라토너', value: 'MARATHONER', image: rankImages.MARATHONER },
+    { label: '스프린터', value: 'SPRINTER', image: rankImages.SPRINTER },
+    { label: '레이서', value: 'RACER', image: rankImages.RACER },
+    { label: '러너', value: 'RUNNER', image: rankImages.RUNNER },
+    { label: '조깅러', value: 'JOGGER', image: rankImages.JOGGER },
+  ];
+  const [openCity, setOpenCity] = useState(false);
+  const [openDistrict, setOpenDistrict] = useState(false);
+  const [openRank, setOpenRank] = useState(false);
+  const scrollViewRef = useRef(null);
+  const [activityTimes, setActivityTimes] = useState([]);
+  const [nameError, setNameError] = useState('');
+  const [isNameChecked, setIsNameChecked] = useState(false);
+  const [modalMessage, setModalMessage] = useState('');
 
   const handleDaySelect = day => {
     let updatedDays = [...selectedDays];
     if (updatedDays.includes(day)) {
       updatedDays = updatedDays.filter(d => d !== day);
+      setActivityTimes(activityTimes.filter(time => time.day !== day));
     } else {
       updatedDays.push(day);
+      setActivityTimes([
+        ...activityTimes,
+        { day, startTime: null, endTime: null },
+      ]);
     }
     setSelectedDays(updatedDays);
   };
 
+  const updateActivityTime = (day, startTime, endTime) => {
+    setActivityTimes(
+      activityTimes.map(time =>
+        time.day === day ? { ...time, startTime, endTime } : time,
+      ),
+    );
+  };
+
   const isDaySelected = day => selectedDays.includes(day);
 
-  const handleSignup = () => {
-    setModalVisible(true);
+  const handleNameCheck = async () => {
+    try {
+      const isDuplicated = await checkCrewName(name);
+      if (!isDuplicated) {
+        setIsNameChecked(true);
+        setNameError('');
+        setModalMessage('사용 가능한 크루명입니다.');
+        setNameCheckModalVisible(true);
+      } else {
+        setIsNameChecked(false);
+        setNameError('이미 사용 중인 크루명입니다.');
+        setModalMessage('이미 사용 중인 크루명입니다.');
+        setNameCheckModalVisible(true);
+      }
+    } catch {
+      setIsNameChecked(false);
+      setNameError('크루명 확인 중 오류가 발생했습니다.');
+      setModalMessage('크루명 확인 중 오류가 발생했습니다.');
+      setNameCheckModalVisible(true);
+    }
+  };
+
+  const handleNameCheckModalClose = () => {
+    setNameCheckModalVisible(false);
+  };
+
+  const validateName = name => {
+    setName(name);
+    setIsNameChecked(false); // 크루명이 변경되면 중복 확인 상태를 초기화
+  };
+
+  const handleSignup = async () => {
+    if (!isNameChecked) {
+      setNameError('크루명 중복 체크를 해주세요.');
+      setModalMessage('크루명 중복 체크를 해주세요.');
+      setNameCheckModalVisible(true);
+      return;
+    }
+    const dayMap = {
+      월: 'MONDAY',
+      화: 'TUESDAY',
+      수: 'WEDNESDAY',
+      목: 'THURSDAY',
+      금: 'FRIDAY',
+      토: 'SATURDAY',
+      일: 'SUNDAY',
+    };
+
+    const formatTime = date => {
+      const hours = date.getHours().toString().padStart(2, '0');
+      const minutes = date.getMinutes().toString().padStart(2, '0');
+      return `${hours}:${minutes}`;
+    };
+
+    const crewData = {
+      name,
+      shortDescription,
+      detailDescription,
+      city,
+      district,
+      ranking,
+      openChatUrl,
+      activityTimes: activityTimes.map(({ day, startTime, endTime }) => ({
+        startTime: startTime ? formatTime(startTime) : '',
+        endTime: endTime ? formatTime(endTime) : '',
+        type: dayMap[day],
+      })),
+    };
+
+    console.log('Sending Crew Data:', crewData); // 보낸 데이터 로그 추가
+
+    try {
+      const crewId = await createCrew(crewData, photo);
+      console.log('Created Crew ID:', crewId); // crewId 출력
+      setModalMessage('크루 생성이 완료되었습니다.');
+      setModalVisible(true);
+    } catch (error) {
+      console.error('Failed to create crew:', error);
+      alert('크루 생성에 실패했습니다. 다시 시도해주세요.');
+    }
   };
 
   const handleModalClose = () => {
@@ -72,9 +190,9 @@ const CreateCrew = ({ navigation }) => {
       detailDescription &&
       city &&
       district &&
+      ranking &&
       openChatUrl &&
-      activityTime.startTime &&
-      activityTime.endTime
+      activityTimes.every(({ startTime, endTime }) => startTime && endTime)
     ) {
       setIsButtonDisabled(false);
     } else {
@@ -82,24 +200,42 @@ const CreateCrew = ({ navigation }) => {
     }
   };
 
+  const handleRankChange = value => {
+    setRanking(value);
+    setOpenRank(false);
+    checkFormCompletion();
+  };
+
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView
+      ref={scrollViewRef}
+      style={styles.container}
+      keyboardShouldPersistTaps="handled"
+    >
       <View style={{ justifyContent: 'center', alignItems: 'center' }}>
         <View style={styles.photoContainer}>
-          <CrewPhotoPicker photos={photos} setPhotos={setPhotos} />
+          <CrewPhotoPicker photo={photo} setPhoto={setPhoto} />
         </View>
         <View style={styles.formContainer}>
           <Text style={styles.title}>크루명</Text>
-          <TextInput
-            value={name}
-            onChangeText={text => {
-              setName(text);
-              checkFormCompletion();
-            }}
-            placeholder="크루 이름을 적어주세요(욕설, 비하 발언 금지)"
-            style={styles.input}
-            placeholderTextColor="#9B9B9D"
-          />
+          <View style={styles.inputContainer}>
+            <TextInput
+              value={name}
+              onChangeText={validateName}
+              placeholder="크루 이름을 적어주세요(욕설, 비하 발언 금지)"
+              style={styles.input}
+              placeholderTextColor="#9B9B9D"
+            />
+            <TouchableOpacity
+              style={styles.nameCheckButton}
+              onPress={handleNameCheck}
+            >
+              <Text style={styles.nameCheckButtonText}>중복 체크</Text>
+            </TouchableOpacity>
+            {nameError ? (
+              <Text style={styles.errorText}>{nameError}</Text>
+            ) : null}
+          </View>
         </View>
         <View style={styles.formContainer}>
           <Text style={styles.title}>크루 간단 소개</Text>
@@ -129,58 +265,79 @@ const CreateCrew = ({ navigation }) => {
             scrollEnabled={true}
           />
         </View>
-        <View style={styles.formContainer}>
+        <View style={[styles.formContainer, { zIndex: 3000 }]}>
           <Text style={styles.title}>위치</Text>
           <View style={styles.locationLayout}>
-            <Dropdown
-              style={styles.locationDropdown}
-              data={cityOptions}
-              labelField="label"
-              valueField="value"
-              placeholder="시/도 선택"
-              value={city}
-              onChange={item => {
-                setCity(item.value);
-                checkFormCompletion();
-              }}
-              placeholderStyle={{ color: '#101010' }}
-              itemTextStyle={{ color: '#101010' }}
-              selectedTextStyle={{ color: '#101010' }}
-            />
-            <Dropdown
-              style={styles.locationDropdown}
-              data={districtOptions}
-              labelField="label"
-              valueField="value"
-              placeholder="구/군 선택"
-              value={district}
-              onChange={item => {
-                setDistrict(item.value);
-                checkFormCompletion();
-              }}
-              placeholderStyle={{ color: '#101010' }}
-              itemTextStyle={{ color: '#101010' }}
-              selectedTextStyle={{ color: '#101010' }}
-            />
+            <View style={styles.dropdownWrapper}>
+              <DropDownPicker
+                open={openCity}
+                value={city}
+                items={cityOptions}
+                setOpen={setOpenCity}
+                setValue={setCity}
+                setItems={() => {}}
+                placeholder="시/도 선택"
+                style={styles.locationDropdown}
+                dropDownContainerStyle={styles.dropDownContainer}
+                placeholderStyle={{ color: '#101010' }}
+                itemTextStyle={{ color: '#101010' }}
+                selectedTextStyle={{ color: '#101010' }}
+                onChangeValue={() => checkFormCompletion()}
+                nestedScrollEnabled={true}
+                dropDownDirection="AUTO"
+              />
+            </View>
+            <View style={styles.dropdownWrapper}>
+              <DropDownPicker
+                open={openDistrict}
+                value={district}
+                items={districtOptions}
+                setOpen={setOpenDistrict}
+                setValue={setDistrict}
+                setItems={() => {}}
+                placeholder="구/군 선택"
+                style={styles.locationDropdown}
+                dropDownContainerStyle={styles.dropDownContainer}
+                placeholderStyle={{ color: '#101010' }}
+                itemTextStyle={{ color: '#101010' }}
+                selectedTextStyle={{ color: '#101010' }}
+                onChangeValue={() => checkFormCompletion()}
+                nestedScrollEnabled={true}
+                dropDownDirection="AUTO"
+              />
+            </View>
           </View>
         </View>
-        <View style={styles.formContainer}>
+        <View style={[styles.formContainer, { zIndex: 2000 }]}>
           <View style={styles.titleSet}>
             <Text style={styles.title}>크루 참여 조건</Text>
             <Text style={styles.subTitle}>(선택)</Text>
           </View>
           <View>
-            <Dropdown
-              style={styles.defaultDropdown}
-              data={[]}
-              labelField="label"
-              valueField="value"
+            <DropDownPicker
+              open={openRank}
+              value={ranking}
+              items={rankOptions}
+              setOpen={setOpenRank}
+              setValue={handleRankChange}
+              setItems={() => {}}
               placeholder="(미선택)"
-              value={''}
-              onChange={() => {}}
+              style={styles.defaultDropdown}
+              dropDownContainerStyle={styles.dropDownContainer}
               placeholderStyle={{ color: '#101010' }}
               itemTextStyle={{ color: '#101010' }}
               selectedTextStyle={{ color: '#101010' }}
+              renderListItem={({ item }) => (
+                <TouchableOpacity
+                  onPress={handleRankChange.bind(this, item.value)}
+                  style={styles.rankItem}
+                >
+                  <Image source={item.image} style={styles.rankImage} />
+                  <Text style={styles.rankLabel}>{item.label}</Text>
+                </TouchableOpacity>
+              )}
+              nestedScrollEnabled={true}
+              dropDownDirection="AUTO"
             />
           </View>
         </View>
@@ -212,31 +369,17 @@ const CreateCrew = ({ navigation }) => {
               </TouchableOpacity>
             ))}
           </View>
-        </View>
-        <View style={styles.formContainer}>
-          <View style={styles.titleSet}>
-            <Text style={styles.title}>주 활동 시간대</Text>
-            <Text style={styles.subTitle}>(중복 선택 가능)</Text>
-          </View>
-          <View style={styles.activityTimeDropdownLayout}>
-            <TimePicker
-              time={activityTime.startTime}
-              setTime={time => {
-                setActivityTime({ ...activityTime, startTime: time });
+          {selectedDays.map(day => (
+            <ActivitySelector
+              key={day}
+              day={day}
+              activityTime={activityTimes.find(time => time.day === day)}
+              updateActivityTime={(day, startTime, endTime) => {
+                updateActivityTime(day, startTime, endTime);
                 checkFormCompletion();
               }}
-              placeholder="시작 시간 선택"
             />
-            <Image source={wave} style={{ width: 25, height: 11 }} />
-            <TimePicker
-              time={activityTime.endTime}
-              setTime={time => {
-                setActivityTime({ ...activityTime, endTime: time });
-                checkFormCompletion();
-              }}
-              placeholder="끝 시간 선택"
-            />
-          </View>
+          ))}
         </View>
         <View style={styles.formContainer}>
           <Text style={styles.title}>
@@ -270,16 +413,40 @@ const CreateCrew = ({ navigation }) => {
       </View>
 
       <Modal
-        animationType="slide"
-        transparent={false}
+        animationType="fade"
+        transparent={true}
+        visible={nameCheckModalVisible}
+        onRequestClose={() => setNameCheckModalVisible(false)}
+      >
+        <View style={styles.modalBackground}>
+          <View style={styles.modalView}>
+            <Text style={styles.modalText}>{modalMessage}</Text>
+            <TouchableOpacity
+              style={styles.okButton}
+              onPress={handleNameCheckModalClose}
+            >
+              <Text style={styles.okButtonText}>OK</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
+      <Modal
+        animationType="fade"
+        transparent={true}
         visible={modalVisible}
         onRequestClose={() => setModalVisible(false)}
       >
-        <View style={styles.modalView}>
-          <Text style={styles.modalText}>크루 생성 신청이 완료되었습니다!</Text>
-          <TouchableOpacity style={styles.okButton} onPress={handleModalClose}>
-            <Text style={styles.okButtonText}>OK</Text>
-          </TouchableOpacity>
+        <View style={styles.modalBackground}>
+          <View style={styles.modalView}>
+            <Text style={styles.modalText}>{modalMessage}</Text>
+            <TouchableOpacity
+              style={styles.okButton}
+              onPress={handleModalClose}
+            >
+              <Text style={styles.okButtonText}>OK</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </Modal>
     </ScrollView>
@@ -290,9 +457,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     marginBottom: 50,
+    marginHorizontal: 20,
   },
   formContainer: {
-    width: '85%',
+    width: '100%',
     marginBottom: 12,
   },
   photoContainer: {
@@ -367,16 +535,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
   },
-  locationDropdown: {
-    width: '48%',
-    borderColor: '#D6D6D6',
-    borderWidth: 1,
-    borderRadius: 8,
-    padding: 16,
-    marginTop: 8,
+  dropdownWrapper: {
+    flex: 1,
+    marginRight: 8,
   },
-  timeDropdown: {
-    width: '45%',
+  locationDropdown: {
     borderColor: '#D6D6D6',
     borderWidth: 1,
     borderRadius: 8,
@@ -410,29 +573,6 @@ const styles = StyleSheet.create({
   weekSelectButtonTextActive: {
     color: 'white',
   },
-  plusButton: {
-    justifyContent: 'center',
-    paddingVertical: 2,
-    paddingHorizontal: 16,
-    borderColor: '#D6D6D6',
-    borderWidth: 1,
-    borderRadius: 8,
-    marginRight: 8,
-  },
-  minusButton: {
-    justifyContent: 'center',
-    paddingVertical: 2,
-    paddingHorizontal: 16,
-    borderColor: '#D6D6D6',
-    borderWidth: 1,
-    borderRadius: 8,
-  },
-  activityTimeDropdownLayout: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginTop: 8,
-  },
   createCrewButton: {
     width: '85%',
     paddingVertical: 22,
@@ -458,27 +598,81 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
   },
-  modalView: {
+  modalBackground: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalView: {
+    width: 300,
+    paddingHorizontal: 20,
+    paddingVertical: 30,
+    backgroundColor: 'white',
+    borderRadius: 10,
+    alignItems: 'center',
   },
   modalText: {
-    fontSize: 20,
+    color: 'black',
+    fontSize: 12,
     fontWeight: 'bold',
-    color: '#fff',
-    marginBottom: 20,
+    textAlign: 'center',
+    marginBottom: 50,
   },
   okButton: {
-    backgroundColor: '#73D393',
-    padding: 10,
-    borderRadius: 10,
-  },
-  okButtonText: {
     color: '#fff',
     fontSize: 18,
     fontWeight: 'bold',
+  },
+  okButtonText: {
+    color: '#73D393',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  modalButtonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    width: '100%',
+  },
+  rankItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    zIndex: 999,
+  },
+  rankLabel: {
+    marginLeft: 10,
+    padding: 5,
+    color: '#101010',
+  },
+  rankImage: {
+    width: 75,
+    height: 25,
+  },
+  dropDownContainer: {
+    borderColor: '#D6D6D6',
+  },
+  inputContainer: {
+    position: 'relative',
+  },
+  nameCheckButton: {
+    position: 'absolute',
+    right: 10,
+    top: 15.5,
+    backgroundColor: '#352555',
+    borderRadius: 32,
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+  },
+  nameCheckButtonText: {
+    color: 'white',
+    fontSize: 10,
+  },
+  errorText: {
+    position: 'absolute',
+    bottom: -20,
+    left: 0,
+    color: 'red',
+    fontSize: 14,
   },
 });
 CreateCrew.propTypes = {

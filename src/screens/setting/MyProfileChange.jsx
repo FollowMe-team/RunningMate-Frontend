@@ -67,7 +67,7 @@ const MyProfileChange = () => {
   const handleNicknameCheck = async () => {
     try {
       const response = await checkNickname(nickname);
-      if (!response.isDuplicated) {
+      if (!response.data.isDuplicated) {
         setIsNicknameChecked(true);
         setNicknameError('');
         setModalMessage('사용 가능한 닉네임입니다.');

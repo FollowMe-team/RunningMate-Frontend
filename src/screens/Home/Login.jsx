@@ -8,6 +8,7 @@ import {
   TextInput,
   TouchableOpacity,
   ScrollView,
+  Modal,
 } from 'react-native';
 import { login } from '../../utils/loginlogout_api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -18,6 +19,8 @@ import right from '../../assets/images/Home/right-arrow.png';
 const Login = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalMessage, setModalMessage] = useState('');
 
   React.useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
@@ -35,7 +38,8 @@ const Login = ({ navigation }) => {
       await AsyncStorage.setItem('isLoggedIn', 'true');
       navigation.navigate('Main', { screen: 'Course' });
     } else {
-      alert(result.message);
+      setModalMessage(result.message);
+      setModalVisible(true);
     }
   };
 
@@ -83,7 +87,7 @@ const Login = ({ navigation }) => {
             <Image source={right} style={{ width: 15, height: 15 }} />
           </TouchableOpacity>
         </View>
-        <View >
+        <View>
           <TouchableOpacity style={styles.changeButton} onPress={handleLogin}>
             <View>
               <Text style={styles.button}>로그인</Text>
@@ -91,6 +95,22 @@ const Login = ({ navigation }) => {
           </TouchableOpacity>
         </View>
       </View>
+
+      <Modal
+        transparent={true}
+        animationType="fade"
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.modalBackground}>
+          <View style={styles.modalContainer}>
+            <Text style={styles.modalText}>{modalMessage}</Text>
+            <TouchableOpacity onPress={() => setModalVisible(false)}>
+              <Text style={styles.modalButtonText}>OK</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </ScrollView>
   );
 };
@@ -181,6 +201,32 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 20,
     fontWeight: 'bold',
+  },
+  modalBackground: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContainer: {
+    width: 250,
+    paddingHorizontal: 20,
+    paddingVertical: 30,
+    backgroundColor: 'white',
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  modalText: {
+    fontSize: 12,
+    fontWeight: 'bold',
+    color: '#959393',
+    textAlign: 'center',
+    marginBottom: 50,
+  },
+  modalButtonText: {
+    fontSize: 12,
+    fontWeight: 'bold',
+    color: '#00C81B',
   },
 });
 

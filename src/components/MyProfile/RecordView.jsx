@@ -14,8 +14,8 @@ const RecordView = ({
   return (
     <View style={styles.recordView}>
       <Calendars
-        onDayPress={handleDayPress}
         dataSource={records}
+        onDayPress={handleDayPress}
         fetchMonthlyRecords={fetchMonthlyRecords}
       />
       <RecordDetails selectedRecord={selectedRecord} />

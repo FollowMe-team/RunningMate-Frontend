@@ -8,21 +8,20 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import applyMemberData from './applyMember.json';
+import PropTypes from 'prop-types';
 
 // import Header from '../../components/Header';
 import defaultProfile from '../../assets/images/Settings/profile.png';
 
-const ApplyList = () => {
-  //   const route = useRoute();
+const ApplyList = ({ route }) => {
   const navigation = useNavigation();
+  const { applicants } = route.params;
 
-  //   const crew = route.params?.crew;
   const [followers, setFollowers] = useState([]);
 
   useEffect(() => {
-    setFollowers(applyMemberData);
-  }, []);
+    setFollowers(applicants);
+  }, [applicants]);
 
   //   React.useLayoutEffect(() => {
   //     navigation.setOptions({
@@ -95,5 +94,13 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
 });
+
+ApplyList.propTypes = {
+  route: PropTypes.shape({
+    params: PropTypes.shape({
+      applicants: PropTypes.array.isRequired,
+    }).isRequired,
+  }).isRequired,
+};
 
 export default ApplyList;

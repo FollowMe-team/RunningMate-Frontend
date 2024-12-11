@@ -11,22 +11,22 @@ import Main from '../components/Main';
 import Course_basic from '../../src/screens/Course/Course_basic';
 import Course_with_record_choosed from '../../src/screens/Course/Course_with_record_choosed';
 import Course_with_record from '../../src/screens/Course/Course_with_record';
-import courserecommend from '../../src/screens/Course/courserecommend';
-import courserecommend_map from '../../src/screens/Course/courserecommend_map';
+// import courserecommend from '../../src/screens/Course/courserecommend';
+// import courserecommend_map from '../../src/screens/Course/courserecommend_map';
 import coursesearch from '../../src/screens/Course/coursesearch';
 import coursesearchmaplist from '../../src/screens/Course/coursesearchmaplist';
-import coursesearchmapview from '../../src/screens/Course/coursesearchmapview';
+// import coursesearchmapview from '../../src/screens/Course/coursesearchmapview';
 import MyCourse from '../../src/screens/Course/MyCourse';
 import MyCourse_none from '../../src/screens/Course/MyCourse_none';
 import reviewed from '../../src/screens/Course/reviewed';
 import reviewing from '../../src/screens/Course/reviewing';
 import reviewlist from '../../src/screens/Course/reviewlist';
-import runningtimesaving from '../../src/screens/Course/runningtimesaving';
-import runningtime from '../../src/screens/Course/runningtime';
+// import runningtimesaving from '../../src/screens/Course/runningtimesaving';
+// import runningtime from '../../src/screens/Course/runningtime';
 import savingcourse from '../../src/screens/Course/savingcourse';
 import runningend from '../../src/screens/Course/runningend';
-import SearchLocation from '../../src/screens/Course/SearchLocation';
-import RecommendLocation from '../../src/screens/Course/RecommendLocation';
+// import SearchLocation from '../../src/screens/Course/SearchLocation';
+// import RecommendLocation from '../../src/screens/Course/RecommendLocation';
 import Othersprofile from '../../src/screens/Othersprofile/Othersprofile';
 import Othersprofile_notteam from '../../src/screens/Othersprofile/Othersprofile_notteam';
 import Othersfootprinting from '../../src/screens/Othersprofile/OthersFootprinting';
@@ -49,6 +49,7 @@ import Withdrawal from '../screens/setting/Withdrawal';
 import WithdrawalComplete from '../screens/setting/WithdrawalComplete';
 import MyCrewModification from '../screens/Crew/MyCrewModification';
 import CrewList from '../screens/Crew/CrewList';
+import MyCrewCourse from '../screens/Crew/MyCrewCourse';
 
 const WebViewScreen = ({ route }) => {
   const { url } = route.params;
@@ -116,7 +117,6 @@ const StackNavigator = () => (
         title: '러닝 코스',
         header: ({ navigation }) => (
           <Header title="러닝 코스" navigation={navigation} />
-
         ),
         headerShown: true,
       }}
@@ -138,13 +138,12 @@ const StackNavigator = () => (
       options={{
         title: '코스 추천_선택',
         header: ({ navigation }) => (
-          <Header title="코스 추천" navigation={navigation}
-            hideSettingButton />
+          <Header title="코스 추천" navigation={navigation} hideSettingButton />
         ),
         headerShown: true,
       }}
     />
-    <Stack.Screen
+    {/* <Stack.Screen
       name="Courserecommend"
       component={courserecommend}
       options={{
@@ -155,8 +154,8 @@ const StackNavigator = () => (
         ),
         headerShown: true,
       }}
-    />
-    <Stack.Screen
+    /> */}
+    {/* <Stack.Screen
       name="Courserecommend_map"
       component={courserecommend_map}
       options={{
@@ -167,15 +166,14 @@ const StackNavigator = () => (
         ),
         headerShown: true,
       }}
-    />
+    /> */}
     <Stack.Screen
       name="Coursesearch"
       component={coursesearch}
       options={{
         title: '코스 검색',
         header: ({ navigation }) => (
-          <Header title="코스 검색" navigation={navigation}
-            hideSettingButton />
+          <Header title="코스 검색" navigation={navigation} hideSettingButton />
         ),
         headerShown: true,
       }}
@@ -186,35 +184,29 @@ const StackNavigator = () => (
       options={{
         title: '러닝 검색 리스트',
         header: ({ navigation }) => (
-          <Header title="코스 검색" navigation={navigation}
-            hideSettingButton />
+          <Header title="코스 검색" navigation={navigation} hideSettingButton />
         ),
         headerShown: true,
       }}
     />
-    <Stack.Screen
+    {/* <Stack.Screen
       name="Coursesearchmapview"
       component={coursesearchmapview}
       options={{
         title: '코스 검색 선택 뷰',
         header: ({ navigation }) => (
-          <Header title="코스 검색" navigation={navigation}
-            hideSettingButton />
+          <Header title="코스 검색" navigation={navigation} hideSettingButton />
         ),
         headerShown: false,
       }}
-    />
+    /> */}
     <Stack.Screen
       name="MyCourse"
       component={MyCourse}
       options={{
         title: '내 코스',
         header: ({ navigation }) => (
-          <Header
-            title="내 코스"
-            navigation={navigation}
-            hideSettingButton
-          />
+          <Header title="내 코스" navigation={navigation} hideSettingButton />
         ),
         headerShown: true,
       }}
@@ -225,8 +217,7 @@ const StackNavigator = () => (
       options={{
         title: '내 코스 없음',
         header: ({ navigation }) => (
-          <Header title="내 코스" navigation={navigation}
-            hideSettingButton />
+          <Header title="내 코스" navigation={navigation} hideSettingButton />
         ),
         headerShown: true,
       }}
@@ -237,8 +228,11 @@ const StackNavigator = () => (
       options={{
         title: '리뷰',
         header: ({ navigation }) => (
-          <Header title="선택한 코스" navigation={navigation}
-            hideSettingButton />
+          <Header
+            title="선택한 코스"
+            navigation={navigation}
+            hideSettingButton
+          />
         ),
         headerShown: true,
       }}
@@ -249,8 +243,7 @@ const StackNavigator = () => (
       options={{
         title: '리뷰 작성',
         header: ({ navigation }) => (
-          <Header title="리뷰 작성" navigation={navigation}
-            hideSettingButton />
+          <Header title="리뷰 작성" navigation={navigation} hideSettingButton />
         ),
         headerShown: true,
       }}
@@ -261,30 +254,37 @@ const StackNavigator = () => (
       options={{
         title: '리뷰 리스트',
         header: ({ navigation }) => (
-          <Header title="작성된 리뷰" navigation={navigation}
-            hideSettingButton />
+          <Header
+            title="작성된 리뷰"
+            navigation={navigation}
+            hideSettingButton
+          />
         ),
         headerShown: true,
       }}
     />
-    <Stack.Screen
+    {/* <Stack.Screen
       name="Runningtimesaving"
       component={runningtimesaving}
       options={{ title: '코스 기록' }}
-    />
-    <Stack.Screen
+    /> */}
+    {/* <Stack.Screen
       name="Runningtime"
       component={runningtime}
       options={{ title: '달리기' }}
-    />
+    /> */}
     <Stack.Screen
       name="Savingcourse"
       component={savingcourse}
       options={{
         title: '코스 저장',
         header: ({ navigation }) => (
-          <Header title="코스 저장" navigation={navigation} hideBackButton
-            hideSettingButton />
+          <Header
+            title="코스 저장"
+            navigation={navigation}
+            hideBackButton
+            hideSettingButton
+          />
         ),
         headerShown: true,
       }}
@@ -295,8 +295,12 @@ const StackNavigator = () => (
       options={{
         title: '달리기 완료',
         header: ({ navigation }) => (
-          <Header title="달리기 완료" navigation={navigation}
-            hideBackButton hideSettingButton />
+          <Header
+            title="달리기 완료"
+            navigation={navigation}
+            hideBackButton
+            hideSettingButton
+          />
         ),
         headerShown: true,
       }}
@@ -307,8 +311,11 @@ const StackNavigator = () => (
       options={{
         title: '타인 프로필 기본',
         header: ({ navigation }) => (
-          <Header title="타인 프로필" navigation={navigation}
-            hideSettingButton />
+          <Header
+            title="타인 프로필"
+            navigation={navigation}
+            hideSettingButton
+          />
         ),
         headerShown: true,
       }}
@@ -319,8 +326,11 @@ const StackNavigator = () => (
       options={{
         title: '타인 프로필 기본',
         header: ({ navigation }) => (
-          <Header title="타인 프로필" navigation={navigation}
-            hideSettingButton />
+          <Header
+            title="타인 프로필"
+            navigation={navigation}
+            hideSettingButton
+          />
         ),
         headerShown: true,
       }}
@@ -331,8 +341,11 @@ const StackNavigator = () => (
       options={{
         title: '발자국 평가',
         header: ({ navigation }) => (
-          <Header title="발자국 평가" navigation={navigation}
-            hideSettingButton />
+          <Header
+            title="발자국 평가"
+            navigation={navigation}
+            hideSettingButton
+          />
         ),
         headerShown: true,
       }}
@@ -357,7 +370,7 @@ const StackNavigator = () => (
       name="CrewSearchResult"
       component={CrewSearchResult}
       options={{
-        title: '크루 검색 결과',
+        title: '크루 검�� 결과',
         header: ({ navigation }) => (
           <Header title="크루 검색 결과" navigation={navigation} />
         ),
@@ -519,36 +532,28 @@ const StackNavigator = () => (
         headerShown: true,
       }}
     />
-    <Stack.Screen
+    {/* <Stack.Screen
       name="SearchLocation"
       component={SearchLocation}
       options={{
         title: '위치 선택',
         header: ({ navigation }) => (
-          <Header
-            title="위치 선택"
-            navigation={navigation}
-            hideSettingButton
-          />
+          <Header title="위치 선택" navigation={navigation} hideSettingButton />
         ),
         headerShown: true,
       }}
-    />
-    <Stack.Screen
+    /> */}
+    {/* <Stack.Screen
       name="RecommendLocation"
       component={RecommendLocation}
       options={{
         title: '위치 선택',
         header: ({ navigation }) => (
-          <Header
-            title="위치 선택"
-            navigation={navigation}
-            hideSettingButton
-          />
+          <Header title="위치 선택" navigation={navigation} hideSettingButton />
         ),
         headerShown: true,
       }}
-    />
+    /> */}
     <Stack.Screen name="CrewSearch" component={CrewSearch} />
     <Stack.Screen
       name="Modification"
@@ -573,6 +578,17 @@ const StackNavigator = () => (
         title: '크루 멤버 목록',
         header: ({ navigation }) => (
           <Header title="크루 멤버 목록" navigation={navigation} />
+        ),
+        headerShown: true,
+      }}
+    />
+    <Stack.Screen
+      name="MyCrewCourse"
+      component={MyCrewCourse}
+      options={{
+        title: '크루 코스 관리',
+        header: ({ navigation }) => (
+          <Header title="크루 코스 관리" navigation={navigation} />
         ),
         headerShown: true,
       }}

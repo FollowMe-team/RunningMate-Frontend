@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import {
   View,
@@ -9,7 +9,7 @@ import {
   TouchableOpacity,
   Animated,
 } from 'react-native';
-import reviewerData from './reviewer.json';
+import { getFootprints } from '../../utils/api';
 import profileImageDefault from '../../assets/images/Settings/profile.png';
 import good from '../../assets/images/MyProfile/good.png';
 import bad from '../../assets/images/MyProfile/bad.png';
@@ -32,6 +32,19 @@ const formatDate = dateString => {
 
 const FootprintFigure = ({ onClose }) => {
   const fadeAnim = useRef(new Animated.Value(0)).current;
+  const [reviews, setReviews] = useState([]);
+
+  useEffect(() => {
+    const fetchFootprints = async () => {
+      const result = await getFootprints();
+      if (result.success) {
+        setReviews(result.data);
+      } else {
+        console.error(result.message);
+      }
+    };
+    fetchFootprints();
+  }, []);
 
   useEffect(() => {
     Animated.timing(fadeAnim, {
@@ -49,7 +62,7 @@ const FootprintFigure = ({ onClose }) => {
     }).start(() => onClose());
   };
 
-  const sortedReviews = reviewerData
+  const sortedReviews = reviews
     .slice(0, 5)
     .sort((a, b) => new Date(b.date) - new Date(a.date));
 
@@ -58,9 +71,17 @@ const FootprintFigure = ({ onClose }) => {
       <View style={styles.modalContainer}>
         <Text style={styles.modalText}>나의 발걸음 리뷰</Text>
         <ScrollView>
-          {sortedReviews.map(review => (
-            <FootprintReview key={review.id} review={review} />
-          ))}
+          {sortedReviews.length > 0 ? (
+            sortedReviews.map(review => (
+              <FootprintReview key={review.id} review={review} />
+            ))
+          ) : (
+            <View style={styles.noReviewsContainer}>
+              <Text style={styles.noReviewsText}>
+                리뷰한 사용자가 없습니다...
+              </Text>
+            </View>
+          )}
         </ScrollView>
         <TouchableOpacity onPress={handleClose}>
           <Text style={styles.modalButtonText}>나가기</Text>
@@ -171,6 +192,16 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: 'regular',
     lineHeight: 20,
+  },
+  noReviewsContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: 200,
+  },
+  noReviewsText: {
+    fontSize: 16,
+    color: 'gray',
   },
 });
 

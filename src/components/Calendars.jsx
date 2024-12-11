@@ -17,15 +17,17 @@ const Calendars = ({ onDayPress, dataSource, fetchMonthlyRecords }) => {
 
   useEffect(() => {
     const marks = {};
-    dataSource.forEach(record => {
-      const date = record.startTime
-        ? record.startTime.split('T')[0]
-        : record.date;
-      marks[date] = {
-        marked: true,
-        dotColor: selectedDate === date ? 'white' : 'black',
-      };
-    });
+    if (dataSource) {
+      dataSource.forEach(record => {
+        const date = record.startTime
+          ? record.startTime.split('T')[0]
+          : record.date;
+        marks[date] = {
+          marked: true,
+          dotColor: selectedDate === date ? 'white' : 'black',
+        };
+      });
+    }
     marks[selectedDate] = {
       selected: true,
       selectedColor: '#73D393',
@@ -36,6 +38,15 @@ const Calendars = ({ onDayPress, dataSource, fetchMonthlyRecords }) => {
     console.log('Marked dates:', marks);
     setMarkedDates(marks);
   }, [dataSource, selectedDate]);
+
+  useEffect(() => {
+    const yearMonth = `${currentMonth.year}-${String(
+      currentMonth.month,
+    ).padStart(2, '0')}`;
+    if (fetchMonthlyRecords) {
+      fetchMonthlyRecords(yearMonth);
+    }
+  }, [currentMonth]); // currentMonth가 변경될 때만 호출되도록 설정
 
   const handleDayPress = day => {
     const newMarkedDates = { ...markedDates };

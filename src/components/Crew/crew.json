@@ -8,7 +8,7 @@
         "https://cdn.ceopartners.co.kr/news/photo/202102/11284_54269_5733.jpg",
         "https://www.canceranswer.co.kr/news/photo/202008/1086_1661_5426.jpg"
       ],
-      "footprint": 86,
+      "rank": "IRON_LEGS",
       "brief": "The captain is the leader of the crew.",
       "number": 10,
       "members": [
@@ -103,7 +103,7 @@
         "https://cdn.healthlifeherald.com/news/photo/202408/1063_1767_5117.jpg",
         "https://cdn.kormedi.com/wp-content/uploads/2019/11/nd3000-580x387.jpg"
       ],
-      "footprint": 71,
+      "rank": "MARATHONER",
       "brief": "The first mate is the captain's right-hand person.",
       "number": 10,
       "members": [
@@ -198,7 +198,7 @@
         "https://flexible.img.hani.co.kr/flexible/normal/970/515/imgdb/original/2024/1010/20241010504310.jpg",
         "https://cdn.news.hidoc.co.kr/news/photo/202211/28629_68507_0358.jpg"
       ],
-      "footprint": 65,
+      "rank": "SPRINTER",
       "brief": "The second mate is the captain's left-hand person.",
       "number": 10,
       "members": [
@@ -288,7 +288,7 @@
     {
       "id": 4,
       "name": "Boatswain",
-      "footprint": 94,
+      "rank": "ULTRA_RUNNER",
       "profile_url": [
         "https://dqwc99gnfppi1.cloudfront.net/media/job/article/2020-11-19_104558_cover_KakaoTalk_20201117_175339258_05.png",
         "https://healthcarejournal.co.kr/boardImage/healthcarejournal/20240215/MC40NjM0OTQwMCAxNzA3OTkzNzAy.jpeg",
@@ -384,6 +384,7 @@
     {
       "id": 5,
       "name": "Carpenter",
+      "rank": "RUNNER",
       "profile_url": [
         "https://thumb.mt.co.kr/06/2019/11/2019112811181537259_1.jpg/dims/optimize/",
         "https://mblogthumb-phinf.pstatic.net/MjAyMjAyMjJfMjYg/MDAxNjQ1NDk2NzU5MTAx.zrXj5Y5KFfHTVTZwKVF-uk37NUnu0TWlamNRlGqbF8Ug.igqvmK_MVMXw8rmqZIQhSQZSPYxT16EayQD2Au9rYdgg.PNG.l_heo/3.png?type=w800",
@@ -391,7 +392,6 @@
         "https://imagescdn.gettyimagesbank.com/500/202104/jv12269915.jpg",
         "https://newsimg-hams.hankookilbo.com/2024/10/14/c867fec5-83e9-4141-928e-d6f7490e2871.jpg"
       ],
-      "footprint": 73,
       "brief": "The carpenter is responsible for the ship's structure.",
       "number": 10,
       "members": [
