@@ -47,7 +47,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   badge: {
-    width: 50,
+    width: 72,
     height: 25,
   },
   description: {

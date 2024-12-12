@@ -9,7 +9,7 @@ const RecordDetails = ({ selectedRecord }) => {
         selectedRecord.message ? (
           <Text style={styles.noRecordText}>{selectedRecord.message}</Text>
         ) : (
-          <View style={{ flexDirection: 'column' }}>
+          <View style={{ flexDirection: 'column', marginBottom: 120 }}>
             <View>
               <Text style={styles.recordDetailTitle}>일자</Text>
               <Text style={styles.recordDetailValue}>
@@ -57,7 +57,16 @@ const RecordDetails = ({ selectedRecord }) => {
           </View>
         )
       ) : (
-        <Text style={{ color: '#000' }}>날짜를 선택하세요.</Text>
+        <Text
+          style={{
+            color: 'black',
+            textAlign: 'center',
+            fontSize: 24,
+            marginBottom: 320,
+          }}
+        >
+          날짜를 선택하세요.
+        </Text>
       )}
     </View>
   );
@@ -73,7 +82,10 @@ const styles = StyleSheet.create({
   noRecordText: {
     color: 'black',
     fontWeight: 'bold',
+    textAlign: 'center',
     fontSize: 20,
+    marginTop: 20,
+    marginBottom: 310,
   },
   recordDetailTitle: {
     fontSize: 14,
