@@ -19,6 +19,9 @@ const getFootprintImage = experience => {
 };
 
 const Footprint = ({ experience }) => {
+  if (experience === undefined) {
+    return null;
+  }
   return (
     <View style={styles.container}>
       <Image source={getFootprintImage(experience)} style={styles.badge} />
@@ -38,7 +41,7 @@ const styles = StyleSheet.create({
 });
 
 Footprint.propTypes = {
-  experience: PropTypes.number.isRequired,
+  experience: PropTypes.number,
 };
 
 export default Footprint;

@@ -11,7 +11,7 @@ import ultra from '../assets/images/rank/ultra-runner-badge.png';
 import iron from '../assets/images/rank/iron-legs-badge.png';
 import demon from '../assets/images/rank/speed-demon-badge.png';
 
-const rankImages = {
+export const rankImages = {
   JOGGER: jogger,
   RUNNER: runner,
   RACER: racer,

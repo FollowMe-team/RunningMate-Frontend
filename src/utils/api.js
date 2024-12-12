@@ -99,9 +99,11 @@ const updateProfile = async (profileData, profileImage) => {
 const checkNickname = async nickname => {
   try {
     const response = await api.get(
-      `/members/check/nickname=?nickname=${nickname}`,
+      `/members/check/nickname?nickname=${nickname}`,
       {
-        headers: { accept: 'application/json' },
+        headers: {
+          accept: 'application/json',
+        },
       },
     );
     console.log('Nickname check successful:', response.data);
@@ -118,7 +120,7 @@ const checkNickname = async nickname => {
 
 const checkEmail = async email => {
   try {
-    const response = await api.get(`/members/check/email=?email=${email}`, {
+    const response = await api.get(`/members/check/email?email=${email}`, {
       headers: { accept: 'application/json' },
     });
     console.log('Email check successful:', response.data);
@@ -297,6 +299,39 @@ const changePassword = async (currentPassword, newPassword) => {
   }
 };
 
+const getFootprints = async () => {
+  try {
+    const accessToken = await AsyncStorage.getItem('accessToken');
+    if (!accessToken) {
+      console.error('No access token found');
+      return { success: false, message: '인증되지 않은 사용자입니다.' };
+    }
+    const response = await api.get('/members/footprint', {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+    if (response.status === 200) {
+      console.log('Footprints fetch successful:', response.data);
+      return { success: true, data: response.data.data.footprints };
+    }
+  } catch (error) {
+    console.error('Footprints fetch failed:', error);
+    if (error.response) {
+      const { data } = error.response;
+      if (data.code === 'AUTH001') {
+        return { success: false, message: '인증되지 않은 사용자입니다.' };
+      } else if (data.code === 'MEMBER001') {
+        return { success: false, message: '회원을 찾을 수 없습니다.' };
+      } else if (data.code === 'MEMBER008') {
+        return { success: false, message: '존재하지 않는 대상 사용자입니다.' };
+      }
+    }
+    return {
+      success: false,
+      message: '발자국 정보를 가져오는데 실패했습니다.',
+    };
+  }
+};
+
 export {
   getProfile,
   updateProfile,
@@ -307,6 +342,7 @@ export {
   getFollowers,
   getProfileSummary,
   changePassword,
+  getFootprints,
 };
 
 export default api;

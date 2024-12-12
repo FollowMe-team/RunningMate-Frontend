@@ -19,16 +19,19 @@ const MyProfile = () => {
   const [badges, setBadges] = useState([]);
   const [badgesLoading, setBadgesLoading] = useState(true);
   const [monthlyRecords, setMonthlyRecords] = useState([]);
-  const [recordsLoading, setRecordsLoading] = useState(true);
   const [isFootprintFigureVisible, setFootprintFigureVisible] = useState(false);
 
   const fetchMonthlyRecords = async yearMonth => {
-    setRecordsLoading(true);
-    const result = await getMonthlyRecords(yearMonth);
-    if (result.success) {
-      setMonthlyRecords(result.data);
+    try {
+      const result = await getMonthlyRecords(yearMonth);
+      if (result.success) {
+        setMonthlyRecords(result.data);
+      } else {
+        console.error(result.message);
+      }
+    } catch (error) {
+      console.error('Failed to fetch monthly records:', error);
     }
-    setRecordsLoading(false);
   };
 
   useFocusEffect(
@@ -57,14 +60,8 @@ const MyProfile = () => {
       setBadgesLoading(false);
     };
 
-    const today = new Date();
-    const yearMonth = `${today.getFullYear()}-${String(
-      today.getMonth() + 1,
-    ).padStart(2, '0')}`;
-
     fetchProfile();
     fetchBadges();
-    fetchMonthlyRecords(yearMonth);
   }, []);
 
   const handleDayPress = day => {
@@ -91,23 +88,18 @@ const MyProfile = () => {
       <Tabs activeTab={activeTab} setActiveTab={setActiveTab} />
       <View contentContainerStyle={styles.contentContainer}>
         {activeTab === 'record' ? (
-          recordsLoading ? (
-            <Skeleton />
-          ) : (
-            <RecordView
-              handleDayPress={handleDayPress}
-              selectedRecord={selectedRecord}
-              records={monthlyRecords}
-              fetchMonthlyRecords={fetchMonthlyRecords}
-              Calendars={Calendars} // Calendars 컴포넌트를 RecordView에 전달
-            />
-          )
+          <RecordView
+            handleDayPress={handleDayPress}
+            selectedRecord={selectedRecord}
+            records={monthlyRecords}
+            fetchMonthlyRecords={fetchMonthlyRecords}
+            Calendars={Calendars} // Calendars 컴포넌트를 RecordView에 전달
+          />
         ) : badgesLoading ? (
           <Skeleton />
         ) : (
           <ActivityView badges={badges} />
         )}
-
       </View>
       {isFootprintFigureVisible && (
         <FootprintFigure onClose={() => setFootprintFigureVisible(false)} />
@@ -120,7 +112,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     marginHorizontal: 20,
-    paddingBottom: 100,
+    marginBottom: 120,
   },
   contentContainer: {
     flexGrow: 1,
