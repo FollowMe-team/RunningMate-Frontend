@@ -106,98 +106,16 @@ const Course_basic = ({ data }) => {
     return (
         <View style={styles.smallboxlist}>
             <Image
-                style={{ width: 42, height: 42, alignSelf: 'center', marginLeft: 10, marginRight: 5 }}
-                source={profileimage}
-            />
+                style={{ width: 42, height: 42,borderRadius:21, alignSelf: 'center', marginLeft: 10, marginRight: 5 }}
+                source={data.profileImageUrl && data.profileImageUrl !== null
+                    ? { uri: data.profileImageUrl }
+                    : profileimage} />
             <View style={{ justifyContent: 'center', width: "84%" }}>
                 <View style={{ flexWrap: 'wrap', flexDirection: 'row', justifyContent: 'space-between' }}>
                     <View style={{ flexWrap: 'wrap', flexDirection: 'row' }}>
                         <Text style={{ color: 'black', fontSize: 16 }}>
                             {data.name}</Text>
-                        {data.badge === 'ironlegsbadge' &&
-                            <Image
-                                style={{ width: 50, height: 18, alignSelf: 'center', marginLeft: 5 }}
-                                source={ironlegsbadge}
-                            />
-                        }
-                        {data.badge === 'joggerbadge' &&
-                            <Image
-                                style={{ width: 50, height: 18, alignSelf: 'center', marginLeft: 5 }}
-                                source={joggerbadge}
-                            />
-                        }
-                        {data.badge === 'marathonerbadge' &&
-                            <Image
-                                style={{ width: 50, height: 18, alignSelf: 'center', marginLeft: 5 }}
-                                source={marathonerbadge}
-                            />
-                        }
-                        {data.badge === 'racerbadge' &&
-                            <Image
-                                style={{ width: 50, height: 18, alignSelf: 'center', marginLeft: 5 }}
-                                source={racerbadge}
-                            />
-                        }
-                        {data.badge === 'runnerbadge' &&
-                            <Image
-                                style={{ width: 50, height: 18, alignSelf: 'center', marginLeft: 5 }}
-                                source={runnerbadge}
-                            />
-                        }
-                        {data.badge === 'speeddemonbadge' &&
-                            <Image
-                                style={{ width: 55, height: 18, alignSelf: 'center', marginLeft: 5 }}
-                                source={speeddemonbadge}
-                            />
-                        }
-                        {data.badge === 'sprinterbadge' &&
-                            <Image
-                                style={{ width: 50, height: 18, alignSelf: 'center', marginLeft: 5 }}
-                                source={sprinterbadge}
-                            />
-                        }
-                        {data.badge === 'ultrarunnerbadge' &&
-                            <Image
-                                style={{ width: 55, height: 18, alignSelf: 'center', marginLeft: 5 }}
-                                source={ultrarunnerbadge}
-                            />
-                        }
-                        {data.footprint === 1 &&
-                            <Image
-                                style={{ width: 16, height: 16, alignSelf: 'center', marginLeft: 5 }}
-                                source={footprint1}
-                            />
-                        }
-                        {data.footprint === 2 &&
-                            <Image
-                                style={{ width: 16, height: 16, alignSelf: 'center', marginLeft: 5 }}
-                                source={footprint2}
-                            />
-                        }
-                        {data.footprint === 3 &&
-                            <Image
-                                style={{ width: 16, height: 16, alignSelf: 'center', marginLeft: 5 }}
-                                source={footprint3}
-                            />
-                        }
-                        {data.footprint === 4 &&
-                            <Image
-                                style={{ width: 16, height: 16, alignSelf: 'center', marginLeft: 5 }}
-                                source={footprint4}
-                            />
-                        }
-                        {data.footprint === 5 &&
-                            <Image
-                                style={{ width: 16, height: 16, alignSelf: 'center', marginLeft: 5 }}
-                                source={footprint5}
-                            />
-                        }
-                        {data.footprint === 6 &&
-                            <Image
-                                style={{ width: 16, height: 16, alignSelf: 'center', marginLeft: 5 }}
-                                source={footprint6}
-                            />
-                        }
+
                     </View>
                     <TouchableOpacity onPress={() => navigation.navigate('Main')}>
                         <View style={{ flexWrap: 'wrap', flexDirection: 'row' }}>
@@ -211,7 +129,10 @@ const Course_basic = ({ data }) => {
                 <View style={{ flexWrap: 'wrap', flexDirection: 'row', justifyContent: 'space-between', marginBottom: 3 }}>
                     <Text
                         style={{ color: 'grey', fontSize: 10, textAlignVertical: 'center' }}
-                    >{data.describe}</Text>
+                    >{data.shortDescription}</Text>
+                    <Text
+                        style={{ color: 'grey', fontSize: 10, textAlignVertical: 'center', marginRight:-220 }}
+                    >{data.memberCount}명</Text>
                     <View style={{ flexWrap: 'wrap', flexDirection: 'row', marginRight: 12 }}>
 
 

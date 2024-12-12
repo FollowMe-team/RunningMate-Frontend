@@ -3,6 +3,8 @@ import React, { useCallback, useMemo, useRef, useEffect, useState } from 'react'
 import { TextInput, StyleSheet, TouchableOpacity, View, Text, Alert, Pressable, Image, ScrollView, ImageBackground } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
+import subscribe from '../../assets/images/Course/subscribe.png';
+import subscribed from '../../assets/images/Course/subscribed.png'
 import mapview from '../../assets/images/Course/mapforcourseview.png';
 import whiteplus from '../../assets/images/Course/whiteplus.png';
 import location from '../../assets/images/Course/location.png';
@@ -20,6 +22,7 @@ import Reviews from '../../components/Course/reviews';
 import Crews from '../../components/Course/Crews';
 import { getCourseDetail } from '../../utils/courseapi';
 import MapDetails from '../../components/Course/MapDetails';
+import { BookCourse, unBookCourse } from '../../utils/courseapi';
 
 const styles = StyleSheet.create({
     space: { height: 15 },
@@ -92,27 +95,52 @@ const Reviewed = ({ route, navigated }) => {
     const navigation = useNavigation();
     const [Coursedetails, setCoursedetails] = useState();
     const [Coursesuccess, setCoursesuccess] = useState(false);
+    const [subs, setsubs] = useState(false);
 
     useEffect(() => {
         const fetchCoursedetails = async idss => {
             const result = await getCourseDetail(idss);
             setCoursedetails(result.data);
             setCoursesuccess(result.success);
+            setsubs(result.data.bookmarked);
         };
         fetchCoursedetails(ids.id);
-    }, []);
+    }, [subs]);
+
+
+    const handlebookToggle = async () => {
+        let result;
+        if (subs) {
+            result = await unBookCourse(route.params.id);
+        } else {
+            result = await BookCourse(route.params.id);
+        }
+        const newsub = !subs;
+        console.log("subs", subs);
+        setsubs(newsub);
+    };
     return (
         < ScrollView >
-
-            {Coursesuccess === true ?
+            {Coursesuccess === true ? 
                 <View>
+                    <TouchableOpacity onPress={handlebookToggle}
+                    >
+                        <Image
+                            style={{ width: 25, height: 25, right: 33, top: 0, position: 'absolute' }}
+                            source={Coursedetails.bookmarked === true ? subscribed : subscribe}
+                        /></TouchableOpacity>
                     <MapDetails data={Coursedetails} />
-                    <TouchableOpacity onPress={() => navigation.navigate('Reviewlist', {data : Coursedetails})}>
-                        <Text style={{
-                            height: 'auto', width: 65, fontSize: 10,
-                            borderRadius: 15, color: 'black', backgroundColor: '#DADADA', textAlign: 'center', textAlignVertical: 'center', paddingVertical: 4, alignSelf: 'center', marginBottom: 15
-                        }}>리뷰 더보기</Text></TouchableOpacity>
-                    <TouchableOpacity onPress={() => navigation.navigate('Runningtime')}
+                    <TouchableOpacity onPress={() => navigation.navigate('Reviewlist', { data: Coursedetails })}>
+
+                        {Coursedetails.reviewCount > 2 &&
+                            <Text style={{
+                                height: 'auto', width: 65, fontSize: 10,
+                                borderRadius: 15, color: 'black', backgroundColor: '#DADADA', textAlign: 'center', textAlignVertical: 'center', paddingVertical: 4, alignSelf: 'center', marginBottom: 15
+                            }}>리뷰 더보기</Text>
+                        }
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() => navigation.navigate('Runningtime', {data : Coursedetails})}
+
                         style={styles.greenbutton}>
                         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                             <Image

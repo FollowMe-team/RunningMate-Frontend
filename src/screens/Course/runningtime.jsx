@@ -7,6 +7,7 @@ import { Image, ImageBackground } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import moment from 'moment';
 import { useInterval } from 'react-use';
+import { getCourseMap } from '../../utils/courseapi';
 
 // Google Maps Directions API 키가 필요합니다
 const GOOGLE_MAPS_API_KEY = 'AIzaSyCQdugA7ICLSYCnuAvsf_pfgtJYzM0sfTs';
@@ -21,7 +22,8 @@ let runpause = false
 
 
 
-const RunningScreen = () => {
+const RunningScreen = ({ route }) => {
+    const data = route.params;
     const [currentLocation, setCurrentLocation] = useState(null);
     const [waypoints, setWaypoints] = useState([]);
     const [newPoint, setNewPoint] = useState({ latitude: '', longitude: '' });
@@ -40,6 +42,8 @@ const RunningScreen = () => {
     const [time, setTime] = useState(moment.duration(0, 'seconds'));
     const [focus, setFocus] = useState(true);
     const [isRunning, setIsRunning] = useState(true);
+    const [Coursedetails, setCoursedetails] = useState();
+    const [Coursesuccess, setCoursesuccess] = useState(false);
 
 
     const tick = () => {
@@ -62,6 +66,14 @@ const RunningScreen = () => {
     }
 
     useEffect(() => {
+
+        const fetchCourseMaps = async idss => {
+            const result = await getCourseMap(idss);
+            setCoursedetails(result.data);
+            setCoursesuccess(result.success);
+        };
+        fetchCourseMaps(data.data.id);
+
         const focusListener = navigation.addListener('focus', () => {
             setFocus(true);
             //getLocationUpdates(); // 위치 업데이트 시작
@@ -196,22 +208,41 @@ const RunningScreen = () => {
     };
     // 사용자의 현재 위치 가져오기
     useEffect(() => {
-        Geolocation.getCurrentPosition(
-            (position) => {
-                const { latitude, longitude } = position.coords;
-                const initialLocation = { latitude, longitude };
-                setCurrentLocation({
-                    ...initialLocation,
-                    latitudeDelta: 0.01,
-                    longitudeDelta: 0.01,
-                });
-                setWaypoints([initialLocation]); // 첫 경로 포인트를 현재 위치로 설정
-            },
-            (error) => Alert.alert('위치 오류', error.message),
-            { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 }
-        );
-    }, []);
+        if (waypoints.length === 0) {
+            Geolocation.getCurrentPosition(
+                (position) => {
+                    const { latitude, longitude } = position.coords;
+                    const initialLocation = { latitude, longitude };
+                    setCurrentLocation({
+                        ...initialLocation,
+                        latitudeDelta: 0.01,
+                        longitudeDelta: 0.01,
+                    });
+                    //setWaypoints([initialLocation]); // 첫 경로 포인트를 현재 위치로 설정
+                },
+                (error) => Alert.alert('위치 오류', error.message),
+                { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 }
 
+            );
+        }
+        if (waypoints.length === 0 ) {
+            addWaypoint2();
+        }
+    }, [waypoints]);
+    const addWaypoint2 = () => {
+        for (let i = 0; i < data.data.coursePointInfos.length; i++) {
+            const a = data.data.coursePointInfos[i].latitude;
+            const b = data.data.coursePointInfos[i].longitude;
+            const lat = parseFloat(a);
+            const lng = parseFloat(b);
+
+            if (isValidCoordinate(a) && isValidCoordinate(b)) {
+                setWaypoints((prevWaypoints) => [...prevWaypoints, { latitude: lat, longitude: lng }]);
+            } else {
+                Alert.alert('오류', '유효한 좌표를 입력하세요.');
+            }
+        }
+    };
     const addWaypoint = () => {
         const lat = parseFloat(newPoint.latitude);
         const lng = parseFloat(newPoint.longitude);
@@ -280,7 +311,8 @@ const RunningScreen = () => {
                         pinColor={'#73D393'}
                         key={index}
                         coordinate={point}
-                        title={index === 0 ? '출발지' : `포인트 ${index}`}
+                        opacity={index === 0 ? 1 : index === (waypoints.length - 1) ? 1 : 0}
+                        title={index === 0 ? '출발지' : index === (waypoints.length - 1) ? '도착지' : ``}
                     />
                 ))}
             </MapView>

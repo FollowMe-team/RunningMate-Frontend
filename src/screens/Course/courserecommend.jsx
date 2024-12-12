@@ -78,8 +78,12 @@ const styles = StyleSheet.create({
 
 const Courserecommend = ({ route }) => {
     const navigation = useNavigation();
-    const [Leveldata, setLevel] = useState('');
-    const [Goaldata, setGoal] = useState('');
+    const [Leveldata, setLevel] = useState();
+    const [Goaldata, setGoal] = useState();
+    const [Latitude, setLatitude] = useState();
+    const [Longitude, setLongitude] = useState();
+    const [recommendedCourse, setrecommendedCourse] = useState([]);
+
     const Goaldatas = [
         { label: "체중 감량", value: 'WEIGHT_LOSS' },
         { label: "속도 증가", value: 'ENDURANCE' },
@@ -96,18 +100,19 @@ const Courserecommend = ({ route }) => {
         longitude: null
     };
 
-    const fetchrecommenedCourse = async (latitude, longitude, difficulty, runningGoal) => {
-        const result = await getCourseRecommend(latitude, longitude, difficulty, runningGoal);
+    const fetchrecommenedCourse = async (params = {}) => {
+        const result = await getCourseRecommend(params);
         setrecommendedCourse(result.data);
     };
-    const [recommendedCourse, setrecommendedCourse] = useState([]);
     useEffect(() => {
-        const fetchbasicrecommenedCourse = async () => {
-            const result = await getbasicCourseRecommend();
-            setrecommendedCourse(result.data);
-        };
-        fetchbasicrecommenedCourse();
-    }, []);
+        if (selectedLocation.latitude === null) {
+            fetchrecommenedCourse();
+
+        }
+        else {
+            fetchrecommenedCourse({ latitude: selectedLocation.latitude, longitude: selectedLocation.longitude })
+        }
+    }, [selectedLocation.latitude]);
 
     return (
         <ScrollView>
@@ -127,6 +132,25 @@ const Courserecommend = ({ route }) => {
                     value={Leveldata}
                     onChange={item => {
                         setLevel(item.value);
+                        if (Goaldata) {
+                            if (selectedLocation.latitude === null) {
+                                fetchrecommenedCourse({ difficulty: item.value, runningGoal: Goaldata });
+
+                            }
+                            else {
+                                fetchrecommenedCourse({ latitude: selectedLocation.latitude, longitude: selectedLocation.longitude, runningGoal: Goaldata, difficulty: item.value });
+                            }
+                        }
+                        else {
+                            if (selectedLocation.latitude === null) {
+                                fetchrecommenedCourse({ difficulty: item.value });
+
+                            }
+                            else {
+                                fetchrecommenedCourse({ latitude: selectedLocation.latitude, longitude: selectedLocation.longitude, difficulty: item.value });
+
+                            }
+                        }
                     }}
 
                     placeholderStyle={{ fontSize: 14, color: 'grey', marginLeft: 3 }} // 글자색 수정
@@ -143,6 +167,25 @@ const Courserecommend = ({ route }) => {
                     value={Goaldata}
                     onChange={item => {
                         setGoal(item.value);
+                        if (Leveldata) {
+                            if (selectedLocation.latitude === null) {
+                                fetchrecommenedCourse({ runningGoal: item.value, difficulty: Leveldata });
+
+                            }
+                            else {
+                                fetchrecommenedCourse({ latitude: selectedLocation.latitude, longitude: selectedLocation.longitude, runningGoal: item.value, difficulty: Leveldata });
+
+                            }
+                        }
+                        else {
+                            if (selectedLocation.latitude === null) {
+                                fetchrecommenedCourse({ runningGoal: item.value });
+                            }
+                            else {
+                                fetchrecommenedCourse({ latitude: selectedLocation.latitude, longitude: selectedLocation.longitude, runningGoal: item.value });
+
+                            }
+                        }
                     }}
 
                     placeholderStyle={{ fontSize: 14, color: 'grey', marginLeft: 3 }} // 글자색 수정
@@ -150,15 +193,8 @@ const Courserecommend = ({ route }) => {
                     selectedTextStyle={{ fontSize: 14, color: 'grey', marginLeft: 3 }} // 선택된 항목 글자색 수정
                 />
             </View>
-            {selectedLocation.latitude && selectedLocation.longitude && Leveldata && Goaldata &&
-                <TouchableOpacity onPress={() => fetchrecommenedCourse(selectedLocation.latitude, selectedLocation.longitude, Leveldata, Goaldata)}
-                    style={styles.greenbutton}>
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                        <Text style={styles.whitetext}>
-                            조건에 맞추어 추천</Text>
-                    </View>
-                </TouchableOpacity>}
-            <View style={{ borderRadius: 15, width: "90%", height: 'auto', backgroundColor: 'white', elevation: 7, alignSelf: 'center', marginTop: 15, paddingBottom: 15, marginBottom: 30, paddingTop:15}}>
+
+            <View style={{ borderRadius: 15, width: "90%", height: 'auto', backgroundColor: 'white', elevation: 7, alignSelf: 'center', marginTop: 15, paddingBottom: 15, marginBottom: 30, paddingTop: 15 }}>
                 <Recommendcourses data={recommendedCourse} />
             </View>
 

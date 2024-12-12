@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { TextInput, TouchableOpacity, StyleSheet, View, Text, Alert, Pressable, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
@@ -192,9 +192,9 @@ const Course_basic = ({ data }) => {
                                 style={{ color: 'grey', fontSize: 10, marginRight: 15, textAlignVertical: 'center' }}
                             >{data.distance}KM</Text>
                             <Text
-                                style={[data.difficulty === 'EASY' && styles.lowlevel,
-                                data.difficulty === 'NORMAL' && styles.middlelevel,
-                                data.difficulty === 'HARD' && styles.highlevel,
+                                style={[data.difficulty === '쉬움' && styles.lowlevel,
+                                data.difficulty === '보통' && styles.middlelevel,
+                                data.difficulty === '어려움' && styles.highlevel,
                                 data.status === '승인 완료' && styles.lowlevel,
                                 data.status === '승인 대기중' && styles.middlelevel,
                                 data.status === '승인 거부' && styles.highlevel,
@@ -246,9 +246,9 @@ const Course_basic = ({ data }) => {
                                 style={{ color: 'grey', fontSize: 10, marginRight: 13, textAlignVertical: 'center' }}
                             >{data.distance}KM</Text>
                             <Text
-                                style={[data.difficulty === 'EASY' && styles.lowlevel,
-                                data.difficulty === 'NORMAL' && styles.middlelevel,
-                                data.difficulty === 'HARD' && styles.highlevel,
+                                style={[data.difficulty === '쉬움' && styles.lowlevel,
+                                data.difficulty === '보통' && styles.middlelevel,
+                                data.difficulty === '어려움' && styles.highlevel,
                                 data.difficulty === '승인 완료' && styles.lowlevel,
                                 data.difficulty === '승인 대기중' && styles.middlelevel,
                                 data.difficulty === '승인 거부' && styles.highlevel,
@@ -276,7 +276,7 @@ const Course_basic = ({ data }) => {
                                 source={runner}
                             />
                             <Text style={{ fontSize: 12 }}>
-                                {data.runningCount}
+                                {data.runningCount}회
                             </Text>
                         </View>
                     </View>
@@ -303,7 +303,7 @@ const Course_basic = ({ data }) => {
                                 />
                             </View>
                         </TouchableOpacity>
-                        <TouchableOpacity onPress={() => navigation.navigate('Runningtime')}>
+                        <TouchableOpacity onPress={() => navigation.navigate('Runningtime', {data : data})}>
 
                             <View style={styles.greenbutton_run}>
                                 <Text style={styles.whitetext_run}>

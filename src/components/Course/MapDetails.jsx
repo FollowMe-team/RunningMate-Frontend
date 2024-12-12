@@ -24,10 +24,10 @@ const styles = StyleSheet.create({
     space: { height: 15 },
 
     mapname: { fontSize: 18, color: '#A8A5AF', alignSelf: 'center' },
-    middlelevel: { marginLeft: 35, textAlign: 'center', textAlignVertical: 'center', width: 32, height: 20, fontSize: 9, borderRadius: 20, backgroundColor: '#FBFF7F', color: '#A9AB35' },
-    lowlevel: { marginLeft: 35, textAlign: 'center', textAlignVertical: 'center', width: 32, height: 20, fontSize: 9, borderRadius: 20, backgroundColor: '#CFF3D0', color: '#409E4B' },
+    middlelevel: { marginLeft: 35, textAlign: 'center', textAlignVertical: 'center', width: 'auto', paddingHorizontal: 5, height: 20, fontSize: 9, borderRadius: 20, backgroundColor: '#FBFF7F', color: '#A9AB35' },
+    lowlevel: { marginLeft: 35, textAlign: 'center', textAlignVertical: 'center', width: 'auto', paddingHorizontal: 5, height: 20, fontSize: 9, borderRadius: 20, backgroundColor: '#CFF3D0', color: '#409E4B' },
     highlevel: {
-        marginLeft: 35, textAlign: 'center', textAlignVertical: 'center', width: 32, height: 20, color: '#E06464', fontSize: 9, backgroundColor: '#F3CFCF', borderRadius: 20
+        marginLeft: 35, textAlign: 'center', textAlignVertical: 'center', width: 'auto', paddingHorizontal: 5, height: 20, color: '#E06464', fontSize: 9, backgroundColor: '#F3CFCF', borderRadius: 20
     },
 
     greensharptext: {
@@ -86,9 +86,20 @@ const styles = StyleSheet.create({
         alignItems: "center", justifyContent: "center",
         marginRight: 10
     },
+    image: {
+        width: 110, height: 110,
+        borderWidth: 1,
+        borderRadius: 15,
+        borderColor: 'black',
+        backgroundColor: '#EEEEEE',
+        marginRight:10,
+        alignItems: "center", justifyContent: "center"
+    },
 });
 
 const Reviewed = ({ data }) => {
+    const navigation = useNavigation();
+
     return (
 
         <View>
@@ -110,7 +121,7 @@ const Reviewed = ({ data }) => {
                     />
                     <Text
                         style={{ color: 'grey', fontSize: 8 }}
-                    >{data.time}</Text>
+                    >{data.duration}</Text>
                 </View>
             </View>
             <View style={styles.space}></View>
@@ -118,9 +129,9 @@ const Reviewed = ({ data }) => {
                 <Text style={{ width: 280, marginLeft: 20, fontWeight: 'bold' }}>{data.description}</Text>
 
                 <Text
-                    style={[data.difficulty === 'EASY' && styles.lowlevel,
-                    data.difficulty === 'NORMAL' && styles.middlelevel,
-                    data.difficulty === 'HARD' && styles.highlevel,
+                    style={[data.difficulty === '쉬움' && styles.lowlevel,
+                    data.difficulty === '보통' && styles.middlelevel,
+                    data.difficulty === '어려움' && styles.highlevel,
                     data.status === '승인 완료' && styles.lowlevel,
                     data.status === '승인 대기중' && styles.middlelevel,
                     data.status === '승인 거부' && styles.highlevel,
@@ -130,7 +141,7 @@ const Reviewed = ({ data }) => {
                 <Image style={styles.starsize} source={yellowstar} />
                 <Text style={{ marginLeft: 8, fontSize: 12, marginRight: 16 }}>{data.rating}</Text>
                 <Image style={styles.starsize} source={runner} />
-                <Text style={{ marginLeft: 8, fontSize: 12, marginRight: 16 }}>{data.runningCount}명</Text>
+                <Text style={{ marginLeft: 8, fontSize: 12, marginRight: 16 }}>{data.runningCount}회</Text>
             </View>
             <View style={{ flexWrap: 'wrap', flexDirection: 'row', marginLeft: 22, marginBottom: 10 }}>
                 {data.courseOptionTypes && data.courseOptionTypes.map((text) => (
@@ -143,21 +154,15 @@ const Reviewed = ({ data }) => {
                 source={mapview}
             />
             <View style={{ flexDirection: 'row', marginLeft: 22 }}>
-                <View
-                    style={styles.imagebutton}>
-                    <Text>출발지</Text>
-                    <Text>사진</Text>
-                </View>
-                <View
-                    style={styles.imagebutton}>
-                    <Text>도착지</Text>
-                    <Text>사진</Text>
-                </View>
-                <View
-                    style={styles.imagebutton}>
-                    <Text>대표 이미지</Text>
-                    <Text>사진</Text>
-                </View>
+                {
+
+                    data.images.map((image) => (
+                        <Image style={styles.image} source={image.imageUrl && image.imageUrl !== null
+                            ? { uri: image.imageUrl }
+                            : examplepic} />
+                    ))
+                }
+
             </View>
             <View style={styles.space}></View>
             <Text style={{ marginLeft: 22, marginBottom: 10 }}>
@@ -172,6 +177,12 @@ const Reviewed = ({ data }) => {
             <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                 <Text style={{ marginLeft: 22, marginBottom: 10 }}>
                     리뷰({data.reviewCount})</Text>
+                <TouchableOpacity onPress={() => navigation.navigate('Reviewing', { id: data.id })}>
+                    <Image
+                        style={{ width: 25, height: 25, alignSelf: 'center', marginBottom: 10, marginRight: 20 }}
+                        source={reviewbutton}
+                    />
+                </TouchableOpacity>
             </View>
             {
                 data.reviews.map((review) => (

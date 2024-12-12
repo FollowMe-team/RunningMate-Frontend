@@ -105,14 +105,11 @@ const Courserecommend = ({ data }) => {
     };
     return (
         <TouchableOpacity style={{ borderRadius: 15, width: "90%", height: 'auto', backgroundColor: 'white', elevation: 7, alignSelf: 'center', marginBottom: 20 }}
-            onPress={() => navigation.navigate('Coursesearchmapview')}>
+            onPress={() => navigation.navigate('Coursesearchmapview', {data : data})}>
             <View style={{ flexWrap: 'wrap', flexDirection: 'row' }}>
-                <Image
-                    style={{ width: 40, height: 40, marginLeft: 20, marginTop: 15 }}
-                    source={mapview}
-                />
+                
                 <View>
-                    <View style={{ flexDirection: 'row', marginTop: 15, marginLeft: 5, justifyContent: 'space-between', width: 250 }}>
+                    <View style={{ flexDirection: 'row', marginTop: 15, marginLeft:22, justifyContent: 'space-between', width: 250 }}>
                         <View style={{flexDirection:'row'}}>
                             <Text style={{ color: 'black', fontSize: 16 }}>{data.name}</Text>
                             <TouchableOpacity onPress={handleFollow}>
@@ -121,7 +118,7 @@ const Courserecommend = ({ data }) => {
                                         style={{ width: 18, height: 18, marginLeft: 5 }}
                                         source={isFollowing === true ? subscribed : subscribe}
                                     /></View></TouchableOpacity></View>
-                        <View style={{ flexWrap: 'wrap', flexDirection: 'row', alignSelf: 'center', marginLeft: 25 }}>
+                        <View style={{ flexWrap: 'wrap', flexDirection: 'row', alignSelf: 'center', marginRight: -36 }}>
                             <View style={{ flexWrap: 'wrap', flexDirection: 'row', marginRight: 7, marginTop: 3 }}>
                                 <Image
                                     style={{ width: 12, alignSelf: 'flex-end', height: 12, marginRight: 3 }}
@@ -144,15 +141,15 @@ const Courserecommend = ({ data }) => {
                     </View>
                     <View style={{ flexWrap: 'wrap', flexDirection: 'row', justifyContent: 'space-between', marginBottom: 3 }}>
                         <Text
-                            style={{ color: 'grey', fontSize: 12, marginLeft: 5 }}
+                            style={{ color: 'grey', fontSize: 12, marginLeft: 22 }}
                         >{data.location}</Text>
-                        <View style={{ flexWrap: 'wrap', flexDirection: 'row', marginRight: 12 }}>
+                        <View style={{ flexWrap: 'wrap', flexDirection: 'row', marginRight: -24 }}>
 
 
                             <Text
-                                style={[data.difficulty === 'EASY' && styles.lowlevel,
-                                data.difficulty === 'NORMAL' && styles.middlelevel,
-                                data.difficulty === 'HARD' && styles.highlevel,
+                                style={[data.difficulty === '쉬움' && styles.lowlevel,
+                                data.difficulty === '보통' && styles.middlelevel,
+                                data.difficulty === '어려움' && styles.highlevel,
                                 ]}
                             >{data.difficulty}</Text>
                         </View>

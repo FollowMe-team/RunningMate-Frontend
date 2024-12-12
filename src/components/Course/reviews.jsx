@@ -102,16 +102,16 @@ const styles = StyleSheet.create({
 const Course_basic = ({ data }) => {
     const navigation = useNavigation();
 
-
     return (
         <View style={styles.smallboxlist2}>
             <View style={{ flexDirection: 'row' }}>
                 <TouchableOpacity onPress={() => navigation.navigate('Othersprofile_notteam')}>
 
                     <Image
-                        style={{ width: 42, height: 42, alignSelf: 'center', marginLeft: 10, marginRight: 5, marginTop: 7 }}
-                        source={profileimage}
-                    />
+                        style={{ borderRadius: 21, borderWidth: 1, borderColor: 'grey', width: 42, height: 42, alignSelf: 'center', marginLeft: 10, marginRight: 5, marginTop: 7 }}
+                        source={data.writer.profileImageUrl && data.writer.profileImageUrl !== null
+                            ? { uri: data.writer.profileImageUrl }
+                            : profileimage} />
                 </TouchableOpacity>
                 <View style={{ justifyContent: 'center', width: "84%" }}>
                     <View style={{ flexWrap: 'wrap', justifyContent: 'space-between' }}>
@@ -119,7 +119,7 @@ const Course_basic = ({ data }) => {
                             <View style={{ flexWrap: 'wrap', flexDirection: 'row' }}>
                                 <Text style={{ color: 'black', fontSize: 16 }}>
                                     {data.writer.nickname}</Text>
-                                {data.writer.ranking === 'IRONLEGS' &&
+                                {data.writer.ranking === 'IRON_LEGS' &&
                                     <Image
                                         style={{ width: 50, height: 18, alignSelf: 'center', marginLeft: 5 }}
                                         source={ironlegsbadge}
@@ -149,7 +149,7 @@ const Course_basic = ({ data }) => {
                                         source={runnerbadge}
                                     />
                                 }
-                                {data.writer.ranking === 'SPEEDDEMON' &&
+                                {data.writer.ranking === 'SPEED_DEMON' &&
                                     <Image
                                         style={{ width: 55, height: 18, alignSelf: 'center', marginLeft: 5 }}
                                         source={speeddemonbadge}
@@ -161,50 +161,44 @@ const Course_basic = ({ data }) => {
                                         source={sprinterbadge}
                                     />
                                 }
-                                {data.writer.ranking === 'ULTRARUNNER' &&
+                                {data.writer.ranking === 'ULTRA_RUNNER' &&
                                     <Image
                                         style={{ width: 55, height: 18, alignSelf: 'center', marginLeft: 5 }}
                                         source={ultrarunnerbadge}
                                     />
                                 }
-                                {data.footprint === 1 &&
-                                    <Image
-                                        style={{ width: 16, height: 16, alignSelf: 'center', marginLeft: 5 }}
-                                        source={footprint1}
-                                    />
-                                }
-                                {data.footprint === 2 &&
-                                    <Image
-                                        style={{ width: 16, height: 16, alignSelf: 'center', marginLeft: 5 }}
-                                        source={footprint2}
-                                    />
-                                }
-                                {data.footprint === 3 &&
-                                    <Image
-                                        style={{ width: 16, height: 16, alignSelf: 'center', marginLeft: 5 }}
-                                        source={footprint3}
-                                    />
-                                }
-                                {data.footprint === 4 &&
-                                    <Image
-                                        style={{ width: 16, height: 16, alignSelf: 'center', marginLeft: 5 }}
-                                        source={footprint4}
-                                    />
-                                }
-                                {data.footprint === 5 &&
-                                    <Image
-                                        style={{ width: 16, height: 16, alignSelf: 'center', marginLeft: 5 }}
-                                        source={footprint5}
-                                    />
-                                }
-                                {data.footprint === 6 &&
-                                    <Image
-                                        style={{ width: 16, height: 16, alignSelf: 'center', marginLeft: 5 }}
-                                        source={footprint6}
-                                    />
+                                {
+                                    data.writer.footPrint >= 900 ?
+                                        <Image
+                                            style={{ width: 16, height: 16, alignSelf: 'center', marginLeft: 5 }}
+                                            source={footprint6}
+                                        />
+                                        : data.writer.footPrint >= 700 ?
+                                            <Image
+                                                style={{ width: 16, height: 16, alignSelf: 'center', marginLeft: 5 }}
+                                                source={footprint5} />
+                                            : data.writer.footPrint >= 500 ?
+                                                <Image
+                                                    style={{ width: 16, height: 16, alignSelf: 'center', marginLeft: 5 }}
+                                                    source={footprint4}
+                                                />
+                                                : data.writer.footPrint >= 300 ?
+                                                    <Image
+                                                        style={{ width: 16, height: 16, alignSelf: 'center', marginLeft: 5 }}
+                                                        source={footprint3}
+                                                    />
+                                                    : data.writer.footPrint >= 100 ?
+                                                        <Image
+                                                            style={{ width: 16, height: 16, alignSelf: 'center', marginLeft: 5 }}
+                                                            source={footprint2}
+                                                        />
+                                                        : <Image
+                                                            style={{ width: 16, height: 16, alignSelf: 'center', marginLeft: 5 }}
+                                                            source={footprint1}
+                                                        />
                                 }
                                 <Text style={{ color: '#A8A5AF', fontSize: 9, marginLeft: 5, verticalAlign: 'middle' }}>
-                                    {data.createAt}</Text>
+                                    {data.createdAt}</Text>
                             </View>
                             <View style={{ flexWrap: 'wrap', flexDirection: 'row' }}>
                                 <Image
@@ -227,7 +221,14 @@ const Course_basic = ({ data }) => {
                 <Text
                     style={{ color: 'grey', fontSize: 10, textAlignVertical: 'center', marginLeft: 10, marginBottom: 5, marginTop: 3, width: '80%' }}
                 >{data.content}</Text>
-                <Image style={{ width: 200, height: 200, marginLeft: 10, marginBottom: 13, marginTop: 7 }} source={examplepic} />
+                {
+                    data.images.map((review) => (
+                        <Image style={{ width: 200, height: 200, marginLeft: 10, marginBottom: 13, marginTop: 7 }} source={review.imageUrl && review.imageUrl !== null
+                            ? { uri: review.imageUrl }
+                            : examplepic} />
+
+                    ))
+                }
 
 
             </View>

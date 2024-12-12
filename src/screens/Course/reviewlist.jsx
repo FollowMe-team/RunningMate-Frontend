@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { TextInput, StyleSheet, View, Text, Alert, Pressable, Image, ScrollView } from 'react-native';
 import { Dropdown } from 'react-native-element-dropdown';
 
@@ -88,20 +88,8 @@ const styles = StyleSheet.create({
 
 
 const Reviewed = ({ route, navigated }) => {
-    const data = route.params;
+    const [data, setData] = useState();
     const [Aligndata, setAlign] = useState('');
-    const five = data.data.reviews.filter(rating => rating.rating === 5).length;
-    const four = data.data.reviews.filter(rating => rating.rating === 4).length;
-    const three = data.data.reviews.filter(rating => rating.rating === 3).length;
-    const two = data.data.reviews.filter(rating => rating.rating === 2).length;
-    const one = data.data.reviews.filter(rating => rating.rating === 1).length;
-    const all = five + four + three + two + one;
-    const point = ((5 * five + 4* four + 3*three+2*two+one)/all).toFixed(1);
-    const fiverating = five / all * 140;
-    const fourrating = four / all * 140;
-    const threerating = three / all * 140;
-    const tworating = two / all * 140;
-    const onerating = one / all * 140;
     const Aligndatas = [
         { label: "최신 순", value: 'LATEST' },
         { label: "오래된 순", value: 'OLDEST' },
@@ -109,123 +97,120 @@ const Reviewed = ({ route, navigated }) => {
         { label: "별점 낮은 순", value: 'LOWEST_RATING' }
     ]
 
-
-    const [Coursedetails, setCoursedetails] = useState();
     const [Coursesuccess, setCoursesuccess] = useState(false);
     const fetchReviews = async (idss, value) => {
         const result = await getReview(idss, value);
-        setCoursedetails(result.data);
+        setData(result.data);
         setCoursesuccess(result.success);
     };
+    useEffect(() => {
+        fetchReviews(route.params.data.id, 'OLDEST');
+    }, []);
     return (
         <ScrollView>
-            <View>
-                <Text style={styles.mapname}>{data.data.name}</Text>
-                <View style={styles.space}></View>
-                <View style={{ flexDirection: "row" }}>
-                    <View style={{ marginLeft: 60, marginTop: 5 }}>
-                        <Text style={{ fontSize: 40, color: 'black', alignSelf: 'center' }}>{point}</Text>
-                        <View style={{ flexWrap: 'wrap', flexDirection: 'row', justifyContent: 'flex-start', marginBottom: 3, marginTop: 3, alignSelf: 'center' }}>
-                            <Image style={styles.starsize} source={point > 0 ? yellowstar : greystar} />
-                            <Image style={styles.starsize} source={point > 1 ? yellowstar : greystar} />
-                            <Image style={styles.starsize} source={point > 2 ? yellowstar : greystar} />
-                            <Image style={styles.starsize} source={point > 3 ? yellowstar : greystar} />
-                            <Image style={styles.starsize} source={point > 4 ? yellowstar : greystar} />
+            {Coursesuccess === true ?
+                <View>
+                    <Text style={styles.mapname}>{route.params.data.name}</Text>
+                    <View style={styles.space}></View>
+                    <View style={{ flexDirection: "row" }}>
+                        <View style={{ marginLeft: 60, marginTop: 5 }}>
+                            <Text style={{ fontSize: 40, color: 'black', alignSelf: 'center' }}>{data.rating.toFixed(2)}</Text>
+                            <View style={{ flexWrap: 'wrap', flexDirection: 'row', justifyContent: 'flex-start', marginBottom: 3, marginTop: 3, alignSelf: 'center' }}>
+                                <Image style={styles.starsize} source={data.rating.toFixed() > 0 ? yellowstar : greystar} />
+                                <Image style={styles.starsize} source={data.rating.toFixed() > 1 ? yellowstar : greystar} />
+                                <Image style={styles.starsize} source={data.rating.toFixed() > 2 ? yellowstar : greystar} />
+                                <Image style={styles.starsize} source={data.rating.toFixed() > 3 ? yellowstar : greystar} />
+                                <Image style={styles.starsize} source={data.rating.toFixed() > 4 ? yellowstar : greystar} />
+                            </View>
+                        </View>
+                        <View>
+                            <View style={{ flexDirection: 'row', marginLeft: 30 }}>
+                                <Text style={{ fontSize: 12 }}>
+                                    5점
+                                </Text>
+                                <View style={{ height: 5, width: 140, position: 'absolute', right: -150, top: 7, backgroundColor: '#A8A5AF' }}></View>
+                                <View style={{ height: 5, width: 140*data.ratingCounts[0]/data.reviewCount, position: 'absolute', right: -10 - 140*data.ratingCounts[0]/data.reviewCount, top: 7, backgroundColor: '#FFAD20' }}></View>
+                                <Text style={{ position: 'absolute', right: -180, fontSize: 12 }}>
+                                    {data.ratingCounts[0]}
+                                </Text>
+                            </View>
+                            <View style={{ flexDirection: 'row', marginLeft: 30 }}>
+                                <Text style={{ fontSize: 12 }}>
+                                    4점
+                                </Text>
+                                <View style={{ height: 5, width: 140, position: 'absolute', right: -150, top: 7, backgroundColor: '#A8A5AF' }}></View>
+                                <View style={{ height: 5, width: 140*data.ratingCounts[1]/data.reviewCount, position: 'absolute', right: -10 - 140*data.ratingCounts[1]/data.reviewCount, top: 7, backgroundColor: '#FFAD20' }}></View>
+                                <Text style={{ position: 'absolute', right: -180, fontSize: 12 }}>
+                                    {data.ratingCounts[1]}
+                                </Text>
+                            </View>
+                            <View style={{ flexDirection: 'row', marginLeft: 30 }}>
+                                <Text style={{ fontSize: 12 }}>
+                                    3점
+                                </Text>
+                                <View style={{ height: 5, width: 140, position: 'absolute', right: -150, top: 7, backgroundColor: '#A8A5AF' }}></View>
+                                <View style={{ height: 5, width: 140*data.ratingCounts[2]/data.reviewCount, position: 'absolute', right: -10 - 140*data.ratingCounts[2]/data.reviewCount, top: 7, backgroundColor: '#FFAD20' }}></View>
+                                <Text style={{ position: 'absolute', right: -180, fontSize: 12 }}>
+                                    {data.ratingCounts[2]}
+                                </Text>
+                            </View>
+                            <View style={{ flexDirection: 'row', marginLeft: 30 }}>
+                                <Text style={{ fontSize: 12 }}>
+                                    2점
+                                </Text>
+                                <View style={{ height: 5, width: 140, position: 'absolute', right: -150, top: 7, backgroundColor: '#A8A5AF' }}></View>
+                                <View style={{ height: 5, width: 140*data.ratingCounts[3]/data.reviewCount, position: 'absolute', right: -10 - 140*data.ratingCounts[3]/data.reviewCount, top: 7, backgroundColor: '#FFAD20' }}></View>
+                                <Text style={{ position: 'absolute', right: -180, fontSize: 12 }}>
+                                    {data.ratingCounts[3]}
+                                </Text>
+                            </View>
+                            <View style={{ flexDirection: 'row', marginLeft: 30 }}>
+                                <Text style={{ fontSize: 12 }}>
+                                    1점
+                                </Text>
+                                <View style={{ height: 5, width: 140, position: 'absolute', right: -150, top: 7, backgroundColor: '#A8A5AF' }}></View>
+                                <View style={{ height: 5, width: 140*data.ratingCounts[4]/data.reviewCount, position: 'absolute', right: -10 - 140*data.ratingCounts[4]/data.reviewCount, top: 7, backgroundColor: '#FFAD20' }}></View>
+                                <Text style={{ position: 'absolute', right: -180, fontSize: 12 }}>
+                                    {data.ratingCounts[4]}
+                                </Text>
+                            </View>
                         </View>
                     </View>
-                    <View>
-                        <View style={{ flexDirection: 'row', marginLeft: 30 }}>
-                            <Text style={{ fontSize: 12 }}>
-                                5점
-                            </Text>
-                            <View style={{ height: 5, width: 140, position: 'absolute', right: -150, top: 7, backgroundColor: '#A8A5AF' }}></View>
-                            <View style={{ height: 5, width: fiverating, position: 'absolute', right: -10-fiverating, top: 7, backgroundColor: '#FFAD20' }}></View>
-                            <Text style={{ position: 'absolute', right: -180, fontSize: 12 }}>
-                                {data.data.reviews.filter(rating => rating.rating === 5).length}
+                    <View style={styles.space}></View>
+                    <View style={{ flexDirection: 'row' }}>
+                        <Text style={{ marginLeft: 22, marginBottom: 10 }}>
+                            리뷰({route.params.data.reviewCount})</Text>
+                        <View style={{ marginLeft: 5, fontSize: 12, backgroundColor: '#E4E4E4', color: 'black', width: 90, height: 25, textAlign: 'center', textAlignVertical: 'center', borderRadius: 20 }}>
+                            <Dropdown
+                                data={Aligndatas}
+                                labelField="label"
+                                valueField="value"
+                                placeholder="최신 순"
+                                value={Aligndata}
+                                onChange={item => {
+                                    setAlign(item.value);
+                                    fetchReviews(route.params.data.id, item.value);
+                                }}
 
-                            </Text>
+                                placeholderStyle={{ fontSize: 10, color: 'black', marginLeft: 10, marginTop: 3 }} // 글자색 수정
+                                itemTextStyle={{ fontSize: 10, color: 'black' }} // 드롭다운 리스트 글자색 수정
+                                selectedTextStyle={{ fontSize: 10, color: 'black', marginLeft: 10, marginTop: 3 }} // 선택된 항목 글자색 수정
+                            />
                         </View>
-                        <View style={{ flexDirection: 'row', marginLeft: 30 }}>
-                            <Text style={{ fontSize: 12 }}>
-                                4점
-                            </Text>
-                            <View style={{ height: 5, width: 140, position: 'absolute', right: -150, top: 7, backgroundColor: '#A8A5AF' }}></View>
-                            <View style={{ height: 5, width: fourrating, position: 'absolute', right: -10-fourrating, top: 7, backgroundColor: '#FFAD20' }}></View>
-                        <Text style={{ position: 'absolute', right: -180, fontSize: 12 }}>
-                            {data.data.reviews.filter(rating => rating.rating === 4).length}
-                        </Text>
                     </View>
-                    <View style={{ flexDirection: 'row', marginLeft: 30 }}>
-                        <Text style={{ fontSize: 12 }}>
-                            3점
-                        </Text>
-                        <View style={{ height: 5, width: 140, position: 'absolute', right: -150, top: 7, backgroundColor: '#A8A5AF' }}></View>
-                        <View style={{ height: 5, width: threerating, position: 'absolute', right: -10-threerating, top: 7, backgroundColor: '#FFAD20' }}></View>
-                        <Text style={{ position: 'absolute', right: -180, fontSize: 12 }}>
-                            {data.data.reviews.filter(rating => rating.rating === 3).length}
+                    <View style={styles.space}></View>
 
-                        </Text>
-                    </View>
-                    <View style={{ flexDirection: 'row', marginLeft: 30 }}>
-                        <Text style={{ fontSize: 12 }}>
-                            2점
-                        </Text>
-                        <View style={{ height: 5, width: 140, position: 'absolute', right: -150, top: 7, backgroundColor: '#A8A5AF' }}></View>
-                        <View style={{ height: 5, width: tworating, position: 'absolute', right: -10-tworating, top: 7, backgroundColor: '#FFAD20' }}></View>
-                        <Text style={{ position: 'absolute', right: -180, fontSize: 12 }}>
-                            {data.data.reviews.filter(rating => rating.rating === 2).length}
+                    {Coursesuccess === false ?
+                        route.params.data.reviews.map((reviewer) => (
+                            <Reviews data={reviewer} />
+                        )) :
+                        data.reviews.map((reviewer) => (
+                            <Reviews data={reviewer} />
+                        ))
+                    }
 
-                        </Text>
-                    </View>
-                    <View style={{ flexDirection: 'row', marginLeft: 30 }}>
-                        <Text style={{ fontSize: 12 }}>
-                            1점
-                        </Text>
-                        <View style={{ height: 5, width: 140, position: 'absolute', right: -150, top: 7, backgroundColor: '#A8A5AF' }}></View>
-                        <View style={{ height: 5, width: onerating, position: 'absolute', right: -10-onerating, top: 7, backgroundColor: '#FFAD20' }}></View>
-                        <Text style={{ position: 'absolute', right: -180, fontSize: 12 }}>
-                            {data.data.reviews.filter(rating => rating.rating === 1).length}
-
-                        </Text>
-                    </View>
-                </View>
-            </View>
-            <View style={styles.space}></View>
-            <View style={{ flexDirection: 'row' }}>
-                <Text style={{ marginLeft: 22, marginBottom: 10 }}>
-                    리뷰({data.data.reviewCount})</Text>
-                <View style={{ marginLeft: 5, fontSize: 12, backgroundColor: '#E4E4E4', color: 'black', width: 90, height: 25, textAlign: 'center', textAlignVertical: 'center', borderRadius: 20 }}>
-                    <Dropdown
-                        data={Aligndatas}
-                        labelField="label"
-                        valueField="value"
-                        placeholder="최신 순"
-                        value={Aligndata}
-                        onChange={item => {
-                            setAlign(item.value);
-                            fetchReviews(data.data.id, Aligndata);
-                        }}
-
-                        placeholderStyle={{ fontSize: 10, color: 'black', marginLeft: 10, marginTop: 3 }} // 글자색 수정
-                        itemTextStyle={{ fontSize: 10, color: 'black' }} // 드롭다운 리스트 글자색 수정
-                        selectedTextStyle={{ fontSize: 10, color: 'black', marginLeft: 10, marginTop: 3 }} // 선택된 항목 글자색 수정
-                    />
-                </View>
-            </View>
-            <View style={styles.space}></View>
-
-            {   !Coursesuccess &&
-                data.data.reviews.map((reviewer) => (
-                    <Reviews data={reviewer} />
-                ))
+                </View> : <View></View>
             }
-            {   Coursesuccess &&
-                Coursedetails.reviews.map((reviewer) => (
-                    <Reviews data={reviewer} />
-                ))
-            }
-
-        </View>
         </ScrollView >
     );
 }

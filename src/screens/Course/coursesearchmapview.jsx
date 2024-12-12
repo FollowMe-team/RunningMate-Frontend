@@ -24,7 +24,7 @@ import whiteplus from '../../assets/images/Course/whiteplus.png';
 import Qmark from '../../assets/images/Course/Qmark.png';
 import back from '../../assets/images/NaviIcon/left.png';
 
-const RunningScreen = () => {
+const RunningScreen = ({ route }) => {
     const [currentLocation, setCurrentLocation] = useState(null);
     const [waypoints, setWaypoints] = useState([]);
     const [newPoint, setNewPoint] = useState({ latitude: '', longitude: '' });
@@ -41,7 +41,7 @@ const RunningScreen = () => {
     const navigation = useNavigation();
     const [Leveldata, setLevel] = useState('');
     const [Goaldata, setGoal] = useState('');
-
+    const data = route.params || {};
     const Goaldatas = [
         { label: "체중 감량", value: 'WEIGHT_LOSS' },
         { label: "속도 증가", value: 'ENDURANCE' },
@@ -144,28 +144,34 @@ const RunningScreen = () => {
         }
     };
 
-
     const isValidCoordinate = (value) => {
         const num = parseFloat(value);
         return !isNaN(num) && isFinite(num);
     };
     // 사용자의 현재 위치 가져오기
     useEffect(() => {
-        Geolocation.getCurrentPosition(
-            (position) => {
-                const { latitude, longitude } = position.coords;
-                const initialLocation = { latitude, longitude };
-                setCurrentLocation({
-                    ...initialLocation,
-                    latitudeDelta: 0.01,
-                    longitudeDelta: 0.01,
-                });
-                setWaypoints([initialLocation]); // 첫 경로 포인트를 현재 위치로 설정
-            },
-            (error) => Alert.alert('위치 오류', error.message),
-            { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 }
-        );
-    }, []);
+        if (waypoints.length === 0) {
+            Geolocation.getCurrentPosition(
+                (position) => {
+                    const { latitude, longitude } = position.coords;
+                    const initialLocation = { latitude, longitude };
+                    setCurrentLocation({
+                        ...initialLocation,
+                        latitudeDelta: 0.01,
+                        longitudeDelta: 0.01,
+                    });
+                    //setWaypoints([initialLocation]); // 첫 경로 포인트를 현재 위치로 설정
+                },
+                (error) => Alert.alert('위치 오류', error.message),
+                { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 }
+
+            );
+        }
+        if (waypoints.length === 0) {
+            addWaypoint2();
+        }
+        focusOnRoute();
+    }, [waypoints]);
     const handlePressIn = () => {
         Animated.timing(scaleValue, {
             toValue: 0.9,
@@ -180,6 +186,22 @@ const RunningScreen = () => {
             duration: 100,
             useNativeDriver: true,
         }).start();
+    };
+
+    const addWaypoint2 = () => {
+        for (let i = 0; i < data.data.coursePointInfos.length; i++) {
+
+            const a = data.data.coursePointInfos[i].latitude;
+            const b = data.data.coursePointInfos[i].longitude;
+            const lat = parseFloat(a);
+            const lng = parseFloat(b);
+
+            if (isValidCoordinate(a) && isValidCoordinate(b)) {
+                setWaypoints((prevWaypoints) => [...prevWaypoints, { latitude: lat, longitude: lng }]);
+            } else {
+                Alert.alert('오류', '유효한 좌표를 입력하세요.');
+            }
+        }
     };
 
     const addWaypoint = () => {
@@ -233,10 +255,16 @@ const RunningScreen = () => {
                 ref={mapRef}
                 provider={PROVIDER_GOOGLE}
                 style={styles.map}
-                region={currentLocation}
-                showsUserLocation={true}
+                //region={currentLocation}
+                showsUserLocation={false}
             >
                 {/* 경로 표시 */}
+
+                <Polyline
+                    coordinates={waypoints}
+                    strokeColor="#73D393"
+                    strokeWidth={4}
+                />
                 {waypoints.length > 1 && (
                     <Polyline
                         coordinates={waypoints}
@@ -247,18 +275,18 @@ const RunningScreen = () => {
 
                 {/* 각 포인트에 마커 추가 */}
                 {waypoints.map((point, index) => (
-                    <Marker
+                    < Marker
                         pinColor={'#73D393'}
                         key={index}
                         coordinate={point}
-                        title={index === 0 ? '출발지' : `포인트 ${index}`}
+                        opacity={index === 0 ? 1 : index === (waypoints.length - 1) ? 1 : 0}
+                        title={index === 0 ? '출발지' : index === (waypoints.length - 1) ? '도착지' : ``}
                     />
                 ))}
             </MapView>
             <View style={{ flexWrap: 'wrap', flexDirection: 'row', position: 'absolute', top: 75, left: 10 }}>
-                    <Text style={styles.whitesharptext}># 3KM 미만</Text>
-                    <Text style={styles.whitesharptext}># 숲길</Text>
-                </View>
+
+            </View>
 
             <TouchableOpacity
                 onPress={() => navigation.goBack()}
@@ -317,45 +345,52 @@ const RunningScreen = () => {
                 </View>
             </Modal>
 
-            {/* 버튼 */}
-            <View style={styles.inputbarsearch}>
+            <TouchableOpacity style={styles.inputbarsearch} onPress={() => navigation.navigate('Coursesearch')}>
+                <View style={{ borderRadius: 10, width: "100%", height: 40, alignSelf: 'center', flexDirection: 'row' }}>
                     <Image style={{ width: 20, height: 20, alignSelf: 'center', marginRight: 5 }} source={Qmark} />
-                    <Text style={{ textAlignVertical: 'center' }}>코스명 또는 지역명</Text>
+                    <Text style={{ textAlignVertical: 'center' }}>{data.data.name}</Text>
                 </View>
+            </TouchableOpacity>
 
-            <TouchableOpacity
-                style={styles.routeButton}
-                onPress={() => setIsRouteModalVisible(true)}
-            >
-                <Text style={styles.buttonText}>좌표 추가</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-                style={[styles.routeButton, { top: 100 }]}
-                onPress={focusOnRoute}
-            >
-                <Text style={styles.buttonText}>경로 보기</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-                style={[styles.routeButton, { top: 150 }]}
-                onPress={resetWaypoints}
-            >
-                <Text style={styles.buttonText}>경로 초기화</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-                style={[styles.routeButton, { top: 200 }]}
-                onPress={moveToCurrentLocation}
-            >
-                <Text style={styles.buttonText}>내 위치로 이동</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-                style={[styles.routeButton, { top: 250 }]}
-                onPress={handleCalculateSlope}
-            >
-                <Text style={styles.buttonText}>경사 가져오기</Text>
-            </TouchableOpacity>
+            {/* 버튼 */}
+            {false &&
+                <View>
+                    <TouchableOpacity
+                        style={styles.routeButton}
+                        onPress={() => setIsRouteModalVisible(true)}
+                    >
+                        <Text style={styles.buttonText}>좌표 추가</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                        style={[styles.routeButton, { top: 100 }]}
+                        onPress={focusOnRoute}
+                    >
+                        <Text style={styles.buttonText}>경로 보기</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                        style={[styles.routeButton, { top: 150 }]}
+                        onPress={resetWaypoints}
+                    >
+                        <Text style={styles.buttonText}>경로 초기화</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                        style={[styles.routeButton, { top: 200 }]}
+                        onPress={moveToCurrentLocation}
+                    >
+                        <Text style={styles.buttonText}>내 위치로 이동</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                        style={[styles.routeButton, { top: 250 }]}
+                        onPress={handleCalculateSlope}
+                    >
+                        <Text style={styles.buttonText}>경사 가져오기</Text>
+                    </TouchableOpacity>
+                </View>
+            }
             <View style={{ borderTopLeftRadius: 32, borderTopRightRadius: 32, width: "100%", height: 'auto', backgroundColor: 'white', elevation: 7, paddingVertical: 15 }}>
-                <Text style={{ color: 'black', fontSize: 22, fontWeight: 'bold', alignSelf: 'center' }}>문학산 코스</Text>
-                <Text style={{ fontSize: 18, alignSelf: 'center' }}>인천 미추홀구</Text>
+                <Text style={{ color: 'black', fontSize: 22, fontWeight: 'bold', alignSelf: 'center' }}>{data.data.name} </Text>
+
+                <Text style={{ fontSize: 18, alignSelf: 'center' }}>{data.data.location}</Text>
                 <View style={{ flexWrap: 'wrap', flexDirection: 'row', justifyContent: 'center' }}>
                     <View style={{ flexWrap: 'wrap', flexDirection: 'row', marginRight: 7, marginTop: 3 }}>
                         <Image
@@ -364,7 +399,7 @@ const RunningScreen = () => {
                         />
                         <Text
                             style={{ color: 'grey', fontSize: 8 }}
-                        >3.8KM</Text>
+                        >{data.data.distance}KM</Text>
                     </View>
                     <View style={{ flexWrap: 'wrap', flexDirection: 'row', marginRight: 12, marginTop: 3 }}>
                         <Image
@@ -373,22 +408,25 @@ const RunningScreen = () => {
                         />
                         <Text
                             style={{ color: 'grey', fontSize: 8 }}
-                        >30~40분</Text>
+                        >{data.data.duration}</Text>
                     </View>
 
                 </View>
                 <View style={styles.space}></View>
                 <View style={{ flexDirection: 'row' }}>
-                    <Text style={{ marginLeft: 22, marginRight: 22, color: 'black', width: 280 }}>산을 따라서 달리는 하드코어 러닝 코스입니다.
-                        숙련자만 달리시길 권장드립니다.
+                    <Text style={{ marginLeft: 22, marginRight: 22, color: 'black', width: 280 }}>{data.data.description}
                     </Text>
                     <View style={{ marginTop: 2, marginLeft: 10 }}>
+
                         <Text
-                            style={{ textAlign: 'center', textAlignVertical: 'center', width: 32, height: 20, color: '#E06464', fontSize: 9, backgroundColor: '#F3CFCF', borderRadius: 20 }}
-                        >어려움</Text>
+                            style={[data.data.difficulty === 'EASY' && styles.lowlevel,
+                            data.data.difficulty === 'NORMAL' && styles.middlelevel,
+                            data.data.difficulty === 'HARD' && styles.highlevel,
+                            ]}
+                        >{data.data.difficulty}</Text>
                         <Text
                             style={{ marginTop: 2, color: 'grey', fontSize: 10, marginRight: 13, textAlignVertical: 'center' }}
-                        >7.5KM</Text>
+                        >{data.data.distance}KM</Text>
 
                     </View>
                 </View>
@@ -400,7 +438,7 @@ const RunningScreen = () => {
                             source={star}
                         />
                         <Text style={{ fontSize: 12 }}>
-                            4.5
+                            {data.data.rating}
                         </Text>
                     </View>
                     <View style={{ flexWrap: 'wrap', flexDirection: 'row', alignItems: 'center' }}>
@@ -409,18 +447,24 @@ const RunningScreen = () => {
                             source={runner}
                         />
                         <Text style={{ fontSize: 12 }}>
-                            1000명
+                            {data.data.runningCount}회
                         </Text>
                     </View>
                 </View>
                 <View style={styles.space}></View>
                 <View style={{ flexWrap: 'wrap', flexDirection: 'row', marginLeft: 22 }}>
-                    <Text style={styles.greensharptext}># 산</Text>
-                    <Text style={styles.greensharptext}># 경사 높음</Text>
-                    <Text style={styles.greensharptext}># 계단 있음</Text>
+                    {data.data.courseOptionTypes.map((button) => (
+                        <Text
+                            style={[
+                                styles.greensharptext,
+                            ]}
+                        >
+                            # {button}
+                        </Text>
+                    ))}
                 </View>
 
-                <TouchableOpacity onPress={() => navigation.navigate('Reviewed')}
+                <TouchableOpacity onPress={() => navigation.navigate('Reviewed', { id: data.data.id })}
                     style={styles.greenbutton}>
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                         <Image
@@ -428,7 +472,7 @@ const RunningScreen = () => {
                             source={runningman}
                         />
                         <Text style={styles.whitetext}>
-                            코스 달리기</Text>
+                            상세보기</Text>
 
                         <Image
                             style={{ width: 32, height: 32, alignSelf: 'center' }}
@@ -436,6 +480,7 @@ const RunningScreen = () => {
                         />
                     </View>
                 </TouchableOpacity>
+
             </View>
             {slope !== null && (
                 <View style={styles.resultContainer}>
@@ -454,6 +499,11 @@ const RunningScreen = () => {
 
 
 const styles = StyleSheet.create({
+
+    lowlevel: { textAlign: 'center', textAlignVertical: 'center', width: 'auto', paddingHorizontal: 5, height: 20, color: '#409E4B', fontSize: 9, backgroundColor: '#CFF3D0', borderRadius: 20 },
+    middlelevel: { textAlign: 'center', textAlignVertical: 'center', width: 'auto', paddingHorizontal: 5, height: 20, color: '#A9AB35', fontSize: 9, backgroundColor: '#FBFF7F', borderRadius: 20 },
+    highlevel: { textAlign: 'center', textAlignVertical: 'center', width: 'auto', paddingHorizontal: 5, height: 20, color: '#E06464', fontSize: 9, backgroundColor: '#F3CFCF', borderRadius: 20 },
+
     container: {
         flex: 1,
     },
@@ -545,7 +595,7 @@ const styles = StyleSheet.create({
 
     whitetext: { color: 'white', fontSize: 22, fontWeight: 'bold', textAlign: 'center', textAlignVertical: 'center', marginLeft: 60, marginRight: 60 },
     backButton: {
-        position:'absolute', left:12, top:30
+        position: 'absolute', left: 12, top: 30
     },
     backButtonCircle: {
         width: 36,
@@ -556,10 +606,10 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     backIcon: {
-      width: 24,
-      height: 24,
+        width: 24,
+        height: 24,
     },
-    inputbarsearch: { borderRadius: 10, width: "80%", height: 40, backgroundColor: 'white', elevation: 7, alignSelf: 'center', paddingLeft: 10,flexDirection: 'row', position:'absolute', top:28.5, left:60 },
+    inputbarsearch: { borderRadius: 10, width: "80%", height: 40, backgroundColor: 'white', elevation: 7, alignSelf: 'center', paddingLeft: 10, flexDirection: 'row', position: 'absolute', top: 28.5, left: 60 },
     whitesharptext: {
         height: 24, marginRight: 10, width: 'auto', paddingLeft: 10, paddingRight: 10,
         borderColor: 'white',

@@ -136,10 +136,10 @@ const Course_basic = ({ data }) => {
 
     return (
         <View>
-            {data.length === 0 && <SimpleNoCourse />}  
-            {data.length > 0 && 
+            {data.length === 0 && <SimpleNoCourse />}
+            {data.length > 0 &&
                 data.map((course) => (
-                    <SimpleCourse data={course}/>
+                    <SimpleCourse data={course} />
                 ))
             }
         </View>

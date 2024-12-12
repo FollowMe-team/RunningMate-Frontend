@@ -167,9 +167,9 @@ const Course_basic = ({ data }) => {
 
                             <Text
                                 style={[
-                                data.status === 'COMPLETE' && styles.lowlevel,
-                                data.status === 'WAITING' && styles.middlelevel,
-                                data.status === 'REJECTED' && styles.highlevel,
+                                data.status === '승인 완료' && styles.lowlevel,
+                                data.status === '승인 진행 중' && styles.middlelevel,
+                                data.status === '승인 거부' && styles.highlevel,
                                 ]}
                             >{data.status}</Text>
                         </View>
