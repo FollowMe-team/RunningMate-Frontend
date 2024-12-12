@@ -12,7 +12,7 @@ import {
 import ImagePicker from 'react-native-image-crop-picker';
 import ActionSheet, { SheetManager } from 'react-native-actions-sheet';
 
-const CrewPhotoPicker = ({ photos, setPhotos }) => {
+const CrewPhotoPicker = ({ photo, setPhoto }) => {
   const requestCameraPermission = async () => {
     if (Platform.OS === 'android') {
       try {
@@ -52,7 +52,7 @@ const CrewPhotoPicker = ({ photos, setPhotos }) => {
         includeBase64: true,
       })
         .then(image => {
-          setPhotos([...photos, image.path]);
+          setPhoto(image.path);
           SheetManager.hide('photoPickerSheet');
         })
         .catch(error => {
@@ -60,22 +60,21 @@ const CrewPhotoPicker = ({ photos, setPhotos }) => {
         });
     } else if (index === 1) {
       ImagePicker.openPicker({
-        multiple: true,
-        mediaType: 'photo',
+        width: 300,
+        height: 300,
         cropping: true,
         cropperCircleOverlay: true,
         includeBase64: true,
       })
-        .then(images => {
-          const newPhotos = images.map(image => image.path);
-          setPhotos([...photos, ...newPhotos]);
+        .then(image => {
+          setPhoto(image.path);
           SheetManager.hide('photoPickerSheet');
         })
         .catch(error => {
           console.log('ImagePicker Error: ', error);
         });
     } else if (index === 2) {
-      setPhotos([]);
+      setPhoto();
       SheetManager.hide('photoPickerSheet');
     }
   };
@@ -87,20 +86,8 @@ const CrewPhotoPicker = ({ photos, setPhotos }) => {
   return (
     <View style={styles.container}>
       <TouchableOpacity onPress={showActionSheet} style={styles.photoSet}>
-        {photos.length > 0 ? (
-          <>
-            <Image source={{ uri: photos[0] }} style={styles.photo} />
-            {photos.length > 1 && (
-              <View style={[styles.photoSet, styles.photoSetSecond]}>
-                <Image source={{ uri: photos[1] }} style={styles.photo} />
-              </View>
-            )}
-            {photos.length > 2 && (
-              <View style={styles.photoCountBox}>
-                <Text style={styles.photoCountText}>+{photos.length - 2}</Text>
-              </View>
-            )}
-          </>
+        {photo ? (
+          <Image source={{ uri: photo }} style={styles.photo} />
         ) : (
           <Text style={styles.photoText}>대표 이미지 사진</Text>
         )}
@@ -166,7 +153,7 @@ const styles = StyleSheet.create({
   photoSet: {
     width: 100,
     height: 100,
-    borderRadius: 10,
+    borderRadius: 50,
     backgroundColor: '#E8E8E8',
     marginRight: 10,
     position: 'relative',
@@ -177,24 +164,24 @@ const styles = StyleSheet.create({
     right: -10,
     zIndex: -1,
   },
-  photoCountBox: {
-    position: 'absolute',
-    bottom: 5,
-    right: 5,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    borderRadius: 10,
-    padding: 2,
-    zIndex: 1,
-  },
-  photoCountText: {
-    color: '#fff',
-    fontSize: 12,
-  },
+  // photoCountBox: {
+  //   position: 'absolute',
+  //   bottom: 5,
+  //   right: 5,
+  //   backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  //   borderRadius: 10,
+  //   padding: 2,
+  //   zIndex: 1,
+  // },
+  // photoCountText: {
+  //   color: '#fff',
+  //   fontSize: 12,
+  // },
   photoContainer: {
     width: 100,
     height: 100,
     justifyContent: 'center',
-    borderRadius: 10,
+    borderRadius: 50,
     backgroundColor: '#E8E8E8',
     marginRight: 10,
   },
@@ -208,7 +195,7 @@ const styles = StyleSheet.create({
   photo: {
     width: '100%',
     height: '100%',
-    borderRadius: 10,
+    borderRadius: 50,
   },
   actionSheetContent: {
     padding: 20,
@@ -224,8 +211,8 @@ const styles = StyleSheet.create({
 });
 
 CrewPhotoPicker.propTypes = {
-  photos: PropTypes.arrayOf(PropTypes.string).isRequired,
-  setPhotos: PropTypes.func.isRequired,
+  photo: PropTypes.string,
+  setPhoto: PropTypes.func.isRequired,
 };
 
 export default CrewPhotoPicker;

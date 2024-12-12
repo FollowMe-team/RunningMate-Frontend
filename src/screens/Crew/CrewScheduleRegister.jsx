@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -10,19 +10,38 @@ import {
   ScrollView,
 } from 'react-native';
 import TimePicker from '../../components/TimePicker';
+import PropTypes from 'prop-types';
 import { useNavigation } from '@react-navigation/native';
-import schedule from '../../components/Crew/schedule.json';
+import { getFavoriteCourses } from '../../utils/crew/crew_course';
+import SimpleCourse from '../../components/Course/SimpleCourse';
+import { registerCrewSchedule } from '../../utils/crew/crew_schedule';
 
 import wave from '../../assets/images/Crew/wave.png';
 
-const CrewScheduleRegister = () => {
+const CrewScheduleRegister = ({ route }) => {
+  const { selectedDate, crewId } = route.params;
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
   const [startTime, setStartTime] = useState(null);
   const [endTime, setEndTime] = useState(null);
   const [maxParticipants, setMaxParticipants] = useState('');
   const [location, setLocation] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
+  const [favoriteCourses, setFavoriteCourses] = useState([]);
   const navigation = useNavigation();
+
+  useEffect(() => {
+    const fetchFavoriteCourses = async () => {
+      try {
+        const crewId = 37; // Replace with actual crewId
+        const courses = await getFavoriteCourses(crewId);
+        setFavoriteCourses(courses);
+      } catch (error) {
+        console.error('Failed to fetch favorite courses:', error);
+      }
+    };
+
+    fetchFavoriteCourses();
+  }, []);
 
   const handleTimeChange = (type, value) => {
     if (type === 'startTime') {
@@ -41,23 +60,28 @@ const CrewScheduleRegister = () => {
     }
   };
 
-  const handleRegisterCrew = () => {
+  const handleRegisterCrew = async () => {
     const newSchedule = {
-      date: new Date().toISOString().split('T')[0],
-      start_time: startTime.toLocaleTimeString('ko-KR', {
+      courseId: 1, // 실제 courseId로 변경 필요
+      startTime: `${selectedDate}T${startTime.toLocaleTimeString('ko-KR', {
         hour: '2-digit',
         minute: '2-digit',
-      }),
-      end_time: endTime.toLocaleTimeString('ko-KR', {
+      })}`,
+      endTime: `${selectedDate}T${endTime.toLocaleTimeString('ko-KR', {
         hour: '2-digit',
         minute: '2-digit',
-      }),
-      participants: 0,
-      max_participants: parseInt(maxParticipants),
-      location: location,
+      })}`,
+      meetingPlace: location,
+      memberMax: parseInt(maxParticipants),
     };
-    schedule.push(newSchedule);
-    setModalVisible(true);
+
+    try {
+      await registerCrewSchedule(crewId, newSchedule);
+      setModalVisible(true);
+    } catch (error) {
+      console.error('Failed to register crew schedule:', error);
+      alert('일정 등록에 실패했습니다. 다시 시도해주세요.');
+    }
   };
 
   const handleModalClose = () => {
@@ -70,7 +94,13 @@ const CrewScheduleRegister = () => {
       <View style={styles.container}>
         <View style={styles.crewScheduleBox}>
           <Text style={styles.crewScheduleText}>코스 즐겨찾기</Text>
-          {/* 코스 즐겨찾기 내용 */}
+          {favoriteCourses.length > 0 ? (
+            favoriteCourses.map((course, index) => (
+              <SimpleCourse key={index} data={course} />
+            ))
+          ) : (
+            <Text style={styles.noCoursesText}>해당 코스가 없습니다...</Text>
+          )}
         </View>
         <View style={styles.formContainer}>
           <Text style={styles.title}>일시 선택</Text>
@@ -171,6 +201,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     color: 'black',
+    marginBottom: 15,
   },
   formContainer: {
     width: '100%',
@@ -243,6 +274,21 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
   },
+  noCoursesText: {
+    fontSize: 16,
+    color: 'grey',
+    textAlign: 'center',
+    marginTop: 20,
+  },
 });
+
+CrewScheduleRegister.propTypes = {
+  route: PropTypes.shape({
+    params: PropTypes.shape({
+      selectedDate: PropTypes.string.isRequired,
+      crewId: PropTypes.number.isRequired,
+    }).isRequired,
+  }).isRequired,
+};
 
 export default CrewScheduleRegister;

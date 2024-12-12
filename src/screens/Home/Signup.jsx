@@ -105,14 +105,14 @@ const Signup = () => {
   const handleEmailCheck = async () => {
     try {
       const response = await checkEmail(email);
-      if (response.isDuplicated) {
-        setIsEmailChecked(false);
-        setEmailError('이미 사용 중인 이메일입니다.');
-      } else {
+      if (!response.data.isDuplicated) {
         setIsEmailChecked(true);
         setEmailError('');
         setModalMessage('사용 가능한 이메일입니다.');
         setIsModalVisible(true);
+      } else {
+        setIsEmailChecked(false);
+        setEmailError('이미 사용 중인 이메일입니다.');
       }
     } catch {
       setIsEmailChecked(false);
@@ -123,7 +123,7 @@ const Signup = () => {
   const handleNicknameCheck = async () => {
     try {
       const response = await checkNickname(nickname);
-      if (!response.isDuplicated) {
+      if (!response.data.isDuplicated) {
         setIsNicknameChecked(true);
         setNicknameError('');
         setModalMessage('사용 가능한 닉네임입니다.');
@@ -249,7 +249,7 @@ const Signup = () => {
               }}
               placeholderStyle={{ color: '#101010' }} // 글자색 수정
               itemTextStyle={{ color: '#101010' }} // 드롭다운 리스트 글자색 수정
-              selectedTextStyle={{ color: '#101010' }} // 선���된 항목 글자색 수정
+              selectedTextStyle={{ color: '#101010' }} // 선택된 항목 글자색 수정
             />
             <Dropdown
               style={styles.dropdown}

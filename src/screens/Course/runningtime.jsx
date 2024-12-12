@@ -1,5 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, StyleSheet, Alert, TouchableOpacity, Text, TextInput, Modal } from 'react-native';
+import {
+  View,
+  StyleSheet,
+  Alert,
+  TouchableOpacity,
+  Text,
+  TextInput,
+  Modal,
+} from 'react-native';
 import MapView, { PROVIDER_GOOGLE, Marker, Polyline } from 'react-native-maps';
 import Geolocation from '@react-native-community/geolocation';
 
@@ -17,10 +25,7 @@ import stopbutton from '../../assets/images/Course/stopbutton.png';
 import playbutton from '../../assets/images/Course/playbutton.png';
 import endbutton from '../../assets/images/Course/endbutton.png';
 
-let runpause = false
-
-
-
+let runpause = false;
 
 const RunningScreen = ({ route }) => {
     const data = route.params;
@@ -59,10 +64,43 @@ const RunningScreen = ({ route }) => {
 
     const toggleTimer = () => {
         setIsRunning(!isRunning);
-    };
 
-    if (!focus) {
-        clearInterval(timer);
+    };
+  }, [navigation]);
+
+  const formatTime = duration => {
+    const hours = duration.hours().toString().padStart(2, '0');
+    const minutes = duration.minutes().toString().padStart(2, '0');
+    const seconds = duration.seconds().toString().padStart(2, '0');
+    return `${hours}:${minutes}:${seconds}`;
+  };
+
+  // 경사 계산 함수
+  const calculateSlope = async (lat1, lon1, lat2, lon2) => {
+    // 고도 얻기
+    const elevation1 = await getElevation(lat1, lon1);
+    const elevation2 = await getElevation(lat2, lon2);
+
+    if (elevation1 !== null && elevation2 !== null) {
+      // 거리 계산
+      const distance = await getDistance(lat1, lon1, lat2, lon2);
+      if (distance === null) {
+        return;
+      }
+
+      setDistance(distance);
+
+      // 경사 계산 (고도 차이 / 수평 거리)
+      const slopeValue = (elevation2 - elevation1) / (distance / 1000); // 킬로미터로 계산
+      setSlope(slopeValue);
+      setElevation1(elevation1);
+      setElevation2(elevation2);
+      setLat1(lat1);
+      setLon1(lon1);
+      setLat2(lat2);
+      setLon2(lon2);
+    } else {
+      Alert.alert('고도 정보', '고도를 가져오는 데 실패했습니다.');
     }
 
     useEffect(() => {
@@ -83,80 +121,29 @@ const RunningScreen = ({ route }) => {
             setFocus(false);
             setIsRunning(false);
             //removeLocationUpdates(); // 위치 업데이트 중지
-        });
+     });
+        setWaypoints([initialLocation]); // 첫 경로 포인트를 현재 위치로 설정
+      },
+      error => Alert.alert('위치 오류', error.message),
+      { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 },
+    );
+  }, []);
 
-        // 클린업 함수
-        return () => {
-            //focusListener();
-            //blurListener();
-        };
-    }, [navigation]);
+  const addWaypoint = () => {
+    const lat = parseFloat(newPoint.latitude);
+    const lng = parseFloat(newPoint.longitude);
 
-    const formatTime = (duration) => {
-        const hours = duration.hours().toString().padStart(2, '0');
-        const minutes = duration.minutes().toString().padStart(2, '0');
-        const seconds = duration.seconds().toString().padStart(2, '0');
-        return `${hours}:${minutes}:${seconds}`;
-    };
-
-
-    // 경사 계산 함수
-    const calculateSlope = async (lat1, lon1, lat2, lon2) => {
-        // 고도 얻기
-        const elevation1 = await getElevation(lat1, lon1);
-        const elevation2 = await getElevation(lat2, lon2);
-
-        if (elevation1 !== null && elevation2 !== null) {
-            // 거리 계산
-            const distance = await getDistance(lat1, lon1, lat2, lon2);
-            if (distance === null) {
-                return;
-            }
-
-            setDistance(distance);
-
-            // 경사 계산 (고도 차이 / 수평 거리)
-            const slopeValue = ((elevation2 - elevation1) / (distance / 1000)); // 킬로미터로 계산
-            setSlope(slopeValue);
-            setElevation1(elevation1);
-            setElevation2(elevation2);
-            setLat1(lat1);
-            setLon1(lon1);
-            setLat2(lat2);
-            setLon2(lon2);
-        } else {
-            Alert.alert('고도 정보', '고도를 가져오는 데 실패했습니다.');
-        }
-    };
-    // 경사 계산 버튼 클릭 시 동작
-    const handleCalculateSlope = () => {
-        if (slope !== null) {
-            // 이미 정보가 표시된 상태라면, 정보 초기화 (토글 효과)
-            setSlope(null);
-            setDistance(null);
-            setElevation1(null);
-            setElevation2(null);
-            setLat1(null);
-            setLon1(null);
-            setLat2(null);
-            setLon2(null);
-        } else {
-            // 새로운 경사 계산
-            const lat1 = 37.7749;  // 샌프란시스코 예시 위도
-            const lon1 = -122.4194; // 샌프란시스코 예시 경도
-            const lat2 = 37.8044;  // 오클랜드 예시 위도
-            const lon2 = -122.2711; // 오클랜드 예시 경도
-            calculateSlope(lat1, lon1, lat2, lon2);
-        }
-    };
-
-    const handleEnd = () => {
-        if (end !== null) {
-            // 이미 정보가 표시된 상태라면, 정보 초기화 (토글 효과)
-            setEnd(null);
-        } else {
-            setEnd(true)
-        }
+    if (
+      isValidCoordinate(newPoint.latitude) &&
+      isValidCoordinate(newPoint.longitude)
+    ) {
+      setWaypoints(prevWaypoints => [
+        ...prevWaypoints,
+        { latitude: lat, longitude: lng },
+      ]);
+      setNewPoint({ latitude: '', longitude: '' });
+    } else {
+      Alert.alert('오류', '유효한 좌표를 입력하세요.');
     }
 
 
@@ -253,13 +240,11 @@ const RunningScreen = ({ route }) => {
         } else {
             Alert.alert('오류', '유효한 좌표를 입력하세요.');
         }
+
     };
 
-    const resetWaypoints = () => {
-        setWaypoints((prev) => (prev.length > 0 ? [prev[0]] : []));
-    };
-    const focusOnRoute = () => {
-        if (waypoints.length === 0) return;
+    mapRef.current?.animateToRegion(region, 1000);
+  };
 
         const latitudes = waypoints.map((point) => point.latitude);
         const longitudes = waypoints.map((point) => point.longitude);
@@ -382,154 +367,130 @@ const RunningScreen = ({ route }) => {
                 style={[styles.routeButton, { top: 170 }]}
                 onPress={moveToCurrentLocation}
             >
-                <Text style={styles.buttonText}>내 위치로 이동</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-                style={[styles.routeButton, { top: 220 }]}
-                onPress={handleCalculateSlope}
+              종료 후 이어하기가 불가능합니다. 러닝을 그만두시겠습니까?
+            </Text>
+            <View
+              style={{ flexDirection: 'row', height: '35%', width: '100%' }}
             >
-                <Text style={styles.buttonText}>경사 가져오기</Text>
-            </TouchableOpacity>
-            <View style={{ borderTopLeftRadius: 32, borderTopRightRadius: 32, width: "100%", height: 260, backgroundColor: 'white', elevation: 7 }}>
-                <View style={{ borderRadius: 15, width: "20%", height: 5, backgroundColor: '#E5E5EB', alignSelf: 'center', marginTop: 7, marginBottom: 25 }}></View>
-                <View style={{ borderRadius: 15, width: "85%", height: 120, backgroundColor: 'white', elevation: 7, alignSelf: 'center' }}>
-                    <Text style={{ fontSize: 30, color: 'black', alignSelf: 'center' }}>{formatTime(time)}</Text>
-                    <View style={{ flexDirection: 'row', marginTop: 20, justifyContent: 'space-around' }}>
-                        <View>
-                            <Text style={{ alignSelf: 'center' }}>거리</Text>
-                            <Text style={{ color: 'black', fontSize: 16, alignSelf: 'center' }}>{(distance / 1000).toFixed(2)} km</Text>
-                        </View>
-                        <View>
-                            <Text style={{ alignSelf: 'center' }}>평균 페이스</Text>
-                            <Text style={{ color: 'black', fontSize: 16, alignSelf: 'center' }}>{distance > 0
-                                ? ((distance / 1000) / (time / 3600)).toFixed(2)
-                                : '0'} km/h</Text>
-                        </View>
-                        <View>
-                            <Text style={{ alignSelf: 'center' }}>칼로리</Text>
-                            <Text style={{ color: 'black', fontSize: 16, alignSelf: 'center' }}>{(0.0055 * distance).toFixed(2)}</Text>
-                        </View>
-                    </View>
+              <TouchableOpacity
+                onPress={handleEnd}
+                style={{
+                  width: '50%',
+                  height: '100%',
+                  justifyContent: 'center',
+                }}
+              >
+                <View style={{ alignSelf: 'center', justifyContent: 'center' }}>
+                  <Text
+                    style={{
+                      color: 'black',
+                      alignSelf: 'center',
+                      fontWeight: 'bold',
+                    }}
+                  >
+                    Cancel
+                  </Text>
                 </View>
-                <View style={{ flexDirection: 'row', justifyContent: 'center', marginTop: 30 }}>
-                    <TouchableOpacity onPress={toggleTimer}>
-                        <Image style={{ height: 55, width: 55 }} source={isRunning ? stopbutton : playbutton} />
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={handleEnd}>
-                        <Image style={{ height: 55, width: 55, marginLeft: 20 }} source={endbutton} />
-                    </TouchableOpacity>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => navigation.navigate('Runningend')}
+                style={{
+                  width: '50%',
+                  height: '100%',
+                  justifyContent: 'center',
+                }}
+              >
+                <View style={{ alignSelf: 'center', justifyContent: 'center' }}>
+                  <Text
+                    style={{
+                      color: 'black',
+                      alignSelf: 'center',
+                      fontWeight: 'bold',
+                      color: 'red',
+                    }}
+                  >
+                    Finish
+                  </Text>
                 </View>
+              </TouchableOpacity>
             </View>
-
-            {slope !== null && (
-                <View style={styles.resultContainer}>
-                    <Text style={styles.slopeText}>경사: {slope.toFixed(4)} (고도 차이 / 수평 거리)</Text>
-                    <Text style={styles.infoText}>첫 번째 지점 (위도, 경도): {lat1}, {lon1}</Text>
-                    <Text style={styles.infoText}>첫 번째 지점 고도: {elevation1} 미터</Text>
-                    <Text style={styles.infoText}>두 번째 지점 (위도, 경도): {lat2}, {lon2}</Text>
-                    <Text style={styles.infoText}>두 번째 지점 고도: {elevation2} 미터</Text>
-                    <Text style={styles.infoText}>두 지점 간의 거리: {distance} km</Text>
-                    <Text style={styles.infoText}>두 지점 간의 고도 차이: {elevation2 - elevation1} m</Text>
-                </View>
-            )}
-            {end !== null && (
-                <View style={{ backgroundColor: ' rgba(0, 0, 0, 0.5)', height: '100%', width: '100%', position: 'absolute', justifyContent: 'center' }}>
-                    <View style={{ backgroundColor: 'white', height: '18%', width: '60%', alignSelf: 'center', justifyContent: 'space-between', borderRadius: 15 }}>
-                        <Text style={{ height: '50%', width: '75%', color: 'black', alignSelf: 'center', textAlign: 'center', textAlignVertical: 'center', color: 'grey', fontSize: 12, fontWeight: 'bold', marginTop: '9%' }}>종료 후 이어하기가 불가능합니다. 러닝을 그만두시겠습니까?</Text>
-                        <View style={{ flexDirection: 'row', height: '35%', width: '100%' }}>
-                            <TouchableOpacity onPress={handleEnd} style={{ width: '50%', height: '100%', justifyContent: 'center' }}>
-                                <View style={{ alignSelf: 'center', justifyContent: 'center' }}>
-                                    <Text style={{ color: 'black', alignSelf: 'center', fontWeight: 'bold' }}>Cancel</Text>
-                                </View>
-                            </TouchableOpacity>
-                            <TouchableOpacity onPress={() => navigation.navigate('Runningend')}
-                                style={{ width: '50%', height: '100%', justifyContent: 'center' }}>
-                                <View style={{ alignSelf: 'center', justifyContent: 'center' }}>
-                                    <Text style={{ color: 'black', alignSelf: 'center', fontWeight: 'bold', color: 'red' }}>Finish</Text>
-                                </View>
-                            </TouchableOpacity>
-                        </View>
-                    </View>
-
-                </View>
-            )}
+          </View>
         </View>
-    );
+      )}
+    </View>
+  );
 };
 
-
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-    },
-    map: {
-        flex: 1,
-    },
-    modalContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    },
-    modalContent: {
-        backgroundColor: 'white',
-        padding: 20,
-        borderRadius: 10,
-        width: '80%',
-    },
-    modalTitle: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        marginBottom: 10,
-    },
-    input: {
-        borderWidth: 1,
-        borderColor: '#ddd',
-        padding: 10,
-        marginBottom: 10,
-        borderRadius: 5,
-    },
-    modalButtons: {
-        flexDirection: 'row',
-        justifyContent: 'space-around',
-    },
-    routeButton: {
-        position: 'absolute',
-        top: 20,
-        right: 20,
-        backgroundColor: '#4285F4',
-        padding: 10,
-        borderRadius: 5,
-    },
-    button: {
-        padding: 10,
-        borderRadius: 5,
-    },
-    buttonText: {
-        color: 'white',
-        fontWeight: 'bold',
-    },
-    resultContainer: {
-        position: 'absolute',
-        marginTop: 20,
-        padding: 10,
-        backgroundColor: '#fff',
-        borderRadius: 5,
-        borderWidth: 1,
-        borderColor: '#ddd',
-    },
-    slopeText: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        marginBottom: 10,
-    },
-    infoText: {
-        fontSize: 14,
-        marginBottom: 5,
-    },
-    space: { height: 15 },
-
+  container: {
+    flex: 1,
+  },
+  map: {
+    flex: 1,
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    padding: 20,
+    borderRadius: 10,
+    width: '80%',
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: '#ddd',
+    padding: 10,
+    marginBottom: 10,
+    borderRadius: 5,
+  },
+  modalButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+  },
+  routeButton: {
+    position: 'absolute',
+    top: 20,
+    right: 20,
+    backgroundColor: '#4285F4',
+    padding: 10,
+    borderRadius: 5,
+  },
+  button: {
+    padding: 10,
+    borderRadius: 5,
+  },
+  buttonText: {
+    color: 'white',
+    fontWeight: 'bold',
+  },
+  resultContainer: {
+    position: 'absolute',
+    marginTop: 20,
+    padding: 10,
+    backgroundColor: '#fff',
+    borderRadius: 5,
+    borderWidth: 1,
+    borderColor: '#ddd',
+  },
+  slopeText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  infoText: {
+    fontSize: 14,
+    marginBottom: 5,
+  },
+  space: { height: 15 },
 });
 
 export default RunningScreen;
-

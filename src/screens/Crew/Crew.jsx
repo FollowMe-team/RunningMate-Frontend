@@ -13,22 +13,29 @@ import {
   BottomSheetBackdrop,
   BottomSheetModalProvider,
 } from '@gorhom/bottom-sheet';
-import { useNavigation, useRoute } from '@react-navigation/native';
+import {
+  useNavigation,
+  useRoute,
+  useFocusEffect,
+} from '@react-navigation/native';
 
 import CreateCrewButton from '../../components/Crew/CreateCrewButton';
 import MyCrewList from '../../components/Crew/MyCrewList';
 import ApplicableCrewList from '../../components/Crew/ApplicableCrewList';
 import crewData from '../../components/Crew/crew.json';
 import search from '../../assets/images/Crew/searching.png';
+import { getMyCrews } from '../../utils/crew/crew';
+import { getCrewSelect } from '../../utils/crew/crew2';
+import { searchCrews } from '../../utils/crew/crew3';
+import { getCrewDetail } from '../../utils/crew/crew';
 
 const Crew = () => {
   const navigation = useNavigation();
   const route = useRoute();
   const bottomSheetRef = useRef(null);
   const snapPoints = ['70%'];
-  const [filteredApplicableCrew, setFilteredApplicableCrew] = useState(
-    crewData.crew.filter(crew => !crew.is_my_crew),
-  );
+  const [filteredApplicableCrew, setFilteredApplicableCrew] = useState([]);
+  const [myCrews, setMyCrews] = useState([]);
 
   useEffect(() => {
     if (route.params?.type === 'search' && route.params?.searchParams) {
@@ -69,10 +76,74 @@ const Crew = () => {
     }
   }, [route.params?.searchParams]);
 
-  useEffect(() => {
-    // 크루 데이터가 변경되었을 때 다시 렌더링
-    setFilteredApplicableCrew(crewData.crew.filter(crew => !crew.is_my_crew));
-  }, [crewData]);
+  useFocusEffect(
+    useCallback(() => {
+      setFilteredApplicableCrew(crewData.crew.filter(crew => !crew.is_my_crew));
+    }, [crewData]),
+  );
+
+  useFocusEffect(
+    useCallback(() => {
+      const fetchCrews = async () => {
+        try {
+          const crews = await getMyCrews();
+          setMyCrews(crews);
+        } catch (error) {
+          console.error('Failed to fetch my crews:', error);
+          if (
+            error.message === 'No token found' ||
+            (error.response && error.response.status === 401)
+          ) {
+            alert('로그인이 필요합니다. 로그인 페이지로 이동합니다.');
+            navigation.navigate('Login');
+          } else if (error.response && error.response.status === 500) {
+            alert('서버에 문제가 발생했습니다. 잠시 후 다시 시도해주세요.');
+          }
+        }
+      };
+
+      fetchCrews();
+    }, []),
+  );
+
+  useFocusEffect(
+    useCallback(() => {
+      const fetchCrews = async () => {
+        try {
+          const crews = await getMyCrews();
+          setMyCrews(crews);
+        } catch (error) {
+          console.error('Failed to fetch my crews:', error);
+          if (
+            error.message === 'No token found' ||
+            (error.response && error.response.status === 401)
+          ) {
+            alert('로그인이 필요합니다. 로그인 페이지로 이동합니다.');
+            navigation.navigate('Login');
+          } else if (error.response && error.response.status === 500) {
+            alert('서버에 문제가 발생했습니다. 잠시 후 다시 시도해주세요.');
+          }
+        }
+      };
+
+      fetchCrews();
+    }, []),
+  );
+
+  useFocusEffect(
+    useCallback(() => {
+      const fetchCrews = async () => {
+        try {
+          const crews = await searchCrews();
+          setFilteredApplicableCrew(crews);
+        } catch (error) {
+          console.error('Failed to fetch applicable crews:', error);
+        }
+      };
+
+      fetchCrews();
+    }, []),
+  );
 
   const renderBackdrop = useCallback(
     props => (
@@ -85,8 +156,26 @@ const Crew = () => {
     [],
   );
 
-  const handleCrewPress = crew => {
-    navigation.navigate('CrewInformation', { crew });
+  const handleMyCrewPress = async crewId => {
+    try {
+      const crewDetail = await getCrewSelect(crewId);
+      navigation.navigate('MyCrew', {
+        crew: crewDetail,
+      });
+    } catch (error) {
+      console.error('Failed to fetch crew detail:', error);
+      alert('크루 정보를 불러오는데 실패했습니다.');
+    }
+  };
+
+  const handleApplicableCrewPress = async crewId => {
+    try {
+      const crewDetail = await getCrewDetail(crewId);
+      navigation.navigate('CrewInformation', { crew: crewDetail });
+    } catch (error) {
+      console.error('Failed to fetch crew detail:', error);
+      alert('크루 정보를 불러오는데 실패했습니다.');
+    }
   };
 
   return (
@@ -99,14 +188,12 @@ const Crew = () => {
               <Text style={styles.title}>내 크루 목록</Text>
               <TouchableOpacity style={styles.sortingButton}></TouchableOpacity>
             </View>
-            <MyCrewList
-              crewData={crewData.crew.filter(crew => crew.is_my_crew)}
-            />
+            <MyCrewList crewData={myCrews} onCrewPress={handleMyCrewPress} />
           </View>
           <View style={styles.dividingLine} />
           <View style={styles.crewListSet}>
             <View style={styles.titleSet}>
-              <Text style={styles.title}>크루 리스트</Text>
+              <Text style={styles.title}>추천 크루</Text>
               <TouchableOpacity style={styles.sortingButton}></TouchableOpacity>
               <TouchableOpacity
                 onPress={() => navigation.navigate('CrewSearch')}
@@ -116,7 +203,7 @@ const Crew = () => {
             </View>
             <ApplicableCrewList
               crewData={filteredApplicableCrew}
-              onCrewPress={handleCrewPress}
+              onCrewPress={handleApplicableCrewPress}
             />
           </View>
         </ScrollView>

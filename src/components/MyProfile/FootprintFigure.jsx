@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import {
   View,
@@ -9,7 +9,10 @@ import {
   TouchableOpacity,
   Animated,
 } from 'react-native';
-import reviewerData from './reviewer.json';
+import { getFootprints } from '../../utils/api';
+import Rank from '../Rank';
+import Footprint from '../Footprint';
+
 import profileImageDefault from '../../assets/images/Settings/profile.png';
 import good from '../../assets/images/MyProfile/good.png';
 import bad from '../../assets/images/MyProfile/bad.png';
@@ -32,6 +35,19 @@ const formatDate = dateString => {
 
 const FootprintFigure = ({ onClose }) => {
   const fadeAnim = useRef(new Animated.Value(0)).current;
+  const [reviews, setReviews] = useState([]);
+
+  useEffect(() => {
+    const fetchFootprints = async () => {
+      const result = await getFootprints();
+      if (result.success) {
+        setReviews(result.data);
+      } else {
+        console.error(result.message);
+      }
+    };
+    fetchFootprints();
+  }, []);
 
   useEffect(() => {
     Animated.timing(fadeAnim, {
@@ -49,56 +65,99 @@ const FootprintFigure = ({ onClose }) => {
     }).start(() => onClose());
   };
 
-  const sortedReviews = reviewerData
+  const sortedReviews = reviews
     .slice(0, 5)
-    .sort((a, b) => new Date(b.date) - new Date(a.date));
+    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
   return (
-    <Animated.View style={[styles.modalBackground, { opacity: fadeAnim }]}>
+    <View style={styles.modalBackground}>
       <View style={styles.modalContainer}>
         <Text style={styles.modalText}>나의 발걸음 리뷰</Text>
         <ScrollView>
-          {sortedReviews.map(review => (
-            <FootprintReview key={review.id} review={review} />
-          ))}
+          {sortedReviews.length > 0 ? (
+            sortedReviews.map(review => (
+              <FootprintReview key={review.footprintId} review={review} />
+            ))
+          ) : (
+            <View style={styles.noReviewsContainer}>
+              <Text style={styles.noReviewsText}>
+                리뷰한 사용자가 없습니다...
+              </Text>
+            </View>
+          )}
         </ScrollView>
         <TouchableOpacity onPress={handleClose}>
           <Text style={styles.modalButtonText}>나가기</Text>
         </TouchableOpacity>
       </View>
-    </Animated.View>
+    </View>
   );
 };
 
 const FootprintReview = ({ review }) => {
+  const profileImageSource = review.memberInfo?.profileImageUrl
+    ? { uri: review.memberInfo.profileImageUrl }
+    : profileImageDefault;
+
   return (
     <View style={styles.reviewContainer}>
       <View style={styles.reviewTitleSet}>
-        <View style={{ flexDirection: 'row' }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
           <Image
-            source={profileImageDefault}
+            source={profileImageSource}
             style={{ width: 30, height: 30, borderRadius: 100 }}
           />
-          <Text style={styles.reviewTitleText}>{review.nickname}</Text>
-          <Text style={styles.reviewDateText}>{formatDate(review.date)}</Text>
+          <Text style={styles.reviewTitleText}>
+            {review.memberInfo?.nickname || '익명'}
+          </Text>
+          {review.memberInfo && (
+            <>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  marginRight: 5,
+                }}
+              >
+                <Rank rank={review.memberInfo.ranking} />
+              </View>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  marginRight: 5,
+                }}
+              >
+                <Footprint experience={review.memberInfo.footPrint} />
+              </View>
+            </>
+          )}
+          <Text style={styles.reviewDateText}>
+            {formatDate(review.createdAt)}
+          </Text>
         </View>
         <Image
-          source={review.isGood ? good : bad}
+          source={review.footprintType === 'GOOD' ? good : bad}
           style={{ width: 20, height: 20 }}
         />
       </View>
-      <Text style={styles.reviewText}>{review.review}</Text>
+      <Text style={styles.reviewText}>{review.content}</Text>
     </View>
   );
 };
 
 FootprintReview.propTypes = {
   review: PropTypes.shape({
-    id: PropTypes.number.isRequired,
-    nickname: PropTypes.string.isRequired,
-    date: PropTypes.string.isRequired,
-    isGood: PropTypes.bool.isRequired,
-    review: PropTypes.string.isRequired,
+    footprintId: PropTypes.number.isRequired,
+    memberInfo: PropTypes.shape({
+      nickname: PropTypes.string,
+      profileImageUrl: PropTypes.string,
+      ranking: PropTypes.string,
+      footPrint: PropTypes.number,
+    }),
+    footprintType: PropTypes.string.isRequired,
+    content: PropTypes.string.isRequired,
+    createdAt: PropTypes.string.isRequired,
   }).isRequired,
 };
 
@@ -108,11 +167,7 @@ FootprintFigure.propTypes = {
 
 const styles = StyleSheet.create({
   modalBackground: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
@@ -171,6 +226,16 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: 'regular',
     lineHeight: 20,
+  },
+  noReviewsContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: 200,
+  },
+  noReviewsText: {
+    fontSize: 16,
+    color: 'gray',
   },
 });
 

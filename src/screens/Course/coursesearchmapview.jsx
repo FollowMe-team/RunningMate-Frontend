@@ -1,7 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
-    View,
-    Animated, StyleSheet, Alert, TouchableOpacity, Text, TextInput, Modal
+  View,
+  Animated,
+  StyleSheet,
+  Alert,
+  TouchableOpacity,
+  Text,
+  TextInput,
+  Modal,
 } from 'react-native';
 import MapView, { PROVIDER_GOOGLE, Marker, Polyline } from 'react-native-maps';
 import Geolocation from '@react-native-community/geolocation';
@@ -493,10 +499,55 @@ const RunningScreen = ({ route }) => {
                     <Text style={styles.infoText}>두 지점 간의 고도 차이: {elevation2 - elevation1} m</Text>
                 </View>
             )}
-        </View>
-    );
-};
 
+        </View>
+
+        <TouchableOpacity
+          onPress={() => navigation.navigate('Reviewed')}
+          style={styles.greenbutton}
+        >
+          <View
+            style={{ flexDirection: 'row', justifyContent: 'space-between' }}
+          >
+            <Image
+              style={{ width: 40, height: 40, marginTop: 20 }}
+              source={runningman}
+            />
+            <Text style={styles.whitetext}>코스 달리기</Text>
+
+            <Image
+              style={{ width: 32, height: 32, alignSelf: 'center' }}
+              source={whiteplus}
+            />
+          </View>
+        </TouchableOpacity>
+      </View>
+      {slope !== null && (
+        <View style={styles.resultContainer}>
+          <Text style={styles.slopeText}>
+            경사: {slope.toFixed(4)} (고도 차이 / 수평 거리)
+          </Text>
+          <Text style={styles.infoText}>
+            첫 번째 지점 (위도, 경도): {lat1}, {lon1}
+          </Text>
+          <Text style={styles.infoText}>
+            첫 번째 지점 고도: {elevation1} 미터
+          </Text>
+          <Text style={styles.infoText}>
+            두 번째 지점 (위도, 경도): {lat2}, {lon2}
+          </Text>
+          <Text style={styles.infoText}>
+            두 번째 지점 고도: {elevation2} 미터
+          </Text>
+          <Text style={styles.infoText}>두 지점 간의 거리: {distance} km</Text>
+          <Text style={styles.infoText}>
+            두 지점 간의 고도 차이: {elevation2 - elevation1} m
+          </Text>
+        </View>
+      )}
+    </View>
+  );
+};
 
 const styles = StyleSheet.create({
 
@@ -623,4 +674,3 @@ const styles = StyleSheet.create({
 });
 
 export default RunningScreen;
-

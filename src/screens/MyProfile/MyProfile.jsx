@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { View, ScrollView, StyleSheet } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { View, StyleSheet, Animated, Modal } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 
 import ProfileBox from '../../components/MyProfile/ProfileBox';
@@ -19,16 +19,23 @@ const MyProfile = () => {
   const [badges, setBadges] = useState([]);
   const [badgesLoading, setBadgesLoading] = useState(true);
   const [monthlyRecords, setMonthlyRecords] = useState([]);
-  const [recordsLoading, setRecordsLoading] = useState(true);
   const [isFootprintFigureVisible, setFootprintFigureVisible] = useState(false);
+  const scrollY = useRef(new Animated.Value(0)).current;
+  const [isMinimized, setIsMinimized] = useState(false);
+  const lastScrollY = useRef(0);
+  const scrollDirection = useRef('');
 
   const fetchMonthlyRecords = async yearMonth => {
-    setRecordsLoading(true);
-    const result = await getMonthlyRecords(yearMonth);
-    if (result.success) {
-      setMonthlyRecords(result.data);
+    try {
+      const result = await getMonthlyRecords(yearMonth);
+      if (result.success) {
+        setMonthlyRecords(result.data);
+      } else {
+        console.error(result.message);
+      }
+    } catch (error) {
+      console.error('Failed to fetch monthly records:', error);
     }
-    setRecordsLoading(false);
   };
 
   useFocusEffect(
@@ -57,14 +64,8 @@ const MyProfile = () => {
       setBadgesLoading(false);
     };
 
-    const today = new Date();
-    const yearMonth = `${today.getFullYear()}-${String(
-      today.getMonth() + 1,
-    ).padStart(2, '0')}`;
-
     fetchProfile();
     fetchBadges();
-    fetchMonthlyRecords(yearMonth);
   }, []);
 
   const handleDayPress = day => {
@@ -76,43 +77,83 @@ const MyProfile = () => {
     );
   };
 
+  const handleScroll = Animated.event(
+    [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+    {
+      useNativeDriver: true,
+      listener: ({ nativeEvent }) => {
+        const currentScrollY = nativeEvent.contentOffset.y;
+
+        // 스크롤 방향 감지
+        if (currentScrollY > lastScrollY.current) {
+          scrollDirection.current = 'down';
+        } else if (currentScrollY < lastScrollY.current) {
+          scrollDirection.current = 'up';
+        }
+
+        // 스크롤 위치에 따른 상태 변경
+        if (currentScrollY > 50 && scrollDirection.current === 'down') {
+          setIsMinimized(true);
+        } else if (currentScrollY <= 50 && scrollDirection.current === 'up') {
+          setIsMinimized(false);
+        }
+
+        lastScrollY.current = currentScrollY;
+      },
+    },
+  );
+
   return (
-    <ScrollView style={styles.container}>
-      {profileData.loading ? (
-        <Skeleton />
-      ) : (
-        profileData.data && (
-          <ProfileBox
-            data={profileData.data}
-            setFootprintFigureVisible={setFootprintFigureVisible}
-          />
-        )
-      )}
-      <Tabs activeTab={activeTab} setActiveTab={setActiveTab} />
-      <View contentContainerStyle={styles.contentContainer}>
-        {activeTab === 'record' ? (
-          recordsLoading ? (
-            <Skeleton />
-          ) : (
+    <View style={styles.container}>
+      <View style={styles.headerContainer}>
+        {profileData.loading ? (
+          <Skeleton />
+        ) : (
+          profileData.data && (
+            <ProfileBox
+              data={profileData.data}
+              setFootprintFigureVisible={setFootprintFigureVisible}
+              isMinimized={isMinimized}
+            />
+          )
+        )}
+      </View>
+      <Animated.ScrollView
+        contentContainerStyle={[
+          styles.contentContainer,
+          { paddingTop: isMinimized ? 100 : 340 },
+        ]}
+        onScroll={handleScroll}
+        scrollEventThrottle={16}
+      >
+        <View style={{ marginTop: isMinimized ? 80 : 320 }}>
+          <Tabs activeTab={activeTab} setActiveTab={setActiveTab} />
+          {activeTab === 'record' ? (
             <RecordView
               handleDayPress={handleDayPress}
               selectedRecord={selectedRecord}
               records={monthlyRecords}
               fetchMonthlyRecords={fetchMonthlyRecords}
-              Calendars={Calendars} // Calendars 컴포넌트를 RecordView에 전달
+              Calendars={Calendars}
             />
-          )
-        ) : badgesLoading ? (
-          <Skeleton />
-        ) : (
-          <ActivityView badges={badges} />
-        )}
-
-      </View>
+          ) : badgesLoading ? (
+            <Skeleton />
+          ) : (
+            <ActivityView badges={badges} />
+          )}
+        </View>
+      </Animated.ScrollView>
       {isFootprintFigureVisible && (
-        <FootprintFigure onClose={() => setFootprintFigureVisible(false)} />
+        <Modal
+          transparent={true}
+          animationType="fade"
+          visible={isFootprintFigureVisible}
+          onRequestClose={() => setFootprintFigureVisible(false)}
+        >
+          <FootprintFigure onClose={() => setFootprintFigureVisible(false)} />
+        </Modal>
       )}
-    </ScrollView>
+    </View>
   );
 };
 
@@ -120,11 +161,17 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     marginHorizontal: 20,
-    paddingBottom: 100,
+  },
+  headerContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    zIndex: 1,
+    backgroundColor: 'white',
   },
   contentContainer: {
     flexGrow: 1,
-    width: '100%',
   },
   closeButton: {
     marginTop: 10,

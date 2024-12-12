@@ -1,5 +1,7 @@
+
 import React, { useState, useEffect } from 'react';
 import { TextInput, TouchableOpacity, StyleSheet, View, Text, Alert, Pressable, Image } from 'react-native';
+
 import { useNavigation } from '@react-navigation/native';
 
 import subscribe from '../../assets/images/Course/subscribe.png';
@@ -113,8 +115,6 @@ const styles = StyleSheet.create({
     whitetext_run: { color: 'white', fontSize: 16, fontWeight: 'bold', marginRight: 12, textAlign: 'center' },
 
 });
-
-
 
 const Course_basic = ({ data }) => {
     const navigation = useNavigation();
