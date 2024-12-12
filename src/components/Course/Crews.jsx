@@ -3,14 +3,13 @@ import React, { useCallback, useMemo, useRef, useEffect, useState } from 'react'
 import { TextInput, StyleSheet, TouchableOpacity, View, Text, Alert, Pressable, Image, ScrollView, ImageBackground } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
-import subscribe from '../../assets/images/Course/subscribe.png';
-import subscribed from '../../assets/images/Course/subscribed.png'
 import mapview from '../../assets/images/Course/mapforcourseview.png';
 import whiteplus from '../../assets/images/Course/whiteplus.png';
 import location from '../../assets/images/Course/location.png';
 import time from '../../assets/images/Course/time.png';
 import runningman from '../../assets/images/Course/runningmanforchoosebutton.png';
 import yellowstar from '../../assets/images/Course/star.png';
+import greystar from '../../assets/images/Course/greystar.png';
 import runner from '../../assets/images/Course/runner.png';
 import sprinter from '../../assets/images/Course/sprinter.png';
 import profileimage from '../../assets/images/Course/profileimage.png';
@@ -18,11 +17,21 @@ import qmark from '../../assets/images/Course/Qmark.png';
 import more from '../../assets/images/Course/more.png';
 import examplepic from '../../assets/images/Course/marathonpic.png';
 import reviewbutton from '../../assets/images/Course/reviewbutton.png';
-import Reviews from '../../components/Course/reviews';
-import Crews from '../../components/Course/Crews';
-import { getCourseDetail } from '../../utils/courseapi';
-import MapDetails from '../../components/Course/MapDetails';
-import { BookCourse, unBookCourse } from '../../utils/courseapi';
+import footprint1 from '../../assets/images/rank/footprint1.png';
+import footprint2 from '../../assets/images/rank/footprint2.png';
+import footprint3 from '../../assets/images/rank/footprint3.png';
+import footprint4 from '../../assets/images/rank/footprint4.png';
+import footprint5 from '../../assets/images/rank/footprint5.png';
+import footprint6 from '../../assets/images/rank/footprint6.png';
+import ironlegsbadge from '../../assets/images/rank/iron-legs-badge.png';
+import joggerbadge from '../../assets/images/rank/jogger-badge.png';
+import marathonerbadge from '../../assets/images/rank/marathoner-badge.png';
+import racerbadge from '../../assets/images/rank/racer-badge.png';
+import runnerbadge from '../../assets/images/rank/runner-badge.png';
+import speeddemonbadge from '../../assets/images/rank/speed-demon-badge.png';
+import sprinterbadge from '../../assets/images/rank/sprinter-badge.png';
+import ultrarunnerbadge from '../../assets/images/rank/ultra-runner-badge.png';
+
 
 const styles = StyleSheet.create({
     space: { height: 15 },
@@ -90,77 +99,50 @@ const styles = StyleSheet.create({
 
 
 
-const Reviewed = ({ route, navigated }) => {
-    const ids = route.params;
+const Course_basic = ({ data }) => {
     const navigation = useNavigation();
-    const [Coursedetails, setCoursedetails] = useState();
-    const [Coursesuccess, setCoursesuccess] = useState(false);
-    const [subs, setsubs] = useState(false);
-
-    useEffect(() => {
-        const fetchCoursedetails = async idss => {
-            const result = await getCourseDetail(idss);
-            setCoursedetails(result.data);
-            setCoursesuccess(result.success);
-            setsubs(result.data.bookmarked);
-        };
-        fetchCoursedetails(ids.id);
-    }, [subs]);
 
 
-    const handlebookToggle = async () => {
-        let result;
-        if (subs) {
-            result = await unBookCourse(route.params.id);
-        } else {
-            result = await BookCourse(route.params.id);
-        }
-        const newsub = !subs;
-        console.log("subs", subs);
-        setsubs(newsub);
-    };
     return (
-        < ScrollView >
-            {Coursesuccess === true ? 
-                <View>
-                    <TouchableOpacity onPress={handlebookToggle}
-                    >
-                        <Image
-                            style={{ width: 25, height: 25, right: 33, top: 0, position: 'absolute' }}
-                            source={Coursedetails.bookmarked === true ? subscribed : subscribe}
-                        /></TouchableOpacity>
-                    <MapDetails data={Coursedetails} />
-                    <TouchableOpacity onPress={() => navigation.navigate('Reviewlist', { data: Coursedetails })}>
+        <View style={styles.smallboxlist}>
+            <Image
+                style={{ width: 42, height: 42,borderRadius:21, alignSelf: 'center', marginLeft: 10, marginRight: 5 }}
+                source={data.profileImageUrl && data.profileImageUrl !== null
+                    ? { uri: data.profileImageUrl }
+                    : profileimage} />
+            <View style={{ justifyContent: 'center', width: "84%" }}>
+                <View style={{ flexWrap: 'wrap', flexDirection: 'row', justifyContent: 'space-between' }}>
+                    <View style={{ flexWrap: 'wrap', flexDirection: 'row' }}>
+                        <Text style={{ color: 'black', fontSize: 16 }}>
+                            {data.name}</Text>
 
-                        {Coursedetails.reviewCount > 2 &&
-                            <Text style={{
-                                height: 'auto', width: 65, fontSize: 10,
-                                borderRadius: 15, color: 'black', backgroundColor: '#DADADA', textAlign: 'center', textAlignVertical: 'center', paddingVertical: 4, alignSelf: 'center', marginBottom: 15
-                            }}>리뷰 더보기</Text>
-                        }
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={() => navigation.navigate('Runningtime', {data : Coursedetails})}
-
-                        style={styles.greenbutton}>
-                        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                    </View>
+                    <TouchableOpacity onPress={() => navigation.navigate('Main')}>
+                        <View style={{ flexWrap: 'wrap', flexDirection: 'row' }}>
                             <Image
-                                style={{ width: 40, height: 40, marginTop: 20 }}
-                                source={runningman}
-                            />
-                            <Text style={styles.whitetext}>
-                                코스 달리기</Text>
-
-                            <Image
-                                style={{ width: 32, height: 32, alignSelf: 'center' }}
-                                source={whiteplus}
+                                style={{ width: 20, height: 20, alignSelf: 'flex-end', marginRight: 15 }}
+                                source={qmark}
                             />
                         </View>
                     </TouchableOpacity>
-                </View> : <Text>{ids.id}</Text>
-            }
-        </ScrollView >
+                </View>
+                <View style={{ flexWrap: 'wrap', flexDirection: 'row', justifyContent: 'space-between', marginBottom: 3 }}>
+                    <Text
+                        style={{ color: 'grey', fontSize: 10, textAlignVertical: 'center' }}
+                    >{data.shortDescription}</Text>
+                    <Text
+                        style={{ color: 'grey', fontSize: 10, textAlignVertical: 'center', marginRight:-220 }}
+                    >{data.memberCount}명</Text>
+                    <View style={{ flexWrap: 'wrap', flexDirection: 'row', marginRight: 12 }}>
+
+
+                    </View>
+
+                </View>
+            </View>
+        </View>
 
     );
 }
 
-export default Reviewed;
+export default Course_basic;

@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { TouchableOpacity, TextInput, StyleSheet, View, Text, Alert, Pressable, Image, ImageBackground, ScrollView } from 'react-native';
+import { TouchableOpacity, TextInput, StyleSheet, View, Text, Alert, Pressable, Image, ImageBackground, ScrollView, Modal } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Dropdown } from 'react-native-element-dropdown';
 
@@ -14,19 +14,71 @@ import whiteplus from '../../assets/images/Course/whiteplus.png';
 import StartPhotoPicker from './startphotochange';
 import EndPhotoPicker from './endphotochange';
 import LeaderPhotoPicker from './leaderphotochange';
+import { checkName } from '../../utils/courseapi';
 
 const styles = StyleSheet.create({
     space: { height: 15 },
-
+    inputContainer: {
+        position: 'relative',
+        borderRadius: 15, width: "90%",
+        alignSelf: 'center',
+        backgroundColor: 'white', elevation: 7,
+    },
+    modalBackground: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    },
+    modalContainer: {
+        width: 250,
+        paddingHorizontal: 20,
+        paddingVertical: 30,
+        backgroundColor: 'white',
+        borderRadius: 10,
+        alignItems: 'center',
+    },
+    modalText: {
+        fontSize: 12,
+        fontWeight: 'bold',
+        color: '#959393',
+        textAlign: 'center',
+        marginBottom: 50,
+    },
+    modalButtonText: {
+        fontSize: 12,
+        fontWeight: 'bold',
+        color: '#00C81B',
+    },
+    input: {
+        color: 'black', borderRadius: 15,
+        height: 50,
+        borderRadius: 8,
+        borderColor: '#D6D6D6',
+        borderWidth: 1,
+        paddingHorizontal: 10,
+    },
     greenbutton: {
         width: 350, height: 60,
         borderColor: 'white',
         backgroundColor: '#73D393',
         borderWidth: 0,
-        borderRadius: 15, FlexDirection: 'row',marginBottom:20,
+        borderRadius: 15, FlexDirection: 'row', marginBottom: 20,
         alignItems: "center", justifyContent: "center", alignSelf: "center"
     },
-
+    nicknameCheckButton: {
+        position: 'absolute',
+        right: 10,
+        top: 8,
+        backgroundColor: '#352555',
+        borderRadius: 32,
+        paddingVertical: 10,
+        paddingHorizontal: 15,
+    },
+    nicknameCheckButtonText: {
+        color: 'white',
+        fontSize: 10,
+    },
     whitetext: { color: 'white', fontSize: 22, fontWeight: 'bold', textAlign: 'center', textAlignVertical: 'center', marginLeft: 60, marginRight: 60 },
 
     titletext: { color: 'black', fontSize: 15, marginLeft: 30, fontWeight: 'bold', marginVertical: 12 },
@@ -59,6 +111,46 @@ const Savingcourse = () => {
     const [Coursedata, setCourse] = useState('');
     const [end, setEnd] = useState(null);
 
+    const [nickname, setNickname] = useState('');
+    const [info, setInfo] = useState('');
+    const [birthday, setBirthday] = useState('');
+    const [gender, setGender] = useState('');
+    const [address, setAddress] = useState('');
+    const [showDatePicker, setShowDatePicker] = useState(false);
+    const [nicknameError, setNicknameError] = useState('');
+    const [modalVisible, setModalVisible] = useState(false);
+    const [isNicknameChecked, setIsNicknameChecked] = useState(false);
+    const [modalMessage, setModalMessage] = useState('');
+    const handleNicknameCheck = async () => {
+        try {
+            const response = await checkName(nickname);
+
+            if (!response.isDuplicated) {
+                setIsNicknameChecked(true);
+                setNicknameError('');
+                setModalMessage('사용 가능한 코스 이름입니다.');
+                setModalVisible(true);
+            } else {
+                setIsNicknameChecked(false);
+                setNicknameError('이미 사용 중인 코스 이름입니다.');
+                setModalMessage('이미 사용 중인 코스 이름입니다.');
+                setModalVisible(true);
+            }
+        } catch {
+            setIsNicknameChecked(false);
+            setNicknameError('코스 이름 확인 중 오류가 발생했습니다.');
+            setModalMessage('코스 이름 확인 중 오류가 발생했습니다.');
+            setModalVisible(true);
+        }
+    };
+
+    const validateNickname = nickname => {
+        setNickname(nickname);
+        setIsNicknameChecked(false); // 닉네임이 변경되면 중복 확인 상태를 초기화
+    };
+    const closeModal = () => {
+        setModalVisible(false);
+    };
     const handleEnd = () => {
         if (end !== null) {
             // 이미 정보가 표시된 상태라면, 정보 초기화 (토글 효과)
@@ -68,27 +160,28 @@ const Savingcourse = () => {
         }
     }
     const CourseDatas = [
-        { label: "숲길", value: '숲길' },
-        { label: "강변", value: '강변' },
-        { label: "호숫가", value: '호숫가' },
-        { label: "산길", value: '산길' },
-        { label: "해변", value: '해변' },
-        { label: "도심", value: '도심' },
-        { label: "공원", value: '공원' },
-        { label: "트랙", value: '트랙' },
-        { label: "캠퍼스", value: '캠퍼스' },
-        { label: "트레일", value: '트레일' }
+        { label: "숲길", value: 'FOREST' },
+        { label: "강변", value: 'RIVERSIDE' },
+        { label: "호숫가", value: 'LAKESIDE' },
+        { label: "산길", value: 'MOUNTAIN' },
+        { label: "해변", value: 'SEASIDE' },
+        { label: "도심", value: 'CITYSCAPE' },
+        { label: "공원", value: 'PARK' },
+        { label: "트랙", value: 'TRACK' },
+        { label: "캠퍼스", value: 'CAMPUS' },
+        { label: "트레일", value: 'TRAIL' }
     ]
     const [Stairsdata, setStairs] = useState('');
     const StairDatas = [
-        { label: "계단 있음", value: '계단있음' },
-        { label: "계단 없음", value: '계단없음' }
+        { label: "경사가 심함", value: 'GRADIENT_HIGH' },
+        { label: "경사가 중간", value: 'GRADIENT_MIDDLE' },
+        { label: "경사가 약함", value: 'GRADIENT_LOW' }
     ]
     const [Optiondata, setOption] = useState('');
     const OptionDatas = [
-        { label: "강아지 산책 가능", value: '강아지' },
-        { label: "자전거 이용 가능", value: '자전거' },
-        { label: "유모차 산책 가능", value: '유모차' }
+        { label: "강아지 산책 가능", value: 'DOG_WALKABLE' },
+        { label: "자전거 이용 가능", value: 'BICYCLE_WALKABLE' },
+        { label: "유모차 산책 가능", value: 'BABY_WALKABLE' }
     ]
 
 
@@ -117,9 +210,21 @@ const Savingcourse = () => {
                 </View>
             </View>
             <Text style={styles.titletext}>코스명</Text>
-            <View style={{ borderRadius: 15, width: "90%", height: 60, backgroundColor: 'white', elevation: 7, alignSelf: 'center', justifyContent: 'center' }}>
-                <Text style={{ borderRadius: 50, width: "22%", height: "75%", backgroundColor: '#352555', elevation: 7, alignSelf: 'flex-end', color: 'white', textAlign: 'center', textAlignVertical: 'center', fontSize: 13, marginRight: 8 }}>
-                    중복 체크</Text>
+            <View style={styles.inputContainer}>
+                <TextInput
+                    style={styles.input}
+                    value={nickname}
+                    onChangeText={validateNickname}
+                />
+                <TouchableOpacity
+                    style={styles.nicknameCheckButton}
+                    onPress={handleNicknameCheck}
+                >
+                    <Text style={styles.nicknameCheckButtonText}>중복 체크</Text>
+                </TouchableOpacity>
+                {nicknameError ? (
+                    <Text style={styles.errorText}>{nicknameError}</Text>
+                ) : null}
             </View>
             <Text style={styles.titletext}>코스 설명</Text>
             <TextInput style={{ borderRadius: 15, width: "90%", height: 130, backgroundColor: 'white', elevation: 7, alignSelf: 'center' }}>
@@ -213,8 +318,8 @@ const Savingcourse = () => {
                         source={whiteplus}
                     />
                 </View>
-            </TouchableOpacity> 
-            {end !== null && (
+            </TouchableOpacity>
+            {end !== null && modalMessage === '사용 가능한 코스 이름입니다.' && (
                 <View style={{ backgroundColor: ' rgba(0, 0, 0, 0.5)', height: '100%', width: '100%', position: 'absolute', justifyContent: 'center' }}>
                     <View style={{ backgroundColor: 'white', height: '18%', width: '60%', alignSelf: 'center', justifyContent: 'space-between', borderRadius: 15 }}>
                         <Text style={{ height: '50%', width: '70%', color: 'black', alignSelf: 'center', textAlign: 'center', textAlignVertical: 'center', color: 'grey', fontSize: 12, fontWeight: 'bold', marginTop: '9%' }}>종료 후에는 변경이 불가합니다. 해당 내용으로 등록하시겠습니까?</Text>
@@ -235,6 +340,36 @@ const Savingcourse = () => {
 
                 </View>
             )}
+            {end !== null && modalMessage != '사용 가능한 코스 이름입니다.' && (
+                <View style={{ backgroundColor: ' rgba(0, 0, 0, 0.5)', height: '100%', width: '100%', position: 'absolute', justifyContent: 'center' }}>
+                    <View style={{ backgroundColor: 'white', height: '18%', width: '60%', alignSelf: 'center', justifyContent: 'space-between', borderRadius: 15 }}>
+                        <Text style={{ height: '50%', width: '70%', color: 'black', alignSelf: 'center', textAlign: 'center', textAlignVertical: 'center', color: 'grey', fontSize: 12, fontWeight: 'bold', marginTop: '9%' }}>코스 네임 중복 인증을 마치세요.</Text>
+                        <View style={{ flexDirection: 'row', height: '35%', width: '100%' }}>
+                            <TouchableOpacity onPress={handleEnd} style={{ width: '100%', height: '100%', justifyContent: 'center' }}>
+                                <View style={{ alignSelf: 'center', justifyContent: 'center' }}>
+                                    <Text style={{ color: 'black', alignSelf: 'center', fontWeight: 'bold' }}>Cancel</Text>
+                                </View>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+
+                </View>
+            )}
+            <Modal
+                transparent={true}
+                visible={modalVisible}
+                onRequestClose={closeModal}
+                animationType="fade"
+            >
+                <View style={styles.modalBackground}>
+                    <View style={styles.modalContainer}>
+                        <Text style={styles.modalText}>{modalMessage}</Text>
+                        <TouchableOpacity onPress={closeModal}>
+                            <Text style={styles.modalButtonText}>확인</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </Modal>
         </ScrollView>
     );
 }

@@ -80,7 +80,7 @@ const styles = StyleSheet.create({
         borderRadius: 15,
         alignItems: "center", justifyContent: "center",
     },
-    starsize: { height: 30, width: 30, marginLeft: 20, marginRight: 10, marginTop:5 },
+    starsize: { height: 30, width: 30, marginLeft: 20, marginRight: 10, marginTop: 5 },
 
     inputbar: { borderRadius: 10, width: "78%", height: 40, backgroundColor: 'white', elevation: 7, alignSelf: 'center', paddingLeft: 10, textAlignVertical: 'center', fontSize: 14, color: 'grey' },
     inputbar2: { borderRadius: 10, width: "87%", height: 32, backgroundColor: 'white', elevation: 7, alignSelf: 'center', paddingLeft: 10, textAlignVertical: 'center', marginTop: 15, justifyContent: 'center' },
@@ -96,6 +96,7 @@ const Coursesearch = ({ route }) => {
     const [selectedelevationButton, setSelectedelevationButton] = useState([]);
     const [selectedenvironmentButton, setSelectedenvironmentButton] = useState([]);
     const [selectedoptionmentButton, setSelectedoptionButton] = useState([]);
+    const [word, setword] = useState('');
 
     const selectedLocation = route.params?.selectedLocation || {
         address: '주소를 검색해주세요',
@@ -103,35 +104,35 @@ const Coursesearch = ({ route }) => {
         longitude: null
     };
     const distance = [
-        { id: 0, label: '# 3KM 미만' },
-        { id: 1, label: '# 3~5KM' },
-        { id: 2, label: '# 5~10KM' },
-        { id: 3, label: '# 10KM 이상' }
+        { id: 0, label: '# 3KM 미만', value: '3km_under' },
+        { id: 1, label: '# 3~5KM', value: '3_5km' },
+        { id: 2, label: '# 5~10KM', value: '5_10km' },
+        { id: 3, label: '# 10KM 이상', value: '10km_over' }
     ];
 
     const elevations = [
-        { id: 0, label: '# 평지' },
-        { id: 1, label: '# 약함' },
-        { id: 2, label: '# 중간' },
-        { id: 3, label: '# 강함' }
+        { id: 0, label: '# 평지', value: 'GRADIENT_NONE' },
+        { id: 1, label: '# 약함', value: 'GRADIENT_LOW' },
+        { id: 2, label: '# 중간', value: 'GRADIENT_MIDDLE' },
+        { id: 3, label: '# 강함', value: 'GRADIENT_HIGH' }
     ];
     const environment = [
-        { id: 0, label: '# 숲길' },
-        { id: 1, label: '# 강변' },
-        { id: 2, label: '# 호숫가' },
-        { id: 3, label: '# 산길' },
-        { id: 4, label: '# 해변' },
-        { id: 5, label: '# 도심' },
-        { id: 6, label: '# 공원' },
-        { id: 7, label: '# 트랙' },
-        { id: 8, label: '# 캠퍼스' },
-        { id: 9, label: '# 트레일' }
+        { id: 0, label: '# 숲길', value: 'FOREST' },
+        { id: 1, label: '# 강변', value: 'RIVERSIDE' },
+        { id: 2, label: '# 호숫가', value: 'LAKESIDE' },
+        { id: 3, label: '# 산길', value: 'MOUNTAIN' },
+        { id: 4, label: '# 해변', value: 'SEASIDE' },
+        { id: 5, label: '# 도심', value: 'CITYSCAPE' },
+        { id: 6, label: '# 공원', value: 'PARK' },
+        { id: 7, label: '# 트랙', value: 'TRACK' },
+        { id: 8, label: '# 캠퍼스', value: 'CAMPUS' },
+        { id: 9, label: '# 트레일', value: 'TRAIL' }
     ];
 
     const option = [
-        { id: 0, label: '# 강아지 산책 가능' },
-        { id: 1, label: '# 자전거 사용 가능' },
-        { id: 2, label: '# 유모차 산책 가능' },
+        { id: 0, label: '# 강아지 산책 가능', value: 'DOG_WALKABLE' },
+        { id: 1, label: '# 자전거 사용 가능', value: 'BICYCLE_WALKABLE' },
+        { id: 2, label: '# 유모차 산책 가능', value: 'BABY_WALKABLE' },
     ];
 
     const [Leveldata, setLevel] = useState('');
@@ -142,34 +143,70 @@ const Coursesearch = ({ route }) => {
     ]
 
 
-    const handledistanceButtonPress = (buttonId) => {
-        setSelecteddistanceButton(prev =>
-            prev.includes(buttonId)
-                ? prev.filter(id => id !== buttonId)
-                : [...prev, buttonId]
-        );
+    const handledistanceButtonPress = (button) => {
+        setSelecteddistanceButton(prev => {
+            // 이미 선택된 버튼이면 제거, 아니면 추가
+            const isAlreadySelected = prev.some(item => item.id === button.id);
+
+            if (isAlreadySelected) {
+                return prev.filter(item => item.id !== button.id);
+            } else {
+                return [...prev, {
+                    id: button.id,
+                    label: button.label,
+                    value: button.value
+                }];
+            }
+        });
     };
 
-    const handleelevationButtonPress = (buttonId) => {
-        setSelectedelevationButton(prev =>
-            prev.includes(buttonId)
-                ? prev.filter(id => id !== buttonId)
-                : [...prev, buttonId]
-        );
+    const handleelevationButtonPress = (button) => {
+        setSelectedelevationButton(prev => {
+            // 이미 선택된 버튼이면 제거, 아니면 추가
+            const isAlreadySelected = prev.some(item => item.id === button.id);
+
+            if (isAlreadySelected) {
+                return prev.filter(item => item.id !== button.id);
+            } else {
+                return [...prev, {
+                    id: button.id,
+                    label: button.label,
+                    value: button.value
+                }];
+            }
+        });
     };
-    const handleenvironmentButtonPress = (buttonId) => {
-        setSelectedenvironmentButton(prev =>
-            prev.includes(buttonId)
-                ? prev.filter(id => id !== buttonId)
-                : [...prev, buttonId]
-        );
+    const handleenvironmentButtonPress = (button) => {
+        setSelectedenvironmentButton(prev => {
+            // 이미 선택된 버튼이면 제거, 아니면 추가
+            const isAlreadySelected = prev.some(item => item.id === button.id);
+
+            if (isAlreadySelected) {
+                return prev.filter(item => item.id !== button.id);
+            } else {
+                return [...prev, {
+                    id: button.id,
+                    label: button.label,
+                    value: button.value
+                }];
+            }
+        });
     };
-    const handleoptionButtonPress = (buttonId) => {
-        setSelectedoptionButton(prev =>
-            prev.includes(buttonId)
-                ? prev.filter(id => id !== buttonId)
-                : [...prev, buttonId]
-        );
+    const handleoptionButtonPress = (button) => {
+        setSelectedoptionButton(prev => {
+            // 이미 선택된 버튼이면 제거, 아니면 추가
+            const isAlreadySelected = prev.some(item => item.id === button.id);
+
+            if (isAlreadySelected) {
+                return prev.filter(item => item.id !== button.id);
+            } else {
+                return [...prev, {
+                    id: button.id,
+                    label: button.label,
+                    value: button.value
+                }];
+            }
+        });
     };
     return (
         <ScrollView>
@@ -177,7 +214,7 @@ const Coursesearch = ({ route }) => {
                 <TouchableOpacity style={{ alignSelf: 'center' }} onPress={() => navigation.navigate('Coursesearchmaplist')}>
                     <Image style={{ width: 20, height: 20, alignSelf: 'center', marginRight: 5 }} source={Qmark} />
                 </TouchableOpacity>
-                <TextInput style={{ textAlignVertical: 'center' }}>코스명 또는 지역명</TextInput>
+                <TextInput onChangeText={text => setword(text)} style={{ textAlignVertical: 'center' } }>코스명 또는 지역명</TextInput>
             </View>
 
             <View style={styles.space}></View>
@@ -222,13 +259,13 @@ const Coursesearch = ({ route }) => {
                     <TouchableOpacity
                         key={button.id}
 
-                        onPress={() => handledistanceButtonPress(button.id)}
+                        onPress={() => handledistanceButtonPress(button)}
                     >
                         <Text
                             style={[
                                 styles.whitesharptext,
                                 // 선택된 버튼일 경우 텍스트 색상 변경
-                                selecteddistacneButton.includes(button.id) && styles.greensharptext
+                                selecteddistacneButton.some(item => item.id === button.id) && styles.greensharptext
                             ]}
                         >
                             {button.label}
@@ -246,13 +283,13 @@ const Coursesearch = ({ route }) => {
                     <TouchableOpacity
                         key={button.id}
 
-                        onPress={() => handleelevationButtonPress(button.id)}
+                        onPress={() => handleelevationButtonPress(button)}
                     >
                         <Text
                             style={[
                                 styles.whitesharptext,
                                 // 선택된 버튼일 경우 텍스트 색상 변경
-                                selectedelevationButton.includes(button.id) && styles.greensharptext
+                                selectedelevationButton.some(item => item.id === button.id) && styles.greensharptext
                             ]}
                         >
                             {button.label}
@@ -270,13 +307,13 @@ const Coursesearch = ({ route }) => {
                     <TouchableOpacity
                         key={button.id}
 
-                        onPress={() => handleenvironmentButtonPress(button.id)}
+                        onPress={() => handleenvironmentButtonPress(button)}
                     >
                         <Text
                             style={[
                                 styles.whitesharptext,
                                 // 선택된 버튼일 경우 텍스트 색상 변경
-                                selectedenvironmentButton.includes(button.id) && styles.greensharptext
+                                selectedenvironmentButton.some(item => item.id === button.id) && styles.greensharptext
                             ]}
                         >
                             {button.label}
@@ -294,13 +331,13 @@ const Coursesearch = ({ route }) => {
                     <TouchableOpacity
                         key={button.id}
 
-                        onPress={() => handleoptionButtonPress(button.id)}
+                        onPress={() => handleoptionButtonPress(button)}
                     >
                         <Text
                             style={[
                                 styles.whitesharptext,
                                 // 선택된 버튼일 경우 텍스트 색상 변경
-                                selectedoptionmentButton.includes(button.id) && styles.greensharptext
+                                selectedoptionmentButton.some(item => item.id === button.id) && styles.greensharptext
                             ]}
                         >
                             {button.label}
@@ -308,7 +345,15 @@ const Coursesearch = ({ route }) => {
                     </TouchableOpacity>
                 ))}
             </View>
-            <TouchableOpacity onPress={() => navigation.navigate('Coursesearchmaplist')}
+            <TouchableOpacity onPress={() => navigation.navigate('Coursesearchmaplist', {
+                selectedDistance: selecteddistacneButton,
+                selectedElevation: selectedelevationButton,
+                selectedEnvironment: selectedenvironmentButton,
+                selectedOptions: selectedoptionmentButton,
+                selectedLocation: selectedLocation,
+                selectedLevel: Leveldata,
+                word : word
+            })}
                 style={styles.greenbutton}>
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                     <Text style={styles.whitetext}>

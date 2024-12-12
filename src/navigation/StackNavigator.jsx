@@ -228,11 +228,10 @@ const StackNavigator = () => (
       options={{
         title: '리뷰',
         header: ({ navigation }) => (
-          <Header
-            title="선택한 코스"
-            navigation={navigation}
-            hideSettingButton
-          />
+
+          <Header title="상세보기" navigation={navigation}
+            hideSettingButton />
+
         ),
         headerShown: true,
       }}

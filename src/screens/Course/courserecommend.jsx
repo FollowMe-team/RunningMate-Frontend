@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { TextInput, TouchableOpacity, StyleSheet, View, Text, Alert, Pressable, Image, ImageBackground, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Dropdown } from 'react-native-element-dropdown';
@@ -12,6 +12,8 @@ import runner from '../../assets/images/Course/runner.png';
 import mapview from '../../assets/images/Course/mapforcourseview.png';
 
 import Courses from '../../components/Course/Courses';
+import { getCourseRecommend, getbasicCourseRecommend } from '../../utils/courseapi';
+import Recommendcourses from '../../components/Course/recommentcourses';
 
 
 const styles = StyleSheet.create({
@@ -37,10 +39,10 @@ const styles = StyleSheet.create({
     },
 
     greenbutton: {
-        width: 350, height: 60,
+        width: 350, height: 45,
         borderColor: 'white',
         backgroundColor: '#73D393',
-        borderWidth: 0,
+        borderWidth: 0, marginTop: 15,
         borderRadius: 15, FlexDirection: 'row',
         alignItems: "center", justifyContent: "center", alignSelf: "center"
     },
@@ -67,29 +69,21 @@ const styles = StyleSheet.create({
         borderRadius: 15,
         alignItems: "center", justifyContent: "center",
     },
-    starsize: { height: 30, width: 30, marginLeft: 20, marginRight: 10, marginTop:5 },
+    starsize: { height: 30, width: 30, marginLeft: 20, marginRight: 10, marginTop: 5 },
 
     inputbar: { borderRadius: 10, width: "78%", height: 40, backgroundColor: 'white', elevation: 7, alignSelf: 'center', paddingLeft: 10, textAlignVertical: 'center', fontSize: 14, color: 'grey' },
     inputbar2: { borderRadius: 10, width: "87%", height: 32, backgroundColor: 'white', elevation: 7, alignSelf: 'center', paddingLeft: 10, textAlignVertical: 'center', marginTop: 15, justifyContent: 'center' },
 
 });
 
-const datas = {
-    name: '문학산 등산로',
-    distance: '7.5KM',
-    time: '1시간 이상',
-    location: '인천 미추홀구',
-    level: '어려움',
-    discription : '산을 따라서 달리는 하드코어 러닝 코스입니다. 숙련자만 하길 권장드립니다.',
-    star : '4.5',
-    runners : '1000명',
-    options : ['#산', '#숲', '계단 있음']
-  }
-
 const Courserecommend = ({ route }) => {
     const navigation = useNavigation();
-    const [Leveldata, setLevel] = useState('');
-    const [Goaldata, setGoal] = useState('');
+    const [Leveldata, setLevel] = useState();
+    const [Goaldata, setGoal] = useState();
+    const [Latitude, setLatitude] = useState();
+    const [Longitude, setLongitude] = useState();
+    const [recommendedCourse, setrecommendedCourse] = useState([]);
+
     const Goaldatas = [
         { label: "체중 감량", value: 'WEIGHT_LOSS' },
         { label: "속도 증가", value: 'ENDURANCE' },
@@ -105,6 +99,21 @@ const Courserecommend = ({ route }) => {
         latitude: null,
         longitude: null
     };
+
+    const fetchrecommenedCourse = async (params = {}) => {
+        const result = await getCourseRecommend(params);
+        setrecommendedCourse(result.data);
+    };
+    useEffect(() => {
+        if (selectedLocation.latitude === null) {
+            fetchrecommenedCourse();
+
+        }
+        else {
+            fetchrecommenedCourse({ latitude: selectedLocation.latitude, longitude: selectedLocation.longitude })
+        }
+    }, [selectedLocation.latitude]);
+
     return (
         <ScrollView>
             <View style={styles.space}></View>
@@ -123,6 +132,25 @@ const Courserecommend = ({ route }) => {
                     value={Leveldata}
                     onChange={item => {
                         setLevel(item.value);
+                        if (Goaldata) {
+                            if (selectedLocation.latitude === null) {
+                                fetchrecommenedCourse({ difficulty: item.value, runningGoal: Goaldata });
+
+                            }
+                            else {
+                                fetchrecommenedCourse({ latitude: selectedLocation.latitude, longitude: selectedLocation.longitude, runningGoal: Goaldata, difficulty: item.value });
+                            }
+                        }
+                        else {
+                            if (selectedLocation.latitude === null) {
+                                fetchrecommenedCourse({ difficulty: item.value });
+
+                            }
+                            else {
+                                fetchrecommenedCourse({ latitude: selectedLocation.latitude, longitude: selectedLocation.longitude, difficulty: item.value });
+
+                            }
+                        }
                     }}
 
                     placeholderStyle={{ fontSize: 14, color: 'grey', marginLeft: 3 }} // 글자색 수정
@@ -139,6 +167,25 @@ const Courserecommend = ({ route }) => {
                     value={Goaldata}
                     onChange={item => {
                         setGoal(item.value);
+                        if (Leveldata) {
+                            if (selectedLocation.latitude === null) {
+                                fetchrecommenedCourse({ runningGoal: item.value, difficulty: Leveldata });
+
+                            }
+                            else {
+                                fetchrecommenedCourse({ latitude: selectedLocation.latitude, longitude: selectedLocation.longitude, runningGoal: item.value, difficulty: Leveldata });
+
+                            }
+                        }
+                        else {
+                            if (selectedLocation.latitude === null) {
+                                fetchrecommenedCourse({ runningGoal: item.value });
+                            }
+                            else {
+                                fetchrecommenedCourse({ latitude: selectedLocation.latitude, longitude: selectedLocation.longitude, runningGoal: item.value });
+
+                            }
+                        }
                     }}
 
                     placeholderStyle={{ fontSize: 14, color: 'grey', marginLeft: 3 }} // 글자색 수정
@@ -146,11 +193,9 @@ const Courserecommend = ({ route }) => {
                     selectedTextStyle={{ fontSize: 14, color: 'grey', marginLeft: 3 }} // 선택된 항목 글자색 수정
                 />
             </View>
-            <View style={{ borderRadius: 15, width: "90%", height: 'auto', backgroundColor: 'white', elevation: 7, alignSelf: 'center', marginTop: 30, paddingBottom: 15, marginBottom:30 }}>
-                <Courses data={datas}/>
-                <Courses data={datas}/>
-                <Courses data={datas}/>
-                <Courses data={datas}/>
+
+            <View style={{ borderRadius: 15, width: "90%", height: 'auto', backgroundColor: 'white', elevation: 7, alignSelf: 'center', marginTop: 15, paddingBottom: 15, marginBottom: 30, paddingTop: 15 }}>
+                <Recommendcourses data={recommendedCourse} />
             </View>
 
         </ScrollView>

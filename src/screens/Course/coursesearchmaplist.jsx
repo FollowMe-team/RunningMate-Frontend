@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { TextInput, ScrollView, TouchableOpacity, StyleSheet, View, Text, Alert, Pressable, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
@@ -11,8 +11,10 @@ import mapview from '../../assets/images/Course/mapforcourseview.png';
 import Qmark from '../../assets/images/Course/Qmark.png';
 import subscribe from '../../assets/images/Course/subscribe.png';
 import subscribed from '../../assets/images/Course/subscribed.png';
+import { getCourseSearch } from '../../utils/courseapi';
 
 import Courses from '../../components/Course/Courses';
+import SimpleNoCourse from '../../components/Course/SimpleNoCourse';
 
 const styles = StyleSheet.create({
     space: { height: 15 },
@@ -88,41 +90,261 @@ const styles = StyleSheet.create({
 
 });
 
-const datas = {
-    name: '문학산 등산로',
-    distance: '7.5KM',
-    time: '1시간 이상',
-    location: '인천 미추홀구',
-    level: '어려움',
-    discription: '산을 따라서 달리는 하드코어 러닝 코스입니다. 숙련자만 하길 권장드립니다.',
-    star: '4.5',
-    runners: '1000명',
-    options : ['#산', '#숲', '계단 있음']
-}
 
-const Coursesearchmaplist = () => {
+const Coursesearchmaplist = ({ route }) => {
+    const {
+        selectedDistance,
+        selectedElevation,
+        selectedEnvironment,
+        selectedOptions,
+        selectedLocation,
+        selectedLevel,
+        word
+    } = route.params || {};
+    console.log(selectedLocation);
+    const [queryOptions, setqueryOptions] = useState('');
+    const [queryParams, setqueryParams] = useState('');
+
+    const elevations = selectedElevation.map(item => item.value).join('%2C');
+    const environments = selectedEnvironment.map(item => item.value).join('%2C');
+    const options = selectedOptions.map(item => item.value).join('%2C');
+
+    const handleSearchCourses = () => {
+        // 쿼리 파라미터 조합
+        if (elevations) {
+            if (environments) {
+                if (options) {
+                    setqueryOptions(elevations + '%2C' + environments + '%2C' + options);
+                }
+                else {
+                    setqueryOptions(elevations + '%2C' + environments);
+                }
+            }
+            else {
+                if (options) {
+                    setqueryOptions(elevations + '%2C' + options);
+                }
+                else {
+                    setqueryOptions(elevations);
+                }
+            }
+        }
+        else {
+            if (environments) {
+                if (options) {
+                    setqueryOptions(environments + '%2C' + options);
+                }
+                else {
+                    setqueryOptions(environments);
+                }
+            }
+            else {
+                if (options) {
+                    setqueryOptions(options);
+                }
+                else {
+                    setqueryOptions();
+                }
+            }
+        }
+        if (word) {
+            if (selectedLocation.latitude) {
+                if (selectedLevel) {
+                    if (queryOptions) {
+                        setqueryParams('keyword=' + word + '&' + 'latitude=' + selectedLocation.latitude + '&' + 'longitude=' + selectedLocation.longitude + '&' +
+                            'difficulties=' + selectedLevel + '&' + 'options=' + queryOptions
+                        );
+                    }
+                    else {
+                        setqueryParams('keyword=' + word + '&' + 'latitude=' + selectedLocation.latitude + '&' + 'longitude=' + selectedLocation.longitude + '&' +
+                            'difficulties=' + selectedLevel
+                        );
+                    }
+                }
+                else {
+                    if (queryOptions) {
+                        setqueryParams('keyword=' + word + '&' + 'latitude=' + selectedLocation.latitude + '&' + 'longitude=' + selectedLocation.longitude + '&' +
+                            '&' + 'options=' + queryOptions
+                        );
+                    }
+                    else {
+                        setqueryParams('keyword=' + word + '&' + 'latitude=' + selectedLocation.latitude + '&' + 'longitude=' + selectedLocation.longitude + '&'
+                        );
+                    }
+                }
+            }
+            else {
+                if (selectedLevel) {
+                    if (queryOptions) {
+                        setqueryParams('keyword=' + word + '&' +
+                            'difficulties=' + selectedLevel + '&' + 'options=' + queryOptions
+                        );
+                    }
+                    else {
+                        setqueryParams('keyword=' + word + '&' +
+                            'difficulties=' + selectedLevel
+                        );
+                    }
+                }
+                else {
+                    if (queryOptions) {
+                        setqueryParams('keyword=' + word +
+                            '&' + 'options=' + queryOptions
+                        );
+                    }
+                    else {
+                        setqueryParams('keyword=' + word
+                        );
+                    }
+                }
+            }
+        }
+        else {
+            if (selectedLocation.latitude) {
+                if (selectedLevel) {
+                    if (queryOptions) {
+                        setqueryParams('latitude=' + selectedLocation.latitude + '&' + 'longitude=' + selectedLocation.longitude + '&' +
+                            'difficulties=' + selectedLevel + '&' + 'options=' + queryOptions
+                        );
+                    }
+                    else {
+                        setqueryParams('latitude=' + selectedLocation.latitude + '&' + 'longitude=' + selectedLocation.longitude + '&' +
+                            'difficulties=' + selectedLevel
+                        );
+                    }
+                }
+                else {
+                    if (queryOptions) {
+                        setqueryParams('latitude=' + selectedLocation.latitude + '&' + 'longitude=' + selectedLocation.longitude + '&' +
+                            '&' + 'options=' + queryOptions
+                        );
+                    }
+                    else {
+                        setqueryParams('latitude=' + selectedLocation.latitude + '&' + 'longitude=' + selectedLocation.longitude + '&'
+                        );
+                    }
+                }
+            }
+            else {
+                if (selectedLevel) {
+                    if (queryOptions) {
+                        setqueryParams(
+                            'difficulties=' + selectedLevel + '&' + 'options=' + queryOptions
+                        );
+                    }
+                    else {
+                        setqueryParams(
+                            'difficulties=' + selectedLevel
+                        );
+                    }
+                }
+                else {
+                    if (queryOptions) {
+                        setqueryParams(
+                            'options=' + queryOptions
+                        );
+                    }
+                    else {
+                        setqueryParams(
+                        );
+
+                    }
+                }
+            }
+        }
+
+    };
+
     const navigation = useNavigation();
+    const [searchCourse, setsearchCourse] = useState([]);
+    const [searchsuccess, setsearchsuccess] = useState(false);
+
+    const fetchsearchCourse = async (query) => {
+        result = await getCourseSearch(query);
+        setsearchCourse(result.data);
+        setsearchsuccess(result.success);
+    };
+    useEffect(() => {
+        handleSearchCourses();
+        { searchCourse != null &&
+            console.log("가나다라",{queryParams});
+            fetchsearchCourse(queryParams);
+        console.log(
+            {selectedDistance},{
+            selectedElevation},{
+            selectedEnvironment},{
+            selectedOptions},{
+            selectedLocation},{
+            selectedLevel},{
+            word}, "이건", {queryParams}, "zmam", {elevations}, {environments}, {options})
+    }
+    }, []);
+
+    
     return (
+
         <ScrollView>
-            <TouchableOpacity style={{ alignSelf: 'center', flexDirection: 'row' }} onPress={() => navigation.navigate('Coursesearch')}>
-                <View style={styles.inputbarsearch}>
-                    <Image style={{ width: 20, height: 20, alignSelf: 'center', marginRight: 5 }} source={Qmark} />
+            {
+                searchsuccess === true ?
+                    <View>
+                        <TouchableOpacity style={{ alignSelf: 'center', flexDirection: 'row' }} onPress={() => navigation.navigate('Coursesearch')}>
+                            <View style={styles.inputbarsearch}>
+                                <Image style={{ width: 20, height: 20, alignSelf: 'center', marginRight: 5 }} source={Qmark} />
 
-                    <Text style={{ textAlignVertical: 'center' }}>코스명 또는 지역명</Text>
+                                <Text style={{ textAlignVertical: 'center' }}>{word}</Text>
 
-                </View>
-            </TouchableOpacity>
-            <View style={{ flexWrap: 'wrap', flexDirection: 'row', marginLeft: 30 }}>
-                <Text style={styles.whitesharptext}># 3KM 미만</Text>
-                <Text style={styles.whitesharptext}># 숲길</Text>
-            </View>
-            <View style={{ borderRadius: 15, width: "90%", height: 'auto', backgroundColor: 'white', elevation: 7, alignSelf: 'center', marginTop: 10, paddingBottom: 15 }}>
-                <Courses data={datas}/>
-                <Courses data={datas}/>
-                <Courses data={datas}/>
-                <Courses data={datas}/>
-            </View>
+                            </View>
+                        </TouchableOpacity>
+                        <View style={{ flexWrap: 'wrap', flexDirection: 'row', marginLeft: 30 }}>
+                            {selectedDistance.map((button) => (
+                                <Text
+                                    style={[
+                                        styles.whitesharptext,
+                                    ]}
+                                >
+                                    {button.label}
+                                </Text>
+                            ))}
+                            {selectedElevation.map((button) => (
+                                <Text
+                                    style={[
+                                        styles.whitesharptext,
+                                    ]}
+                                >
+                                    {button.label}
+                                </Text>
+                            ))}
+                            {selectedEnvironment.map((button) => (
+                                <Text
+                                    style={[
+                                        styles.whitesharptext,
+                                    ]}
+                                >
+                                    {button.label}
+                                </Text>
+                            ))}
+                            {selectedOptions.map((button) => (
+                                <Text
+                                    style={[
+                                        styles.whitesharptext,
+                                    ]}
+                                >
+                                    {button.label}
+                                </Text>
+                            ))}
+                        </View>
+                        <View style={{ borderRadius: 15, width: "90%", height: 'auto', backgroundColor: 'white', elevation: 7, alignSelf: 'center', marginTop: 10, paddingBottom: 15, paddingTop: 15 }}>
+                            {searchCourse.map((course) => (
 
+                                <Courses data={course} />
+                            ))}
+                            {
+                                searchCourse.length === 0 ?
+                                    <SimpleNoCourse /> : <View></View>
+                            }
+                        </View>
+                        
+                    </View> : <View></View>}
         </ScrollView>
     );
 }
