@@ -17,6 +17,8 @@ import {
 } from '../../utils/crew/crew2';
 import { getCrewDetail } from '../../utils/crew/crew';
 
+import defaultProfileImage from '../../assets/images/Settings/profile.png';
+
 const CrewInformation = () => {
   const route = useRoute();
   const { crew, onApply = async () => {} } = route.params; // 기본 함수 추가
@@ -88,7 +90,11 @@ const CrewInformation = () => {
   return (
     <ScrollView>
       <Image
-        source={{ uri: crewDetail.profileImageUrl }}
+        source={
+          crewDetail.profileImageUrl
+            ? { uri: crewDetail.profileImageUrl }
+            : defaultProfileImage
+        }
         style={{
           width: 100,
           height: 100,

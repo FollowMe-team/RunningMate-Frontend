@@ -27,7 +27,6 @@ const CrewCard = ({ crew, onPress }) => {
           {crew.footprintAverage !== undefined && (
             <Footprint experience={crew.footprintAverage} />
           )}
-          {crew.ranking && <Rank rank={crew.ranking} />}
         </View>
         <Text
           style={styles.cardBriefInfo}

@@ -89,6 +89,7 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 16,
     width: '100%',
+    marginBottom: 375,
   },
   badgeTextContainer: {
     flexDirection: 'row',
