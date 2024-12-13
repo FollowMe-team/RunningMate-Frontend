@@ -11,22 +11,22 @@ import Main from '../components/Main';
 import Course_basic from '../../src/screens/Course/Course_basic';
 import Course_with_record_choosed from '../../src/screens/Course/Course_with_record_choosed';
 import Course_with_record from '../../src/screens/Course/Course_with_record';
-// import courserecommend from '../../src/screens/Course/courserecommend';
-// import courserecommend_map from '../../src/screens/Course/courserecommend_map';
+import courserecommend from '../../src/screens/Course/courserecommend';
+import courserecommend_map from '../../src/screens/Course/courserecommend_map';
 import coursesearch from '../../src/screens/Course/coursesearch';
 import coursesearchmaplist from '../../src/screens/Course/coursesearchmaplist';
-// import coursesearchmapview from '../../src/screens/Course/coursesearchmapview';
+import coursesearchmapview from '../../src/screens/Course/coursesearchmapview';
 import MyCourse from '../../src/screens/Course/MyCourse';
 import MyCourse_none from '../../src/screens/Course/MyCourse_none';
 import reviewed from '../../src/screens/Course/reviewed';
 import reviewing from '../../src/screens/Course/reviewing';
 import reviewlist from '../../src/screens/Course/reviewlist';
-// import runningtimesaving from '../../src/screens/Course/runningtimesaving';
-// import runningtime from '../../src/screens/Course/runningtime';
+import runningtimesaving from '../../src/screens/Course/runningtimesaving';
+import runningtime from '../../src/screens/Course/runningtime';
 import savingcourse from '../../src/screens/Course/savingcourse';
 import runningend from '../../src/screens/Course/runningend';
-// import SearchLocation from '../../src/screens/Course/SearchLocation';
-// import RecommendLocation from '../../src/screens/Course/RecommendLocation';
+import SearchLocation from '../../src/screens/Course/SearchLocation';
+import RecommendLocation from '../../src/screens/Course/RecommendLocation';
 import Othersprofile from '../../src/screens/Othersprofile/Othersprofile';
 import Othersprofile_notteam from '../../src/screens/Othersprofile/Othersprofile_notteam';
 import Othersfootprinting from '../../src/screens/Othersprofile/OthersFootprinting';
@@ -143,30 +143,28 @@ const StackNavigator = () => (
         headerShown: true,
       }}
     />
-    {/* <Stack.Screen
+    <Stack.Screen
       name="Courserecommend"
       component={courserecommend}
       options={{
         title: '코스 추천',
         header: ({ navigation }) => (
-          <Header title="코스 추천" navigation={navigation}
-            hideSettingButton />
+          <Header title="코스 추천" navigation={navigation} hideSettingButton />
         ),
         headerShown: true,
       }}
-    /> */}
-    {/* <Stack.Screen
+    />
+    <Stack.Screen
       name="Courserecommend_map"
       component={courserecommend_map}
       options={{
         title: '코스 추천_지도',
         header: ({ navigation }) => (
-          <Header title="코스 추천" navigation={navigation}
-            hideSettingButton />
+          <Header title="코스 추천" navigation={navigation} hideSettingButton />
         ),
         headerShown: true,
       }}
-    /> */}
+    />
     <Stack.Screen
       name="Coursesearch"
       component={coursesearch}
@@ -189,7 +187,7 @@ const StackNavigator = () => (
         headerShown: true,
       }}
     />
-    {/* <Stack.Screen
+    <Stack.Screen
       name="Coursesearchmapview"
       component={coursesearchmapview}
       options={{
@@ -199,7 +197,7 @@ const StackNavigator = () => (
         ),
         headerShown: false,
       }}
-    /> */}
+    />
     <Stack.Screen
       name="MyCourse"
       component={MyCourse}
@@ -228,10 +226,7 @@ const StackNavigator = () => (
       options={{
         title: '리뷰',
         header: ({ navigation }) => (
-
-          <Header title="상세보기" navigation={navigation}
-            hideSettingButton />
-
+          <Header title="상세보기" navigation={navigation} hideSettingButton />
         ),
         headerShown: true,
       }}
@@ -262,16 +257,16 @@ const StackNavigator = () => (
         headerShown: true,
       }}
     />
-    {/* <Stack.Screen
+    <Stack.Screen
       name="Runningtimesaving"
       component={runningtimesaving}
       options={{ title: '코스 기록' }}
-    /> */}
-    {/* <Stack.Screen
+    />
+    <Stack.Screen
       name="Runningtime"
       component={runningtime}
       options={{ title: '달리기' }}
-    /> */}
+    />
     <Stack.Screen
       name="Savingcourse"
       component={savingcourse}
@@ -531,7 +526,7 @@ const StackNavigator = () => (
         headerShown: true,
       }}
     />
-    {/* <Stack.Screen
+    <Stack.Screen
       name="SearchLocation"
       component={SearchLocation}
       options={{
@@ -541,8 +536,8 @@ const StackNavigator = () => (
         ),
         headerShown: true,
       }}
-    /> */}
-    {/* <Stack.Screen
+    />
+    <Stack.Screen
       name="RecommendLocation"
       component={RecommendLocation}
       options={{
@@ -552,7 +547,7 @@ const StackNavigator = () => (
         ),
         headerShown: true,
       }}
-    /> */}
+    />
     <Stack.Screen name="CrewSearch" component={CrewSearch} />
     <Stack.Screen
       name="Modification"
