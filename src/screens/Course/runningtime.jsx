@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { View, StyleSheet, Alert, TouchableOpacity, Text, TextInput, Modal } from 'react-native';
 import MapView, { PROVIDER_GOOGLE, Marker, Polyline } from 'react-native-maps';
@@ -44,7 +45,99 @@ const RunningScreen = ({ route }) => {
     const [isRunning, setIsRunning] = useState(true);
     const [Coursedetails, setCoursedetails] = useState();
     const [Coursesuccess, setCoursesuccess] = useState(false);
+    const [previousLocation, setPreviousLocation] = useState(null); // 이전 위치 저장
+    const [totalDistance, setTotalDistance] = useState(0); // 총 이동 거리
+    const curr = new Date();
+    const [starttime, setStarttime] = useState();
+    const [endtime, setEndtime] = useState();
 
+    const [completedWaypoints, setCompletedWaypoints] = useState([]);
+    const [remainingWaypoints, setRemainingWaypoints] = useState([]);
+    const [remainingWaypointsformap, setRemainingWaypointsformap] = useState([]);
+
+    useEffect(() => {
+        setStarttime(curr.toISOString());
+    }, []);
+    // 초기 경로 세팅
+    useEffect(() => {
+        if (waypoints.length > 0) {
+            setRemainingWaypoints([...waypoints]); // 모든 경로를 remainingWaypoints에 설정
+            setRemainingWaypointsformap([...waypoints]); // 모든 경로를 remainingWaypoints에 설정
+        }
+    }, [waypoints]);
+
+    // 현재 위치 업데이트 및 경로 진행 확인
+    useEffect(() => {
+        const interval = setInterval(() => {
+            Geolocation.getCurrentPosition(
+                (position) => {
+                    const { latitude, longitude } = position.coords;
+
+                    if (currentLocation) {
+                        // 이전 위치와 현재 위치 간의 거리 계산
+                        const distance = calculateDistance(
+                            currentLocation.latitude,
+                            currentLocation.longitude,
+                            latitude,
+                            longitude
+                        );
+
+                        // 총 이동 거리 업데이트
+                        setTotalDistance((prevTotal) => prevTotal + distance);
+                    }
+
+                    setCurrentLocation({
+                        latitude,
+                        longitude,
+                        latitudeDelta: 0.01,
+                        longitudeDelta: 0.01,
+                    });
+
+                    // 지나온 경로를 업데이트
+                    if (remainingWaypoints.length > 0) {
+                        const nextWaypoint = remainingWaypoints[0];
+                        const distanceToNext = calculateDistance(
+                            latitude,
+                            longitude,
+                            nextWaypoint.latitude,
+                            nextWaypoint.longitude
+                        );
+
+                        // 특정 거리 내에 들어오면 해당 포인트를 완료로 이동
+                        if (distanceToNext <= 10) { // 10m 이내
+                            setCompletedWaypoints((prev) => [...prev, nextWaypoint]);
+                            setRemainingWaypoints((prev) => prev.slice(1));
+                            // 첫 번째 포인트 제거
+                            if (completedWaypoints.length > 2) {
+                                setRemainingWaypointsformap((prev) => prev.slice(1));
+                            }
+                        }
+                    }
+                },
+                (error) => console.error(error),
+                { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 }
+            );
+        }, 1000);
+
+        return () => clearInterval(interval); // 클린업
+    }, [remainingWaypoints]);
+
+    // 거리 계산 함수
+    const calculateDistance = (lat1, lon1, lat2, lon2) => {
+        const R = 6371e3; // 지구 반경 (미터)
+        const φ1 = (lat1 * Math.PI) / 180;
+        const φ2 = (lat2 * Math.PI) / 180;
+        const Δφ = ((lat2 - lat1) * Math.PI) / 180;
+        const Δλ = ((lon2 - lon1) * Math.PI) / 180;
+
+        const a =
+            Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
+            Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+        const distance = R * c; // 거리 (미터)
+        return distance;
+    };
 
     const tick = () => {
         setTime(prevTime => prevTime.clone().add(1, 'seconds'));
@@ -151,11 +244,14 @@ const RunningScreen = ({ route }) => {
     };
 
     const handleEnd = () => {
+        setEndtime(curr.toISOString());
         if (end !== null) {
             // 이미 정보가 표시된 상태라면, 정보 초기화 (토글 효과)
             setEnd(null);
+            toggleTimer();
         } else {
             setEnd(true)
+            toggleTimer();
         }
     }
 
@@ -218,16 +314,17 @@ const RunningScreen = ({ route }) => {
                         latitudeDelta: 0.01,
                         longitudeDelta: 0.01,
                     });
-                    //setWaypoints([initialLocation]); // 첫 경로 포인트를 현재 위치로 설정
+                    setWaypoints([initialLocation]); // 첫 경로 포인트를 현재 위치로 설정
                 },
                 (error) => Alert.alert('위치 오류', error.message),
                 { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 }
 
             );
         }
-        if (waypoints.length === 0 ) {
+        if (waypoints.length === 1) {
             addWaypoint2();
         }
+
     }, [waypoints]);
     const addWaypoint2 = () => {
         for (let i = 0; i < data.data.coursePointInfos.length; i++) {
@@ -253,7 +350,7 @@ const RunningScreen = ({ route }) => {
         } else {
             Alert.alert('오류', '유효한 좌표를 입력하세요.');
         }
-    };
+    }
 
     const resetWaypoints = () => {
         setWaypoints((prev) => (prev.length > 0 ? [prev[0]] : []));
@@ -288,6 +385,7 @@ const RunningScreen = ({ route }) => {
     };
 
     return (
+
         <View style={styles.container}>
             <MapView
                 ref={mapRef}
@@ -296,11 +394,19 @@ const RunningScreen = ({ route }) => {
                 region={currentLocation}
                 showsUserLocation={true}
             >
-                {/* 경로 표시 */}
-                {waypoints.length > 1 && (
+                {/* 남은 경로 */}
+                {remainingWaypointsformap.length > 1 && (
                     <Polyline
-                        coordinates={waypoints}
-                        strokeColor="#73D393"
+                        coordinates={remainingWaypointsformap}
+                        strokeColor="#73D393" // 초록색
+                        strokeWidth={4}
+                    />
+                )}
+                {/* 지나온 경로 */}
+                {completedWaypoints.length > 1 && (
+                    <Polyline
+                        coordinates={completedWaypoints}
+                        strokeColor="#B0BEC5" // 회색
                         strokeWidth={4}
                     />
                 )}
@@ -360,36 +466,6 @@ const RunningScreen = ({ route }) => {
 
             {/* 버튼 */}
 
-            <TouchableOpacity
-                style={styles.routeButton}
-                onPress={() => setIsRouteModalVisible(true)}
-            >
-                <Text style={styles.buttonText}>좌표 추가</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-                style={[styles.routeButton, { top: 70 }]}
-                onPress={focusOnRoute}
-            >
-                <Text style={styles.buttonText}>경로 보기</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-                style={[styles.routeButton, { top: 120 }]}
-                onPress={resetWaypoints}
-            >
-                <Text style={styles.buttonText}>경로 초기화</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-                style={[styles.routeButton, { top: 170 }]}
-                onPress={moveToCurrentLocation}
-            >
-                <Text style={styles.buttonText}>내 위치로 이동</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-                style={[styles.routeButton, { top: 220 }]}
-                onPress={handleCalculateSlope}
-            >
-                <Text style={styles.buttonText}>경사 가져오기</Text>
-            </TouchableOpacity>
             <View style={{ borderTopLeftRadius: 32, borderTopRightRadius: 32, width: "100%", height: 260, backgroundColor: 'white', elevation: 7 }}>
                 <View style={{ borderRadius: 15, width: "20%", height: 5, backgroundColor: '#E5E5EB', alignSelf: 'center', marginTop: 7, marginBottom: 25 }}></View>
                 <View style={{ borderRadius: 15, width: "85%", height: 120, backgroundColor: 'white', elevation: 7, alignSelf: 'center' }}>
@@ -397,7 +473,7 @@ const RunningScreen = ({ route }) => {
                     <View style={{ flexDirection: 'row', marginTop: 20, justifyContent: 'space-around' }}>
                         <View>
                             <Text style={{ alignSelf: 'center' }}>거리</Text>
-                            <Text style={{ color: 'black', fontSize: 16, alignSelf: 'center' }}>{(distance / 1000).toFixed(2)} km</Text>
+                            <Text style={{ color: 'black', fontSize: 16, alignSelf: 'center' }}>{(totalDistance / 1000).toFixed(2)} km</Text>
                         </View>
                         <View>
                             <Text style={{ alignSelf: 'center' }}>평균 페이스</Text>
@@ -442,7 +518,7 @@ const RunningScreen = ({ route }) => {
                                     <Text style={{ color: 'black', alignSelf: 'center', fontWeight: 'bold' }}>Cancel</Text>
                                 </View>
                             </TouchableOpacity>
-                            <TouchableOpacity onPress={() => navigation.navigate('Runningend')}
+                            <TouchableOpacity onPress={() => navigation.navigate('Runningend', { time: time, totalDistance: totalDistance, id: data.data.id, starttime: starttime, endtime: endtime, startlatitude: waypoints[0].latitude, startlongitude: waypoints[0].longitude, endlatitude: waypoints[waypoints.length - 1].latitude, endlongitude: waypoints[waypoints.length - 1].longitude })}
                                 style={{ width: '50%', height: '100%', justifyContent: 'center' }}>
                                 <View style={{ alignSelf: 'center', justifyContent: 'center' }}>
                                     <Text style={{ color: 'black', alignSelf: 'center', fontWeight: 'bold', color: 'red' }}>Finish</Text>
@@ -532,4 +608,3 @@ const styles = StyleSheet.create({
 });
 
 export default RunningScreen;
-

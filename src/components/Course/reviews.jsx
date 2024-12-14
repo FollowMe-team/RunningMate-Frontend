@@ -105,7 +105,7 @@ const Course_basic = ({ data }) => {
     return (
         <View style={styles.smallboxlist2}>
             <View style={{ flexDirection: 'row' }}>
-                <TouchableOpacity onPress={() => navigation.navigate('Othersprofile_notteam')}>
+                <TouchableOpacity onPress={() => navigation.navigate('Othersprofile_notteam', {id:data.writer.id})}>
 
                     <Image
                         style={{ borderRadius: 21, borderWidth: 1, borderColor: 'grey', width: 42, height: 42, alignSelf: 'center', marginLeft: 10, marginRight: 5, marginTop: 7 }}

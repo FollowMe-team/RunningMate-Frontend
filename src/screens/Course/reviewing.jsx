@@ -76,23 +76,22 @@ const Reviewing = ({ route }) => {
             return;
         }
 
-        setLoading(true);
-        if (photo != null) {
-            const request = {
-                rating: Stars,
-                content: writings,
-                photo, // 선택된 사진
-            };
+        const request = {
+            rating: Stars,
+            content: writings
+        };
+        console.log("id : ", id, ", request : ", request, ", image : ", photo);
+        if (photo == null) {
+            const result = await RReviewing(id, request);
+            console.log("1");
         }
         else {
-            const request = {
-                rating: Stars,
-                content: writings,
-            };
+            const result = await RReviewing(id, request, photo);
+            console.log("2");
+
         }
 
-        const result = await RReviewing(id, request);
-
+        navigation.navigate('MyProfile');
     };
     const handleEnd = () => {
         if (end !== null) {
@@ -157,7 +156,7 @@ const Reviewing = ({ route }) => {
                                     <Text style={{ color: 'black', alignSelf: 'center', fontWeight: 'bold' }}>Cancel</Text>
                                 </View>
                             </TouchableOpacity>
-                            <TouchableOpacity onPress={() => navigation.navigate('MyProfile') && submitReview}
+                            <TouchableOpacity onPress={submitReview}
                                 style={{ width: '50%', height: '100%', justifyContent: 'center' }}>
                                 <View style={{ alignSelf: 'center', justifyContent: 'center' }}>
                                     <Text style={{ color: 'black', alignSelf: 'center', fontWeight: 'bold', color: 'red' }}>Finish</Text>

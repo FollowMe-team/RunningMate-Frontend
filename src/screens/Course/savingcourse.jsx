@@ -1,13 +1,14 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { TouchableOpacity, TextInput, StyleSheet, View, Text, Alert, Pressable, Image, ImageBackground, ScrollView, Modal } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Dropdown } from 'react-native-element-dropdown';
+import Geocoder from 'react-native-geocoding';
+import { SavesavS } from '../../utils/courseapi';
 
-import mapforrun from '../../assets/images/Course/mapforrun.png';
-import stopbutton from '../../assets/images/Course/stopbutton.png';
-import playbutton from '../../assets/images/Course/playbutton.png';
-import endbutton from '../../assets/images/Course/endbutton.png';
+// Google Maps API 키를 여기에 입력하세요
+Geocoder.init('AIzaSyCQdugA7ICLSYCnuAvsf_pfgtJYzM0sfTs');
+
 import runningman from '../../assets/images/Course/runningmanforchoosebutton.png';
 import whiteplus from '../../assets/images/Course/whiteplus.png';
 
@@ -106,12 +107,19 @@ const styles = StyleSheet.create({
 
 
 
-const Savingcourse = () => {
+const Savingcourse = ({ route }) => {
+    const data = route.params;
+    const times = data.time;
+    const distance = data.totalDistance;
+    const starttime = data.starttime;
+    const endtime = data.endtime;
+    const waypoints = data.waypoint;
+    console.log("times : ", times, ", distance : ", distance, ", starttime : ", starttime, ", endtime :", endtime, ", waypoints : ", waypoints);
     const navigation = useNavigation();
     const [Coursedata, setCourse] = useState('');
     const [end, setEnd] = useState(null);
-
     const [nickname, setNickname] = useState('');
+    const [content, setContent] = useState('');
     const [info, setInfo] = useState('');
     const [birthday, setBirthday] = useState('');
     const [gender, setGender] = useState('');
@@ -159,6 +167,37 @@ const Savingcourse = () => {
             setEnd(true)
         }
     }
+    const savesave = async () => {
+        const request = {
+            name: nickname,
+            description: content,
+            city: address,
+            district: "",
+            distance: distance,
+            options: [
+                Coursedata, Stairsdata, Optiondata
+            ],
+            coursePoints: waypoints
+        };
+        console.log("request", request);
+        
+        const result = await SavesavS(request, photo, startphoto, endphoto);
+        navigation.navigate('MyCourse');
+    }
+    useEffect(() => {
+        addressreturn(waypoints[0].latitude, waypoints[0].longitude);
+    }, []);
+    const addressreturn = async (latitude, longitude) => {
+        try {
+            // 좌표를 주소로 변환
+            const json = await Geocoder.from(latitude, longitude);
+            const addressComponent = json.results[0].formatted_address;
+            setAddress(addressComponent);
+        } catch (error) {
+            console.warn('주소 변환 중 오류 발생:', error);
+            setAddress('주소를 찾을 수 없습니다');
+        }
+    }
     const CourseDatas = [
         { label: "숲길", value: 'FOREST' },
         { label: "강변", value: 'RIVERSIDE' },
@@ -188,24 +227,32 @@ const Savingcourse = () => {
     const [startphoto, setstartPhoto] = useState(null);
     const [endphoto, setendPhoto] = useState(null);
     const [photo, setPhoto] = useState(null);
+    const formatTime = (duration) => {
+        const hours = duration.hours().toString().padStart(2, '0');
+        const minutes = duration.minutes().toString().padStart(2, '0');
+        const seconds = duration.seconds().toString().padStart(2, '0');
+        return `${hours}:${minutes}:${seconds}`;
+    };
 
     return (
         <ScrollView>
             <View style={styles.space}></View>
             <View style={{ borderRadius: 15, width: "90%", height: 120, backgroundColor: 'white', elevation: 7, alignSelf: 'center' }}>
-                <Text style={{ fontSize: 30, color: 'black', alignSelf: 'center' }}>00:00:00</Text>
+                <Text style={{ fontSize: 30, color: 'black', alignSelf: 'center' }}>{formatTime(times)}</Text>
                 <View style={{ flexDirection: 'row', marginTop: 20, justifyContent: 'space-around' }}>
                     <View>
                         <Text style={{ alignSelf: 'center' }}>거리</Text>
-                        <Text style={{ color: 'black', fontSize: 16, alignSelf: 'center' }}>5.3KM</Text>
+                        <Text style={{ color: 'black', fontSize: 16, alignSelf: 'center' }}>{distance}KM</Text>
                     </View>
                     <View>
                         <Text style={{ alignSelf: 'center' }}>평균 페이스</Text>
-                        <Text style={{ color: 'black', fontSize: 16, alignSelf: 'center' }}>5'33"</Text>
+                        <Text style={{ color: 'black', fontSize: 16, alignSelf: 'center' }}>{distance > 0
+                            ? ((distance / 1000) / (time.hours() * 3600 + time.minutes() * 60 + time.seconds())).toFixed(2)
+                            : '0'} km/h</Text>
                     </View>
                     <View>
                         <Text style={{ alignSelf: 'center' }}>칼로리</Text>
-                        <Text style={{ color: 'black', fontSize: 16, alignSelf: 'center' }}>245</Text>
+                        <Text style={{ color: 'black', fontSize: 16, alignSelf: 'center' }}>{(0.0055 * distance).toFixed(1)}</Text>
                     </View>
                 </View>
             </View>
@@ -227,13 +274,17 @@ const Savingcourse = () => {
                 ) : null}
             </View>
             <Text style={styles.titletext}>코스 설명</Text>
-            <TextInput style={{ borderRadius: 15, width: "90%", height: 130, backgroundColor: 'white', elevation: 7, alignSelf: 'center' }}>
-            </TextInput><Text style={styles.titletext}>위치</Text>
+            <TextInput style={{ borderRadius: 15, width: "90%", height: 130, backgroundColor: 'white', elevation: 7, alignSelf: 'center' }}
+                value={content}
+                onChangeText={setContent}
+            >
+            </TextInput>
+            <Text style={styles.titletext}>위치</Text>
             <Text style={{
                 borderRadius: 15, width: "90%", height: 50, backgroundColor: 'white', elevation: 7, alignSelf: 'center', color: 'black', fontSize: 15, justifyContent: 'center', paddingLeft: 20
                 , textAlignVertical: 'center'
             }}>
-                인천광역시 어쩌구 저쩌구
+                {address}
             </Text>
             <Text style={styles.titletext}>코스 이미지(선택)</Text>
             <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
@@ -329,7 +380,7 @@ const Savingcourse = () => {
                                     <Text style={{ color: 'black', alignSelf: 'center', fontWeight: 'bold' }}>Cancel</Text>
                                 </View>
                             </TouchableOpacity>
-                            <TouchableOpacity onPress={() => navigation.navigate('MyCourse')}
+                            <TouchableOpacity onPress={savesave}
                                 style={{ width: '50%', height: '100%', justifyContent: 'center' }}>
                                 <View style={{ alignSelf: 'center', justifyContent: 'center' }}>
                                     <Text style={{ color: 'black', alignSelf: 'center', fontWeight: 'bold', color: 'red' }}>Finish</Text>
