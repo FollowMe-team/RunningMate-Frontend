@@ -1,5 +1,18 @@
 import React, { useState } from 'react';
-import { TextInput, TouchableOpacity, StyleSheet, View, Text, Alert, Pressable, Image, ImageBackground, ScrollView, Modal } from 'react-native';
+import PropTypes from 'prop-types';
+import {
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  View,
+  Text,
+  Alert,
+  Pressable,
+  Image,
+  ImageBackground,
+  ScrollView,
+  Modal,
+} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
 import Qmark from '../../assets/images/Course/Qmark.png';
@@ -13,55 +26,98 @@ import ReviewPhotoPicker from './reviewphotochange';
 
 import { RReviewing } from '../../utils/courseapi';
 
-
-
-
 const styles = StyleSheet.create({
-    container: {
-    },
+  container: {},
 
-    reviewbox: {
-        borderRadius: 10, width: 350, height: 110, backgroundColor: 'white', alignSelf: 'center',
-        elevation: 5, color :'black'
-    },
+  reviewbox: {
+    borderRadius: 10,
+    width: 350,
+    height: 110,
+    backgroundColor: 'white',
+    alignSelf: 'center',
+    elevation: 5,
+    color: 'black',
+  },
 
-    space: { height: 15 },
+  space: { height: 15 },
 
-    smallspace: { height: 5 },
+  smallspace: { height: 5 },
 
-    imagebutton: {
-        width: 95, height: 95,
-        borderColor: 'black',
-        backgroundColor: '#EEEEEE',
-        borderWidth: 1,
-        borderRadius: 15,
-        alignItems: "center", justifyContent: "center",
-        marginLeft: 22
-    },
+  imagebutton: {
+    width: 95,
+    height: 95,
+    borderColor: 'black',
+    backgroundColor: '#EEEEEE',
+    borderWidth: 1,
+    borderRadius: 15,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginLeft: 22,
+  },
 
-    greentext: { color: '#73D393', fontSize: 20, fontWeight: 'bold', marginRight: 30, marginBottom: 4 },
+  greentext: {
+    color: '#73D393',
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginRight: 30,
+    marginBottom: 4,
+  },
 
-    blacktext: { color: 'black', fontSize: 14, fontWeight: 'bold', marginRight: 30, marginBottom: 6, marginLeft: 22 },
+  blacktext: {
+    color: 'black',
+    fontSize: 14,
+    fontWeight: 'bold',
+    marginRight: 30,
+    marginBottom: 6,
+    marginLeft: 22,
+  },
 
-    greenbutton: {
-        width: 350, height: 60,
-        borderColor: 'white',
-        backgroundColor: '#73D393',
-        borderWidth: 0,
-        borderRadius: 15, FlexDirection: 'row',
-        alignItems: "center", justifyContent: "center", alignSelf: "center"
-    },
+  greenbutton: {
+    width: 350,
+    height: 60,
+    borderColor: 'white',
+    backgroundColor: '#73D393',
+    borderWidth: 0,
+    borderRadius: 15,
+    FlexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    alignSelf: 'center',
+  },
 
-    whitetext: { color: 'white', fontSize: 21, fontWeight: 'bold' },
+  whitetext: { color: 'white', fontSize: 21, fontWeight: 'bold' },
 
-    leftstarsize: { height: 30, width: 30, marginLeft: 22 },
+  leftstarsize: { height: 30, width: 30, marginLeft: 22 },
 
-    starsize: { height: 30, width: 30 },
-
-
+  starsize: { height: 30, width: 30 },
 });
 
+const Reviewing = ({ route }) => {
+  const [Stars, setstars] = useState(5);
+  const id = route.params.id;
+  const navigation = useNavigation();
+  const [end, setEnd] = useState(null);
+  const [writings, setwritings] = useState('');
+  // API 호출 함수
+  const submitReview = async () => {
+    if (!writings.trim()) {
+      Alert.alert('오류', '리뷰 내용을 입력해주세요.');
+      return;
+    }
 
+    setLoading(true);
+    if (photo != null) {
+      const request = {
+        rating: Stars,
+        content: writings,
+        photo, // 선택된 사진
+      };
+    } else {
+      const request = {
+        rating: Stars,
+        content: writings,
+      };
+    }
 
 const Reviewing = ({ route }) => {
     const [Stars, setstars] = useState(5);
@@ -165,11 +221,21 @@ const Reviewing = ({ route }) => {
                         </View>
                     </View>
                 </View>
-            )
-            }
-        </View >
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      )}
+    </View>
+  );
+};
 
-    );
-}
+Reviewing.propTypes = {
+  route: PropTypes.shape({
+    params: PropTypes.shape({
+      id: PropTypes.string.isRequired,
+    }).isRequired,
+  }).isRequired,
+};
 
 export default Reviewing;

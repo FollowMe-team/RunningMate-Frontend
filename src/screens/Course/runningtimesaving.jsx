@@ -1,6 +1,15 @@
 
+
 import React, { useState, useEffect, useRef } from 'react';
-import { View, StyleSheet, Alert, TouchableOpacity, Text, TextInput, Modal } from 'react-native';
+import {
+  View,
+  StyleSheet,
+  Alert,
+  TouchableOpacity,
+  Text,
+  TextInput,
+  Modal,
+} from 'react-native';
 import MapView, { PROVIDER_GOOGLE, Marker, Polyline } from 'react-native-maps';
 import Geolocation from '@react-native-community/geolocation';
 
@@ -19,10 +28,7 @@ import playbutton from '../../assets/images/Course/playbutton.png';
 import endbutton from '../../assets/images/Course/endbutton.png';
 import { combineTransition } from 'react-native-reanimated';
 
-let runpause = false
-
-
-
+let runpause = false;
 
 const RunningScreen = () => {
     const [currentLocation, setCurrentLocation] = useState(null);
@@ -120,35 +126,153 @@ const RunningScreen = () => {
         return distance;
     };
 
-    const tick = () => {
-        setTime(prevTime => prevTime.clone().add(1, 'seconds'));
-    };
-
-    const timer = useInterval(() => {
-        if (isRunning && focus) {
-            tick();
-        }
-    }, 1000);
-
-
-    const toggleTimer = () => {
-        setIsRunning(!isRunning);
-    };
-
-    if (!focus) {
-        clearInterval(timer);
+  const timer = useInterval(() => {
+    if (isRunning && focus) {
+      tick();
     }
+  }, 1000);
 
-    useEffect(() => {
-        const focusListener = navigation.addListener('focus', () => {
-            setFocus(true);
-            //getLocationUpdates(); // 위치 업데이트 시작
-        });
+  const toggleTimer = () => {
+    setIsRunning(!isRunning);
+  };
 
-        const blurListener = navigation.addListener('blur', () => {
-            setFocus(false);
-            setIsRunning(false);
-            //removeLocationUpdates(); // 위치 업데이트 중지
+  if (!focus) {
+    clearInterval(timer);
+  }
+
+  useEffect(() => {
+    const focusListener = navigation.addListener('focus', () => {
+      setFocus(true);
+      //getLocationUpdates(); // 위치 업데이트 시작
+    });
+
+    const blurListener = navigation.addListener('blur', () => {
+      setFocus(false);
+      setIsRunning(false);
+      //removeLocationUpdates(); // 위치 업데이트 중지
+    });
+
+    // 클린업 함수
+    return () => {
+      //focusListener();
+      //blurListener();
+    };
+  }, [navigation]);
+
+  const formatTime = duration => {
+    const hours = duration.hours().toString().padStart(2, '0');
+    const minutes = duration.minutes().toString().padStart(2, '0');
+    const seconds = duration.seconds().toString().padStart(2, '0');
+    return `${hours}:${minutes}:${seconds}`;
+  };
+
+  // 경사 계산 함수
+  const calculateSlope = async (lat1, lon1, lat2, lon2) => {
+    // 고도 얻기
+    const elevation1 = await getElevation(lat1, lon1);
+    const elevation2 = await getElevation(lat2, lon2);
+
+    if (elevation1 !== null && elevation2 !== null) {
+      // 거리 계산
+      const distance = await getDistance(lat1, lon1, lat2, lon2);
+      if (distance === null) {
+        return;
+      }
+
+      setDistance(distance);
+
+      // 경사 계산 (고도 차이 / 수평 거리)
+      const slopeValue = (elevation2 - elevation1) / (distance / 1000); // 킬로미터로 계산
+      setSlope(slopeValue);
+      setElevation1(elevation1);
+      setElevation2(elevation2);
+      setLat1(lat1);
+      setLon1(lon1);
+      setLat2(lat2);
+      setLon2(lon2);
+    } else {
+      Alert.alert('고도 정보', '고도를 가져오는 데 실패했습니다.');
+    }
+  };
+  // 경사 계산 버튼 클릭 시 동작
+  const handleCalculateSlope = () => {
+    if (slope !== null) {
+      // 이미 정보가 표시된 상태라면, 정보 초기화 (토글 효과)
+      setSlope(null);
+      setDistance(null);
+      setElevation1(null);
+      setElevation2(null);
+      setLat1(null);
+      setLon1(null);
+      setLat2(null);
+      setLon2(null);
+    } else {
+      // 새로운 경사 계산
+      const lat1 = 37.7749; // 샌프란시스코 예시 위도
+      const lon1 = -122.4194; // 샌프란시스코 예시 경도
+      const lat2 = 37.8044; // 오클랜드 예시 위도
+      const lon2 = -122.2711; // 오클랜드 예시 경도
+      calculateSlope(lat1, lon1, lat2, lon2);
+    }
+  };
+
+  // 거리 계산 함수
+  const getDistance = async (lat1, lon1, lat2, lon2) => {
+    const origin = `${lat1},${lon1}`;
+    const destination = `${lat2},${lon2}`;
+
+    try {
+      const response = await fetch(
+        `https://maps.googleapis.com/maps/api/directions/json?origin=${origin}&destination=${destination}&key=${GOOGLE_MAPS_API_KEY}`,
+      );
+      const data = await response.json();
+
+      if (data.status === 'OK') {
+        const distance = data.routes[0].legs[0].distance.value; // 거리 (미터 단위)
+        return distance; // 미터로 반환
+      } else {
+        Alert.alert('경로 오류', '경로를 찾을 수 없습니다.');
+        return null;
+      }
+    } catch (error) {
+      console.error('API 호출 오류:', error);
+      Alert.alert('네트워크 오류', 'API 호출에 실패했습니다.');
+      return null;
+    }
+  };
+
+  // 고도 계산 함수
+  const getElevation = async (latitude, longitude) => {
+    const url = `https://maps.googleapis.com/maps/api/elevation/json?locations=${latitude},${longitude}&key=${GOOGLE_MAPS_API_KEY}`;
+    try {
+      const response = await fetch(url);
+      const data = await response.json();
+      if (data.status === 'OK') {
+        return data.results[0].elevation; // 고도 반환
+      } else {
+        Alert.alert('고도 오류', '고도를 가져올 수 없습니다.');
+        return null;
+      }
+    } catch (error) {
+      Alert.alert('네트워크 오류', '네트워크 오류가 발생했습니다.');
+      return null;
+    }
+  };
+
+  const isValidCoordinate = value => {
+    const num = parseFloat(value);
+    return !isNaN(num) && isFinite(num);
+  };
+  // 사용자의 현재 위치 가져오기
+  useEffect(() => {
+    Geolocation.getCurrentPosition(
+      position => {
+        const { latitude, longitude } = position.coords;
+        const initialLocation = { latitude, longitude };
+        setCurrentLocation({
+          ...initialLocation,
+          latitudeDelta: 0.01,
+          longitudeDelta: 0.01,
         });
 
         // 클린업 함수
@@ -405,14 +529,28 @@ const RunningScreen = () => {
                         </View>
                     </View>
                 </View>
-                <View style={{ flexDirection: 'row', justifyContent: 'center', marginTop: 30 }}>
-                    <TouchableOpacity onPress={toggleTimer}>
-                        <Image style={{ height: 55, width: 55 }} source={isRunning ? stopbutton : playbutton} />
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={handleEnd}>
-                        <Image style={{ height: 55, width: 55, marginLeft: 20 }} source={endbutton} />
-                    </TouchableOpacity>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => navigation.navigate('Savingcourse')}
+                style={{
+                  width: '50%',
+                  height: '100%',
+                  justifyContent: 'center',
+                }}
+              >
+                <View style={{ alignSelf: 'center', justifyContent: 'center' }}>
+                  <Text
+                    style={{
+                      color: 'black',
+                      alignSelf: 'center',
+                      fontWeight: 'bold',
+                      color: 'red',
+                    }}
+                  >
+                    Finish
+                  </Text>
                 </View>
+              </TouchableOpacity>
             </View>
 
             {end !== null && (
@@ -437,81 +575,81 @@ const RunningScreen = () => {
                 </View>
             )}
         </View>
-    );
+      )}
+    </View>
+  );
 };
 
-
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-    },
-    map: {
-        flex: 1,
-    },
-    modalContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    },
-    modalContent: {
-        backgroundColor: 'white',
-        padding: 20,
-        borderRadius: 10,
-        width: '80%',
-    },
-    modalTitle: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        marginBottom: 10,
-    },
-    input: {
-        borderWidth: 1,
-        borderColor: '#ddd',
-        padding: 10,
-        marginBottom: 10,
-        borderRadius: 5,
-    },
-    modalButtons: {
-        flexDirection: 'row',
-        justifyContent: 'space-around',
-    },
-    routeButton: {
-        position: 'absolute',
-        top: 20,
-        right: 20,
-        backgroundColor: '#4285F4',
-        padding: 10,
-        borderRadius: 5,
-    },
-    button: {
-        padding: 10,
-        borderRadius: 5,
-    },
-    buttonText: {
-        color: 'white',
-        fontWeight: 'bold',
-    },
-    resultContainer: {
-        position: 'absolute',
-        marginTop: 20,
-        padding: 10,
-        backgroundColor: '#fff',
-        borderRadius: 5,
-        borderWidth: 1,
-        borderColor: '#ddd',
-    },
-    slopeText: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        marginBottom: 10,
-    },
-    infoText: {
-        fontSize: 14,
-        marginBottom: 5,
-    },
-    space: { height: 15 },
-
+  container: {
+    flex: 1,
+  },
+  map: {
+    flex: 1,
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    padding: 20,
+    borderRadius: 10,
+    width: '80%',
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: '#ddd',
+    padding: 10,
+    marginBottom: 10,
+    borderRadius: 5,
+  },
+  modalButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+  },
+  routeButton: {
+    position: 'absolute',
+    top: 20,
+    right: 20,
+    backgroundColor: '#4285F4',
+    padding: 10,
+    borderRadius: 5,
+  },
+  button: {
+    padding: 10,
+    borderRadius: 5,
+  },
+  buttonText: {
+    color: 'white',
+    fontWeight: 'bold',
+  },
+  resultContainer: {
+    position: 'absolute',
+    marginTop: 20,
+    padding: 10,
+    backgroundColor: '#fff',
+    borderRadius: 5,
+    borderWidth: 1,
+    borderColor: '#ddd',
+  },
+  slopeText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  infoText: {
+    fontSize: 14,
+    marginBottom: 5,
+  },
+  space: { height: 15 },
 });
 
 export default RunningScreen;

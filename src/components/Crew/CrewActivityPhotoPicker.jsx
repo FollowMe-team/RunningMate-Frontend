@@ -46,7 +46,7 @@ export const handleImageSelection = async (index, setPhoto) => {
     }
 
     ImagePicker.openCamera({
-      width: 300,
+      width: 500,
       height: 300,
       cropping: true,
       includeBase64: true,
@@ -60,7 +60,7 @@ export const handleImageSelection = async (index, setPhoto) => {
       });
   } else if (index === 1) {
     ImagePicker.openPicker({
-      width: 300,
+      width: 500,
       height: 300,
       cropping: true,
       includeBase64: true,
@@ -84,7 +84,7 @@ const CrewActivityPhotoPicker = ({ setPhoto }) => {
   };
 
   return (
-    <View>
+    <View style={styles.container}>
       <TouchableOpacity
         style={styles.addPhotoContainer}
         onPress={showActionSheet}
@@ -128,6 +128,12 @@ const CrewActivityPhotoPicker = ({ setPhoto }) => {
 };
 
 const styles = StyleSheet.create({
+  container: {
+    width: 415,
+    height: 300,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   addPhotoContainer: {
     width: '100%',
     height: 300,

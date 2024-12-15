@@ -5,27 +5,40 @@ import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import defaultProfileImage from '../../assets/images/Settings/profile.png';
 import groups from '../../assets/images/Crew/groups.png';
 import Footprint from '../Footprint';
+import Rank from '../Rank';
 
 const CrewCard = ({ crew, onPress }) => {
+  const profileImageUrl = crew.profileImageUrl
+    ? { uri: crew.profileImageUrl }
+    : defaultProfileImage;
+
   return (
-    <TouchableOpacity style={styles.cardContainer} onPress={onPress}>
-      <Image source={defaultProfileImage} style={{ width: 40, height: 40 }} />
+    <TouchableOpacity
+      style={styles.cardContainer}
+      onPress={() => onPress(crew.id)}
+    >
+      <Image
+        source={profileImageUrl}
+        style={{ width: 50, height: 50, borderRadius: 25 }}
+      />
       <View style={styles.cardInfoSet}>
         <View style={{ flexDirection: 'row', marginBottom: 10 }}>
           <Text style={styles.cardTitle}>{crew.name}</Text>
-          <Footprint experience={crew.footprint} />
+          {crew.footprintAverage !== undefined && (
+            <Footprint experience={crew.footprintAverage} />
+          )}
         </View>
         <Text
           style={styles.cardBriefInfo}
           numberOfLines={1}
           ellipsizeMode="tail"
         >
-          {crew.brief}
+          {crew.shortDescription || 'No description available'}
         </Text>
       </View>
       <View style={styles.groupSet}>
         <Image source={groups} style={{ width: 10, height: 10 }} />
-        <Text style={styles.count}>{crew.members.length}</Text>
+        <Text style={styles.count}>{crew.memberCount || 0}</Text>
       </View>
     </TouchableOpacity>
   );
@@ -76,17 +89,11 @@ CrewCard.propTypes = {
   crew: PropTypes.shape({
     id: PropTypes.number.isRequired,
     name: PropTypes.string.isRequired,
-    footprint: PropTypes.number.isRequired,
-    brief: PropTypes.string.isRequired,
-    members: PropTypes.arrayOf(
-      PropTypes.shape({
-        id: PropTypes.number.isRequired,
-        nickname: PropTypes.string.isRequired,
-        info: PropTypes.string.isRequired,
-        profile_url: PropTypes.string.isRequired,
-      }),
-    ).isRequired,
-    number: PropTypes.number.isRequired,
+    footprintAverage: PropTypes.number,
+    ranking: PropTypes.string,
+    profileImageUrl: PropTypes.string,
+    shortDescription: PropTypes.string,
+    memberCount: PropTypes.number,
   }).isRequired,
   onPress: PropTypes.func.isRequired,
 };

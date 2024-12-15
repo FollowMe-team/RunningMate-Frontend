@@ -49,6 +49,7 @@ import Withdrawal from '../screens/setting/Withdrawal';
 import WithdrawalComplete from '../screens/setting/WithdrawalComplete';
 import MyCrewModification from '../screens/Crew/MyCrewModification';
 import CrewList from '../screens/Crew/CrewList';
+import MyCrewCourse from '../screens/Crew/MyCrewCourse';
 
 const WebViewScreen = ({ route }) => {
   const { url } = route.params;
@@ -116,7 +117,6 @@ const StackNavigator = () => (
         title: '러닝 코스',
         header: ({ navigation }) => (
           <Header title="러닝 코스" navigation={navigation} />
-
         ),
         headerShown: true,
       }}
@@ -138,8 +138,7 @@ const StackNavigator = () => (
       options={{
         title: '코스 추천_선택',
         header: ({ navigation }) => (
-          <Header title="코스 추천" navigation={navigation}
-            hideSettingButton />
+          <Header title="코스 추천" navigation={navigation} hideSettingButton />
         ),
         headerShown: true,
       }}
@@ -150,8 +149,7 @@ const StackNavigator = () => (
       options={{
         title: '코스 추천',
         header: ({ navigation }) => (
-          <Header title="코스 추천" navigation={navigation}
-            hideSettingButton />
+          <Header title="코스 추천" navigation={navigation} hideSettingButton />
         ),
         headerShown: true,
       }}
@@ -162,8 +160,7 @@ const StackNavigator = () => (
       options={{
         title: '코스 추천_지도',
         header: ({ navigation }) => (
-          <Header title="코스 추천" navigation={navigation}
-            hideSettingButton />
+          <Header title="코스 추천" navigation={navigation} hideSettingButton />
         ),
         headerShown: true,
       }}
@@ -174,8 +171,7 @@ const StackNavigator = () => (
       options={{
         title: '코스 검색',
         header: ({ navigation }) => (
-          <Header title="코스 검색" navigation={navigation}
-            hideSettingButton />
+          <Header title="코스 검색" navigation={navigation} hideSettingButton />
         ),
         headerShown: true,
       }}
@@ -186,8 +182,7 @@ const StackNavigator = () => (
       options={{
         title: '러닝 검색 리스트',
         header: ({ navigation }) => (
-          <Header title="코스 검색" navigation={navigation}
-            hideSettingButton />
+          <Header title="코스 검색" navigation={navigation} hideSettingButton />
         ),
         headerShown: true,
       }}
@@ -198,8 +193,7 @@ const StackNavigator = () => (
       options={{
         title: '코스 검색 선택 뷰',
         header: ({ navigation }) => (
-          <Header title="코스 검색" navigation={navigation}
-            hideSettingButton />
+          <Header title="코스 검색" navigation={navigation} hideSettingButton />
         ),
         headerShown: false,
       }}
@@ -210,11 +204,7 @@ const StackNavigator = () => (
       options={{
         title: '내 코스',
         header: ({ navigation }) => (
-          <Header
-            title="내 코스"
-            navigation={navigation}
-            hideSettingButton
-          />
+          <Header title="내 코스" navigation={navigation} hideSettingButton />
         ),
         headerShown: true,
       }}
@@ -225,8 +215,7 @@ const StackNavigator = () => (
       options={{
         title: '내 코스 없음',
         header: ({ navigation }) => (
-          <Header title="내 코스" navigation={navigation}
-            hideSettingButton />
+          <Header title="내 코스" navigation={navigation} hideSettingButton />
         ),
         headerShown: true,
       }}
@@ -237,8 +226,7 @@ const StackNavigator = () => (
       options={{
         title: '리뷰',
         header: ({ navigation }) => (
-          <Header title="상세보기" navigation={navigation}
-            hideSettingButton />
+          <Header title="상세보기" navigation={navigation} hideSettingButton />
         ),
         headerShown: true,
       }}
@@ -249,8 +237,7 @@ const StackNavigator = () => (
       options={{
         title: '리뷰 작성',
         header: ({ navigation }) => (
-          <Header title="리뷰 작성" navigation={navigation}
-            hideSettingButton />
+          <Header title="리뷰 작성" navigation={navigation} hideSettingButton />
         ),
         headerShown: true,
       }}
@@ -261,8 +248,11 @@ const StackNavigator = () => (
       options={{
         title: '리뷰 리스트',
         header: ({ navigation }) => (
-          <Header title="작성된 리뷰" navigation={navigation}
-            hideSettingButton />
+          <Header
+            title="작성된 리뷰"
+            navigation={navigation}
+            hideSettingButton
+          />
         ),
         headerShown: true,
       }}
@@ -283,8 +273,12 @@ const StackNavigator = () => (
       options={{
         title: '코스 저장',
         header: ({ navigation }) => (
-          <Header title="코스 저장" navigation={navigation} hideBackButton
-            hideSettingButton />
+          <Header
+            title="코스 저장"
+            navigation={navigation}
+            hideBackButton
+            hideSettingButton
+          />
         ),
         headerShown: true,
       }}
@@ -295,8 +289,12 @@ const StackNavigator = () => (
       options={{
         title: '달리기 완료',
         header: ({ navigation }) => (
-          <Header title="달리기 완료" navigation={navigation}
-            hideBackButton hideSettingButton />
+          <Header
+            title="달리기 완료"
+            navigation={navigation}
+            hideBackButton
+            hideSettingButton
+          />
         ),
         headerShown: true,
       }}
@@ -307,8 +305,11 @@ const StackNavigator = () => (
       options={{
         title: '타인 프로필 기본',
         header: ({ navigation }) => (
-          <Header title="타인 프로필" navigation={navigation}
-            hideSettingButton />
+          <Header
+            title="타인 프로필"
+            navigation={navigation}
+            hideSettingButton
+          />
         ),
         headerShown: true,
       }}
@@ -319,8 +320,11 @@ const StackNavigator = () => (
       options={{
         title: '타인 프로필 기본',
         header: ({ navigation }) => (
-          <Header title="타인 프로필" navigation={navigation}
-            hideSettingButton />
+          <Header
+            title="타인 프로필"
+            navigation={navigation}
+            hideSettingButton
+          />
         ),
         headerShown: true,
       }}
@@ -331,8 +335,11 @@ const StackNavigator = () => (
       options={{
         title: '발자국 평가',
         header: ({ navigation }) => (
-          <Header title="발자국 평가" navigation={navigation}
-            hideSettingButton />
+          <Header
+            title="발자국 평가"
+            navigation={navigation}
+            hideSettingButton
+          />
         ),
         headerShown: true,
       }}
@@ -357,7 +364,7 @@ const StackNavigator = () => (
       name="CrewSearchResult"
       component={CrewSearchResult}
       options={{
-        title: '크루 검색 결과',
+        title: '크루 검�� 결과',
         header: ({ navigation }) => (
           <Header title="크루 검색 결과" navigation={navigation} />
         ),
@@ -525,11 +532,7 @@ const StackNavigator = () => (
       options={{
         title: '위치 선택',
         header: ({ navigation }) => (
-          <Header
-            title="위치 선택"
-            navigation={navigation}
-            hideSettingButton
-          />
+          <Header title="위치 선택" navigation={navigation} hideSettingButton />
         ),
         headerShown: true,
       }}
@@ -540,11 +543,7 @@ const StackNavigator = () => (
       options={{
         title: '위치 선택',
         header: ({ navigation }) => (
-          <Header
-            title="위치 선택"
-            navigation={navigation}
-            hideSettingButton
-          />
+          <Header title="위치 선택" navigation={navigation} hideSettingButton />
         ),
         headerShown: true,
       }}
@@ -573,6 +572,17 @@ const StackNavigator = () => (
         title: '크루 멤버 목록',
         header: ({ navigation }) => (
           <Header title="크루 멤버 목록" navigation={navigation} />
+        ),
+        headerShown: true,
+      }}
+    />
+    <Stack.Screen
+      name="MyCrewCourse"
+      component={MyCrewCourse}
+      options={{
+        title: '크루 코스 관리',
+        header: ({ navigation }) => (
+          <Header title="크루 코스 관리" navigation={navigation} />
         ),
         headerShown: true,
       }}
