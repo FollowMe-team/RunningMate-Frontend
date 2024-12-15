@@ -220,11 +220,6 @@ const Course_basic = () => {
         <Recentcourse data={bookedCourse} />
       </View>
       <View style={{ height: 100 }}></View>
-      <TouchableOpacity
-        onPress={() => navigation.navigate('DynamicHeightView')}
-      >
-        <Text style={{ color: 'black' }}>TEST</Text>
-      </TouchableOpacity>
     </ScrollView>
   );
 };

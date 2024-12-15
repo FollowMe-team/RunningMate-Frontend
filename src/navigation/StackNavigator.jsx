@@ -50,7 +50,6 @@ import WithdrawalComplete from '../screens/setting/WithdrawalComplete';
 import MyCrewModification from '../screens/Crew/MyCrewModification';
 import CrewList from '../screens/Crew/CrewList';
 import MyCrewCourse from '../screens/Crew/MyCrewCourse';
-import DynamicHeightView from '../screens/Test';
 
 const WebViewScreen = ({ route }) => {
   const { url } = route.params;
@@ -588,7 +587,6 @@ const StackNavigator = () => (
         headerShown: true,
       }}
     />
-    <Stack.Screen name="DynamicHeightView" component={DynamicHeightView} />
   </Stack.Navigator>
 );
 
