@@ -179,7 +179,8 @@ const Reviewed = ({ route, navigated }) => {
                     <View style={styles.space}></View>
                     <View style={{ flexDirection: 'row' }}>
                         <Text style={{ marginLeft: 22, marginBottom: 10 }}>
-                            리뷰({route.params.data.reviewCount})</Text>
+                            리뷰({Coursesuccess === true ? data.reviewCount:
+                            route.params.data.reviewCount})</Text>
                         <View style={{ marginLeft: 5, fontSize: 12, backgroundColor: '#E4E4E4', color: 'black', width: 90, height: 25, textAlign: 'center', textAlignVertical: 'center', borderRadius: 20 }}>
                             <Dropdown
                                 data={Aligndatas}

@@ -7,24 +7,27 @@ import {
 import ProfileBox from '../../components/Othersprofile/Othersprofilebox_notteam';
 import Tabs from '../../components/Othersprofile/OthersTabs';
 import record from '../../components/MyProfile/record.json';
-import { getProfile } from '../../utils/api';
 import Skeleton from '../../components/MyProfile/Skeleton';
 import RecordView from '../../components/Othersprofile/OthersRecordView';
 import ActivityView from '../../components/Othersprofile/OthersFootprint';
+import { getOthersProfile } from '../../utils/courseapi';
 
-const MyProfile = () => {
+const MyProfile = ({ route }) => {
+  const id = route.params.id
   const [activeTab, setActiveTab] = useState('record');
   const [selectedRecord, setSelectedRecord] = useState(null);
   const [profileData, setProfileData] = useState({ loading: true, data: null });
   const [selectedfollowButton, setSelectedfollowButton] = useState(false);
 
+  console.log(id);
 
   useEffect(() => {
     const fetchProfile = async () => {
-      const result = await getProfile();
+      const result = await getOthersProfile(id);
       setProfileData(result);
     };
     fetchProfile();
+    console.log("dkdkd",profileData.data);
   }, []);
 
   const handlefollowButtonPress = () => {
@@ -40,12 +43,13 @@ const MyProfile = () => {
 
   return (
     <ScrollView style={styles.container}>
-      
-      {profileData.loading ? (
-        <Skeleton />
-      ) : (
-        profileData.data && <ProfileBox data={profileData.data} />
-      )}
+
+      {profileData.success ? (<ProfileBox data={profileData.data.data} />
+      )
+        : (
+          <Skeleton />
+        )
+      }
       <Tabs activeTab={activeTab} setActiveTab={setActiveTab} />
       <View contentContainerStyle={styles.contentContainer}>
         {activeTab === 'record' ? (
@@ -93,7 +97,7 @@ const styles = StyleSheet.create({
   },
   button: {
     paddingVertical: 5,
-    paddingHorizontal: 10, position:'absolute', right:10, top:10,
+    paddingHorizontal: 10, position: 'absolute', right: 10, top: 10,
     backgroundColor: '#f0f0f0', // 기본 배경색
     borderRadius: 10,
     borderWidth: 1,
@@ -106,7 +110,7 @@ const styles = StyleSheet.create({
   buttonText: {
     color: '#000', // 기본 텍스트 색상
     fontWeight: '500',
-    fontSize:12
+    fontSize: 12
   },
   selectedButtonText: {
     color: 'white', // 선택된 버튼의 텍스트 색상

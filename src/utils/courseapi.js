@@ -6,6 +6,143 @@ const api = axios.create({
 });
 
 
+const getOthersProfile = async (ids) => {
+    try {
+        const accessToken = await AsyncStorage.getItem('accessToken');
+        if (!accessToken) {
+            console.error('No access token found');
+            return { success: false, message: '인증되지 않은 사용자입니다.' };
+        }
+        const response = await api.get(`/members/${ids}`, {
+            headers: { Authorization: `Bearer ${accessToken}` },
+        });
+        if (response.status === 200) {
+            console.log('Course fetch successful:', response.data);
+            return { success: true, data: response.data };
+        }
+    } catch (error) {
+        console.error('Course fetch failed:', error);
+        if (error.response) {
+            const { data } = error.response;
+            if (data.code === 'AUTH001') {
+                return { success: false, message: '인증되지 않은 사용자입니다.' };
+            } else if (data.code === 'MEMBER001') {
+                return { success: false, message: '회원을 찾을 수 없습니다.' };
+            }
+        }
+        return { success: false, message: '코스 정보를 가져오는데 실패했습니다.' };
+    }
+};
+
+export const SavesavS = async (Request, representativeImage, startImage, finishImage) => {
+    try {
+        const token = await AsyncStorage.getItem('accessToken');
+        if (!token) {
+            console.error('No access token found');
+            return { success: false, message: '인증되지 않은 사용자입니다.' };
+        }
+        const l = {
+            name: "nickname",
+            description: "content",
+            city: "address",
+            district: "",
+            distance: 0,
+            options: [
+            ],
+            coursePoints: []
+        };
+        const formData = new FormData();
+        formData.append('request', JSON.stringify(l));
+        if (representativeImage) {
+            formData.append('representativeImage', {
+                uri: representativeImage,
+                type: 'image/jpeg',
+                name: 'representativeImage.jpg',
+            });
+        }
+        if (startImage) {
+            formData.append('startImage', {
+                uri: startImage,
+                type: 'image/jpeg',
+                name: 'startImage.jpg',
+            });
+        }
+        if (finishImage) {
+            formData.append('finishImage', {
+                uri: finishImage,
+                type: 'image/jpeg',
+                name: 'finishImage.jpg',
+            });
+        }
+        console.log(formData);
+        const response = await api.post(
+            `/courses`,
+            formData,
+            {
+                headers: {
+                    accept: 'application/json',
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'multipart/form-data',
+
+                },
+            },
+        );
+
+        return response.data;
+    } catch (error) {
+        console.error(error);
+        return { success: false, message: error.message };
+    }
+};
+
+export const RecordRunning = async (courseID, Request) => {
+    try {
+        const token = await AsyncStorage.getItem('accessToken');
+        if (!token) {
+            console.error('No access token found');
+            return { success: false, message: '인증되지 않은 사용자입니다.' };
+        }
+        const l = {
+            startTime: "2024-12-13T19:58:48.877Z",
+            endTime: "2024-12-13T19:58:48.877Z",
+            distance: 0,
+            averagePace: 0,
+            caloriesBurned: 0,
+            recordPoints: [
+                {
+                    latitude: 0,
+                    longitude: 0,
+                    recordedTime: "2024-12-13T19:58:48.877Z"
+                },
+                {
+                    latitude: 1,
+                    longitude: 2,
+                    recordedTime: "2024-12-13T19:58:48.877Z"
+                }
+            ]
+        }
+        const formData = new FormData();
+        formData.append('request', JSON.stringify(l));
+        console.log(formData);
+        const response = await api.post(
+            `/courses/${courseID}/record`,
+            formData,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+
+                },
+            },
+        );
+        return response.data;
+    } catch (error) {
+        console.error(error);
+        return { success: false, message: error.message };
+    }
+};
+
+
 const getCourseMap = async courseids => {
 
     try {
@@ -38,15 +175,32 @@ const getCourseMap = async courseids => {
     }
 };
 
-export const RReviewing = async (courseID, Request) => {
+export const RReviewing = async (courseID, Request, image) => {
     try {
         const token = await AsyncStorage.getItem('accessToken');
+        if (!token) {
+            console.error('No access token found');
+            return { success: false, message: '인증되지 않은 사용자입니다.' };
+        }
+
+        const formData = new FormData();
+        formData.append('request', JSON.stringify(Request));
+        if (image) {
+            formData.append('images', {
+                uri: image,
+                type: 'image/jpeg',
+                name: 'profile.jpg',
+            });
+        }
+        console.log(formData);
         const response = await api.post(
             `/courses/${courseID}/reviews`,
-            Request,
+            formData,
             {
                 headers: {
                     Authorization: `Bearer ${token}`,
+                    'Content-Type': 'multipart/form-data',
+
                 },
             },
         );
@@ -346,6 +500,7 @@ export {
     checkName,
     getCourseSearch,
     getCourseMap,
+    getOthersProfile,
 };
 
 export default api;

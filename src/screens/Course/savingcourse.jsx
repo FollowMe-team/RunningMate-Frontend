@@ -1,24 +1,14 @@
-import React, { useState } from 'react';
-import {
-  TouchableOpacity,
-  TextInput,
-  StyleSheet,
-  View,
-  Text,
-  Alert,
-  Pressable,
-  Image,
-  ImageBackground,
-  ScrollView,
-  Modal,
-} from 'react-native';
+
+import React, { useState, useEffect } from 'react';
+import { TouchableOpacity, TextInput, StyleSheet, View, Text, Alert, Pressable, Image, ImageBackground, ScrollView, Modal } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Dropdown } from 'react-native-element-dropdown';
+import Geocoder from 'react-native-geocoding';
+import { SavesavS } from '../../utils/courseapi';
 
-import mapforrun from '../../assets/images/Course/mapforrun.png';
-import stopbutton from '../../assets/images/Course/stopbutton.png';
-import playbutton from '../../assets/images/Course/playbutton.png';
-import endbutton from '../../assets/images/Course/endbutton.png';
+// Google Maps API 키를 여기에 입력하세요
+Geocoder.init('AIzaSyCQdugA7ICLSYCnuAvsf_pfgtJYzM0sfTs');
+
 import runningman from '../../assets/images/Course/runningmanforchoosebutton.png';
 import whiteplus from '../../assets/images/Course/whiteplus.png';
 
@@ -139,10 +129,31 @@ const styles = StyleSheet.create({
   },
 });
 
-const Savingcourse = () => {
-  const navigation = useNavigation();
-  const [Coursedata, setCourse] = useState('');
-  const [end, setEnd] = useState(null);
+const Savingcourse = ({ route }) => {
+    const data = route.params;
+    const times = data.time;
+    const distance = data.totalDistance;
+    const starttime = data.starttime;
+    const endtime = data.endtime;
+    const waypoints = data.waypoint;
+    console.log("times : ", times, ", distance : ", distance, ", starttime : ", starttime, ", endtime :", endtime, ", waypoints : ", waypoints);
+    const navigation = useNavigation();
+    const [Coursedata, setCourse] = useState('');
+    const [end, setEnd] = useState(null);
+    const [nickname, setNickname] = useState('');
+    const [content, setContent] = useState('');
+    const [info, setInfo] = useState('');
+    const [birthday, setBirthday] = useState('');
+    const [gender, setGender] = useState('');
+    const [address, setAddress] = useState('');
+    const [showDatePicker, setShowDatePicker] = useState(false);
+    const [nicknameError, setNicknameError] = useState('');
+    const [modalVisible, setModalVisible] = useState(false);
+    const [isNicknameChecked, setIsNicknameChecked] = useState(false);
+    const [modalMessage, setModalMessage] = useState('');
+    const handleNicknameCheck = async () => {
+        try {
+            const response = await checkName(nickname);
 
   const [nickname, setNickname] = useState('');
   const [info, setInfo] = useState('');
@@ -175,7 +186,61 @@ const Savingcourse = () => {
       setModalMessage('코스 이름 확인 중 오류가 발생했습니다.');
       setModalVisible(true);
     }
-  };
+    const savesave = async () => {
+        const request = {
+            name: nickname,
+            description: content,
+            city: address,
+            district: "",
+            distance: distance,
+            options: [
+                Coursedata, Stairsdata, Optiondata
+            ],
+            coursePoints: waypoints
+        };
+        console.log("request", request);
+        
+        const result = await SavesavS(request, photo, startphoto, endphoto);
+        navigation.navigate('MyCourse');
+    }
+    useEffect(() => {
+        addressreturn(waypoints[0].latitude, waypoints[0].longitude);
+    }, []);
+    const addressreturn = async (latitude, longitude) => {
+        try {
+            // 좌표를 주소로 변환
+            const json = await Geocoder.from(latitude, longitude);
+            const addressComponent = json.results[0].formatted_address;
+            setAddress(addressComponent);
+        } catch (error) {
+            console.warn('주소 변환 중 오류 발생:', error);
+            setAddress('주소를 찾을 수 없습니다');
+        }
+    }
+    const CourseDatas = [
+        { label: "숲길", value: 'FOREST' },
+        { label: "강변", value: 'RIVERSIDE' },
+        { label: "호숫가", value: 'LAKESIDE' },
+        { label: "산길", value: 'MOUNTAIN' },
+        { label: "해변", value: 'SEASIDE' },
+        { label: "도심", value: 'CITYSCAPE' },
+        { label: "공원", value: 'PARK' },
+        { label: "트랙", value: 'TRACK' },
+        { label: "캠퍼스", value: 'CAMPUS' },
+        { label: "트레일", value: 'TRAIL' }
+    ]
+    const [Stairsdata, setStairs] = useState('');
+    const StairDatas = [
+        { label: "경사가 심함", value: 'GRADIENT_HIGH' },
+        { label: "경사가 중간", value: 'GRADIENT_MIDDLE' },
+        { label: "경사가 약함", value: 'GRADIENT_LOW' }
+    ]
+    const [Optiondata, setOption] = useState('');
+    const OptionDatas = [
+        { label: "강아지 산책 가능", value: 'DOG_WALKABLE' },
+        { label: "자전거 이용 가능", value: 'BICYCLE_WALKABLE' },
+        { label: "유모차 산책 가능", value: 'BABY_WALKABLE' }
+    ]
 
   const validateNickname = nickname => {
     setNickname(nickname);
@@ -217,37 +282,67 @@ const Savingcourse = () => {
     { label: '유모차 산책 가능', value: 'BABY_WALKABLE' },
   ];
 
-  const [startphoto, setstartPhoto] = useState(null);
-  const [endphoto, setendPhoto] = useState(null);
-  const [photo, setPhoto] = useState(null);
+    const [startphoto, setstartPhoto] = useState(null);
+    const [endphoto, setendPhoto] = useState(null);
+    const [photo, setPhoto] = useState(null);
+    const formatTime = (duration) => {
+        const hours = duration.hours().toString().padStart(2, '0');
+        const minutes = duration.minutes().toString().padStart(2, '0');
+        const seconds = duration.seconds().toString().padStart(2, '0');
+        return `${hours}:${minutes}:${seconds}`;
+    };
 
-  return (
-    <ScrollView>
-      <View style={styles.space}></View>
-      <View
-        style={{
-          borderRadius: 15,
-          width: '90%',
-          height: 120,
-          backgroundColor: 'white',
-          elevation: 7,
-          alignSelf: 'center',
-        }}
-      >
-        <Text style={{ fontSize: 30, color: 'black', alignSelf: 'center' }}>
-          00:00:00
-        </Text>
-        <View
-          style={{
-            flexDirection: 'row',
-            marginTop: 20,
-            justifyContent: 'space-around',
-          }}
-        >
-          <View>
-            <Text style={{ alignSelf: 'center' }}>거리</Text>
-            <Text style={{ color: 'black', fontSize: 16, alignSelf: 'center' }}>
-              5.3KM
+    return (
+        <ScrollView>
+            <View style={styles.space}></View>
+            <View style={{ borderRadius: 15, width: "90%", height: 120, backgroundColor: 'white', elevation: 7, alignSelf: 'center' }}>
+                <Text style={{ fontSize: 30, color: 'black', alignSelf: 'center' }}>{formatTime(times)}</Text>
+                <View style={{ flexDirection: 'row', marginTop: 20, justifyContent: 'space-around' }}>
+                    <View>
+                        <Text style={{ alignSelf: 'center' }}>거리</Text>
+                        <Text style={{ color: 'black', fontSize: 16, alignSelf: 'center' }}>{distance}KM</Text>
+                    </View>
+                    <View>
+                        <Text style={{ alignSelf: 'center' }}>평균 페이스</Text>
+                        <Text style={{ color: 'black', fontSize: 16, alignSelf: 'center' }}>{distance > 0
+                            ? ((distance / 1000) / (time.hours() * 3600 + time.minutes() * 60 + time.seconds())).toFixed(2)
+                            : '0'} km/h</Text>
+                    </View>
+                    <View>
+                        <Text style={{ alignSelf: 'center' }}>칼로리</Text>
+                        <Text style={{ color: 'black', fontSize: 16, alignSelf: 'center' }}>{(0.0055 * distance).toFixed(1)}</Text>
+                    </View>
+                </View>
+            </View>
+            <Text style={styles.titletext}>코스명</Text>
+            <View style={styles.inputContainer}>
+                <TextInput
+                    style={styles.input}
+                    value={nickname}
+                    onChangeText={validateNickname}
+                />
+                <TouchableOpacity
+                    style={styles.nicknameCheckButton}
+                    onPress={handleNicknameCheck}
+                >
+                    <Text style={styles.nicknameCheckButtonText}>중복 체크</Text>
+                </TouchableOpacity>
+                {nicknameError ? (
+                    <Text style={styles.errorText}>{nicknameError}</Text>
+                ) : null}
+            </View>
+            <Text style={styles.titletext}>코스 설명</Text>
+            <TextInput style={{ borderRadius: 15, width: "90%", height: 130, backgroundColor: 'white', elevation: 7, alignSelf: 'center' }}
+                value={content}
+                onChangeText={setContent}
+            >
+            </TextInput>
+            <Text style={styles.titletext}>위치</Text>
+            <Text style={{
+                borderRadius: 15, width: "90%", height: 50, backgroundColor: 'white', elevation: 7, alignSelf: 'center', color: 'black', fontSize: 15, justifyContent: 'center', paddingLeft: 20
+                , textAlignVertical: 'center'
+            }}>
+                {address}
             </Text>
           </View>
           <View>
@@ -535,42 +630,63 @@ const Savingcourse = () => {
                 </View>
               </TouchableOpacity>
             </View>
-          </View>
-        </View>
-      )}
-      {end !== null && modalMessage != '사용 가능한 코스 이름입니다.' && (
-        <View
-          style={{
-            backgroundColor: ' rgba(0, 0, 0, 0.5)',
-            height: '100%',
-            width: '100%',
-            position: 'absolute',
-            justifyContent: 'center',
-          }}
-        >
-          <View
-            style={{
-              backgroundColor: 'white',
-              height: '18%',
-              width: '60%',
-              alignSelf: 'center',
-              justifyContent: 'space-between',
-              borderRadius: 15,
-            }}
-          >
-            <Text
-              style={{
-                height: '50%',
-                width: '70%',
-                color: 'black',
-                alignSelf: 'center',
-                textAlign: 'center',
-                textAlignVertical: 'center',
-                color: 'grey',
-                fontSize: 12,
-                fontWeight: 'bold',
-                marginTop: '9%',
-              }}
+            <TouchableOpacity onPress={handleEnd}
+                style={styles.greenbutton}>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                    <Image
+                        style={{ width: 40, height: 40, marginTop: 20 }}
+                        source={runningman}
+                    />
+                    <Text style={styles.whitetext}>
+                        코스 등록하기</Text>
+
+                    <Image
+                        style={{ width: 32, height: 32, alignSelf: 'center' }}
+                        source={whiteplus}
+                    />
+                </View>
+            </TouchableOpacity>
+            {end !== null && modalMessage === '사용 가능한 코스 이름입니다.' && (
+                <View style={{ backgroundColor: ' rgba(0, 0, 0, 0.5)', height: '100%', width: '100%', position: 'absolute', justifyContent: 'center' }}>
+                    <View style={{ backgroundColor: 'white', height: '18%', width: '60%', alignSelf: 'center', justifyContent: 'space-between', borderRadius: 15 }}>
+                        <Text style={{ height: '50%', width: '70%', color: 'black', alignSelf: 'center', textAlign: 'center', textAlignVertical: 'center', color: 'grey', fontSize: 12, fontWeight: 'bold', marginTop: '9%' }}>종료 후에는 변경이 불가합니다. 해당 내용으로 등록하시겠습니까?</Text>
+                        <View style={{ flexDirection: 'row', height: '35%', width: '100%' }}>
+                            <TouchableOpacity onPress={handleEnd} style={{ width: '50%', height: '100%', justifyContent: 'center' }}>
+                                <View style={{ alignSelf: 'center', justifyContent: 'center' }}>
+                                    <Text style={{ color: 'black', alignSelf: 'center', fontWeight: 'bold' }}>Cancel</Text>
+                                </View>
+                            </TouchableOpacity>
+                            <TouchableOpacity onPress={savesave}
+                                style={{ width: '50%', height: '100%', justifyContent: 'center' }}>
+                                <View style={{ alignSelf: 'center', justifyContent: 'center' }}>
+                                    <Text style={{ color: 'black', alignSelf: 'center', fontWeight: 'bold', color: 'red' }}>Finish</Text>
+                                </View>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+
+                </View>
+            )}
+            {end !== null && modalMessage != '사용 가능한 코스 이름입니다.' && (
+                <View style={{ backgroundColor: ' rgba(0, 0, 0, 0.5)', height: '100%', width: '100%', position: 'absolute', justifyContent: 'center' }}>
+                    <View style={{ backgroundColor: 'white', height: '18%', width: '60%', alignSelf: 'center', justifyContent: 'space-between', borderRadius: 15 }}>
+                        <Text style={{ height: '50%', width: '70%', color: 'black', alignSelf: 'center', textAlign: 'center', textAlignVertical: 'center', color: 'grey', fontSize: 12, fontWeight: 'bold', marginTop: '9%' }}>코스 네임 중복 인증을 마치세요.</Text>
+                        <View style={{ flexDirection: 'row', height: '35%', width: '100%' }}>
+                            <TouchableOpacity onPress={handleEnd} style={{ width: '100%', height: '100%', justifyContent: 'center' }}>
+                                <View style={{ alignSelf: 'center', justifyContent: 'center' }}>
+                                    <Text style={{ color: 'black', alignSelf: 'center', fontWeight: 'bold' }}>Cancel</Text>
+                                </View>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+
+                </View>
+            )}
+            <Modal
+                transparent={true}
+                visible={modalVisible}
+                onRequestClose={closeModal}
+                animationType="fade"
             >
               코스 네임 중복 인증을 마치세요.
             </Text>
