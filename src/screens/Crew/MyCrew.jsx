@@ -13,7 +13,6 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import Header from '../../components/Header';
 
 import Calendars from '../../components/Calendars';
-import applyMembers from './applyMember.json';
 
 import add from '../../assets/images/Crew/icons8-help.png';
 import more from '../../assets/images/Crew/free-icon-more-options-17764.png';
@@ -23,7 +22,11 @@ import picture from '../../assets/images/Settings/photo-gallery1.png';
 import CrewActivityPicture from '../../components/Crew/CrewActivityPicture';
 import EditCrewActivityPicture from '../../components/Crew/EditCrewActivityPicture';
 import { deleteCrew, leaveCrew } from '../../utils/crew/crew';
-import { getCrewSelect, uploadCrewImages } from '../../utils/crew/crew2';
+import {
+  getCrewSelect,
+  uploadCrewImages,
+  getCrewApplicants,
+} from '../../utils/crew/crew2';
 import { getFavoriteCourses } from '../../utils/crew/crew_course';
 import SimpleCourse from '../../components/Course/SimpleCourse';
 import { fetchMonthlyCrewSchedule } from '../../utils/crew/crew_schedule';
@@ -52,8 +55,9 @@ const MyCrew = () => {
   const [selectedCourse, setSelectedCourse] = useState(null);
 
   useEffect(() => {
-    const count = applyMembers.length;
-    setApplyCount(count);
+    if (crew) {
+      setApplyCount(crew.apply_count);
+    }
   }, []);
 
   const fetchCrewDetail = async () => {
@@ -66,9 +70,14 @@ const MyCrew = () => {
     }
   };
 
-  useEffect(() => {
-    fetchCrewDetail();
-  }, []);
+  const fetchCrewApplicantsCount = async () => {
+    try {
+      const applicants = await getCrewApplicants(initialCrew.id);
+      setApplyCount(applicants.length);
+    } catch (error) {
+      console.error('Failed to fetch crew applicants count:', error);
+    }
+  };
 
   useEffect(() => {
     if (route.params?.crew) {
@@ -90,6 +99,12 @@ const MyCrew = () => {
 
     fetchFavoriteCourses();
   }, [initialCrew.id]);
+
+  useEffect(() => {
+    if (crew && crew.is_master) {
+      fetchCrewApplicantsCount();
+    }
+  }, [crew]);
 
   const fetchMonthlyRecords = async yearMonth => {
     try {
@@ -162,12 +177,11 @@ const MyCrew = () => {
     try {
       await leaveCrew(crew.id);
       alert('크루에서 성공적으로 탈퇴하였습니다.');
-      navigation.navigate('Crew');
+      setModalVisible(false);
+      fetchCrewDetail();
     } catch (error) {
       console.error('Failed to leave crew:', error);
       alert('크루 탈퇴에 실패했습니다. 다시 시도해주세요.');
-    } finally {
-      closeModal();
     }
   };
 
@@ -179,12 +193,12 @@ const MyCrew = () => {
     }).start(() => {
       setConfirmationModalVisible(false);
       crew.is_my_crew = false;
-      navigation.navigate('Crew');
+      fetchCrewDetail();
     });
   };
 
   const handleViewMembers = () => {
-    navigation.navigate('CrewList', { members: crew.members });
+    navigation.navigate('CrewList', { crewId: crew.id });
   };
 
   const handleEditGallery = () => {
@@ -196,6 +210,7 @@ const MyCrew = () => {
       await uploadCrewImages(crew.id, crew.profile_urls);
       alert('사진이 성공적으로 업로드되었습니다.');
       setIsEditing(false);
+      fetchCrewDetail();
     } catch (error) {
       console.error('Failed to upload images:', error);
       alert('사진 업로드에 실패했습니다. 다시 시도해주세요.');
@@ -223,12 +238,11 @@ const MyCrew = () => {
     try {
       await deleteCrew(crew.id);
       alert('크루가 성공적으로 삭제되었습니다.');
+      setDeleteModalVisible(false);
       navigation.navigate('Crew');
     } catch (error) {
       console.error('Failed to delete crew:', error);
       alert('크루 삭제에 실패했습니다. 다시 시도해주세요.');
-    } finally {
-      closeDeleteModal();
     }
   };
 
@@ -277,6 +291,11 @@ const MyCrew = () => {
       ? `${year}년 ${month}월 ${day}일 ${period} ${formattedHours}시${formattedMinutes}`
       : `${period} ${formattedHours}시${formattedMinutes}`;
   };
+
+  useEffect(() => {
+    fetchCrewDetail();
+    fetchCrewApplicantsCount();
+  }, []);
 
   return (
     <ScrollView onScroll={handleScroll} scrollEventThrottle={16}>
@@ -358,6 +377,7 @@ const MyCrew = () => {
                       )}\n`}
                       참여 인원:{' '}
                       {`(${selectedSchedule.memberCount}/${selectedSchedule.memberMax})\n`}
+                      장소: {`${selectedSchedule.meetingPlace}\n`}
                     </Text>
                     {selectedCourse && <SimpleCourse data={selectedCourse} />}
                   </>
@@ -574,8 +594,7 @@ const styles = StyleSheet.create({
   },
   button: {
     width: '30%',
-    height: 50,
-    backgroundColor: '#FF0000',
+    height: 30,
     justifyContent: 'center',
     alignItems: 'center',
     alignSelf: 'flex-end',
@@ -583,9 +602,8 @@ const styles = StyleSheet.create({
     marginBottom: 90,
   },
   buttonText: {
-    color: 'white',
-    fontSize: 20,
-    fontWeight: 'bold',
+    color: '#FF0000',
+    fontSize: 15,
   },
   modalBackground: {
     flex: 1,

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -12,11 +12,35 @@ import { useRoute } from '@react-navigation/native';
 import defaultProfile from '../../assets/images/Settings/profile.png';
 import follow from '../../assets/images/MyProfile/free-icon-add-3683218.png';
 import unfollow from '../../assets/images/MyProfile/free-icon-delete-friend-3683211.png';
+import { searchCrewMembers } from '../../utils/crew/crew3';
+import Rank from '../../components/Rank';
+import Footprint from '../../components/Footprint';
 
 const CrewList = () => {
   const route = useRoute();
-  const { members } = route.params;
-  const [memberList, setMemberList] = useState(members);
+  const { crewId } = route.params;
+  const [memberList, setMemberList] = useState([]);
+
+  useEffect(() => {
+    const fetchCrewMembers = async () => {
+      try {
+        const members = await searchCrewMembers(crewId);
+        const formattedMembers = members.map(member => ({
+          id: member.memberId,
+          profile_url: member.profileImageUrl,
+          nickname: member.nickname,
+          ranking: member.ranking,
+          footPrint: member.footPrint,
+          // is_follow: false, // Assuming default follow state
+        }));
+        setMemberList(formattedMembers);
+      } catch (error) {
+        console.error('Failed to fetch crew members:', error);
+      }
+    };
+
+    fetchCrewMembers();
+  }, [crewId]);
 
   const toggleFollow = id => {
     setMemberList(prevState =>
@@ -28,16 +52,18 @@ const CrewList = () => {
 
   const renderItem = ({ item }) => (
     <View style={styles.itemContainer}>
-      <Image
-        source={{ uri: item.profile_url || defaultProfile }}
-        style={styles.profileImage}
-      />
       <View style={styles.infoLayout}>
+        <Image
+          source={item.profile_url ? { uri: item.profile_url } : defaultProfile}
+          style={styles.profileImage}
+        />
         <Text style={styles.nickname}>{item.nickname}</Text>
-        <Text style={styles.info}>{item.info}</Text>
+        <Rank rank={item.ranking} />
+        <View style={{ marginLeft: 5 }} />
+        <Footprint experience={item.footPrint} />
       </View>
       <TouchableOpacity
-        style={{ marginTop: 5, marginLeft: '50%' }}
+        style={{ marginTop: 5 }}
         onPress={() => toggleFollow(item.id)}
       >
         <Image
@@ -68,9 +94,12 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    paddingHorizontal: 20,
   },
   itemContainer: {
+    width: '100%',
     flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
     padding: 10,
   },
@@ -81,16 +110,14 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   infoLayout: {
-    flexDirection: 'column',
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   nickname: {
     color: 'black',
     fontSize: 16,
     fontWeight: 'bold',
-  },
-  info: {
-    color: '#666',
-    fontSize: 14,
+    marginRight: 5,
   },
   emptyMessage: {
     fontSize: 18,

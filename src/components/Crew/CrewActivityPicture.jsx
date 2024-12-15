@@ -26,7 +26,7 @@ const CrewActivityPicture = ({ profileUrls }) => {
     <View>
       {profileUrls.length === 0 ? (
         <View style={styles.emptyContainer}>
-          <Image source={gallery} style={styles.crewActivityPicture} />
+          <Image source={gallery} style={styles.galleryIcon} />
           <Text style={styles.emptyText}>
             아직 크루 활동 사진이 없어요...{'\n'}
             아래의 갤러리 편집 버튼을 눌러 업로드해주세요!
@@ -74,8 +74,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   crewActivityPicture: {
-    width: 75,
-    height: 75,
+    width: '100%',
+    height: 300,
+    marginBottom: 10,
+  },
+  galleryIcon: {
+    width: 100,
+    height: 100,
     marginBottom: 10,
   },
   pagination: {

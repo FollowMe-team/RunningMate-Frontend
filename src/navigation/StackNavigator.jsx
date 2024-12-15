@@ -50,6 +50,7 @@ import WithdrawalComplete from '../screens/setting/WithdrawalComplete';
 import MyCrewModification from '../screens/Crew/MyCrewModification';
 import CrewList from '../screens/Crew/CrewList';
 import MyCrewCourse from '../screens/Crew/MyCrewCourse';
+import DynamicHeightView from '../screens/Test';
 
 const WebViewScreen = ({ route }) => {
   const { url } = route.params;
@@ -364,7 +365,7 @@ const StackNavigator = () => (
       name="CrewSearchResult"
       component={CrewSearchResult}
       options={{
-        title: '크루 검�� 결과',
+        title: '크루 검색 결과',
         header: ({ navigation }) => (
           <Header title="크루 검색 결과" navigation={navigation} />
         ),
@@ -587,6 +588,7 @@ const StackNavigator = () => (
         headerShown: true,
       }}
     />
+    <Stack.Screen name="DynamicHeightView" component={DynamicHeightView} />
   </Stack.Navigator>
 );
 

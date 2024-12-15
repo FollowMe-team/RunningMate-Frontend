@@ -29,7 +29,10 @@ export const applyToCrew = async crewId => {
     });
 
     console.log('Apply to Crew Response:', response.data);
-    return response.data;
+    if (!response.data || !response.data.data) {
+      throw new Error('Invalid response data');
+    }
+    return response.data.data; // 응답 데이터 업데이트
   } catch (error) {
     console.error('Failed to apply to crew:', error);
     throw error;
@@ -50,7 +53,10 @@ export const cancelCrewApplication = async crewId => {
     });
 
     console.log('Cancel Crew Application Response:', response.data);
-    return response.data;
+    if (!response.data || !response.data.data) {
+      throw new Error('Invalid response data');
+    }
+    return response.data.data; // 응답 데이터 업데이트
   } catch (error) {
     console.error('Failed to cancel crew application:', error);
     throw error;
@@ -109,7 +115,7 @@ export const getCrewSelect = async crewId => {
   }
 };
 
-export const uploadCrewImages = async (crewId, images) => {
+export const uploadCrewImages = async (crewId, activityImages) => {
   try {
     const token = await AsyncStorage.getItem('accessToken');
     if (!token) {
@@ -117,13 +123,16 @@ export const uploadCrewImages = async (crewId, images) => {
     }
 
     const formData = new FormData();
-    images.forEach((image, index) => {
+    activityImages.forEach((image, index) => {
       formData.append('activityImages', {
         uri: image,
         type: 'image/jpeg',
         name: `image${index}.jpg`,
       });
     });
+
+    // Request Body 내용을 로그에 출력
+    console.log('Request Body:', formData);
 
     const response = await api.post(`/crew/${crewId}/image`, formData, {
       headers: {
@@ -135,6 +144,7 @@ export const uploadCrewImages = async (crewId, images) => {
     console.log('Upload Crew Images Response:', response.data);
     return response.data;
   } catch (error) {
+    console.log('Activity Images:', activityImages);
     console.error('Failed to upload crew images:', error);
     throw error;
   }
@@ -249,17 +259,21 @@ export const getCrewApplicants = async crewId => {
       throw new Error('No token found');
     }
 
-    const response = await api.get(`/crew/${crewId}/members`, {
+    const response = await api.get(`/crew/${crewId}/ready`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
-      params: {
-        status: 'READY',
-      },
     });
 
-    console.log('Get Crew Applicants Response:', response.data.data);
-    return response.data.data;
+    const data = response.data.data.crewApplyList;
+    console.log('Get Crew Applicants Response:', data);
+    return data.map(member => ({
+      id: member.memberId,
+      profile_url: member.profileImageUrl,
+      nickname: member.nickname,
+      ranking: member.ranking,
+      footPrint: member.footPrint,
+    }));
   } catch (error) {
     console.error('Failed to fetch crew applicants:', error);
     throw error;

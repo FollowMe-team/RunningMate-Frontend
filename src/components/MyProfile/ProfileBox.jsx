@@ -33,7 +33,13 @@ const formatNumber = num => {
   return num.toString();
 };
 
-const ProfileBox = ({ data, setFootprintFigureVisible, isMinimized }) => {
+const ProfileBox = ({
+  data,
+  setFootprintFigureVisible,
+  isMinimized,
+  setIsMinimized, // 상태 변경 함수 추가
+  hideDetails,
+}) => {
   const navigation = useNavigation();
   const animation = useRef(new Animated.Value(1)).current;
 
@@ -61,7 +67,10 @@ const ProfileBox = ({ data, setFootprintFigureVisible, isMinimized }) => {
   };
 
   return (
-    <View style={[styles.container, { height: isMinimized ? 80 : 320 }]}>
+    <TouchableOpacity
+      onPress={() => setIsMinimized(!isMinimized)} // 클릭 시 간소화 상태 전환
+      style={styles.container}
+    >
       <Animated.View
         style={[styles.contentWrapper, !isMinimized && containerStyle]}
       >
@@ -132,29 +141,33 @@ const ProfileBox = ({ data, setFootprintFigureVisible, isMinimized }) => {
                 </Text>
               </TouchableOpacity>
             </View>
-            <View
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-              }}
-            >
-              <View style={styles.detailsContainer}>
-                <Image source={nameImg} style={styles.icon} />
-                <Text style={styles.detailValue}>{data.name}</Text>
-              </View>
-              <View style={styles.detailsContainer}>
-                <Image source={birthdayImg} style={styles.icon} />
-                <Text style={styles.detailValue}>{data.birthday}</Text>
-              </View>
-              <View style={styles.detailsContainer}>
-                <Image source={genderImg} style={styles.icon} />
-                <Text style={styles.detailValue}>{data.gender}</Text>
-              </View>
-            </View>
-            <View style={styles.detailsContainer}>
-              <Image source={addressImg} style={styles.icon} />
-              <Text style={styles.detailValue}>{data.address}</Text>
-            </View>
+            {!hideDetails && (
+              <>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                  }}
+                >
+                  <View style={styles.detailsContainer}>
+                    <Image source={nameImg} style={styles.icon} />
+                    <Text style={styles.detailValue}>{data.name}</Text>
+                  </View>
+                  <View style={styles.detailsContainer}>
+                    <Image source={birthdayImg} style={styles.icon} />
+                    <Text style={styles.detailValue}>{data.birthday}</Text>
+                  </View>
+                  <View style={styles.detailsContainer}>
+                    <Image source={genderImg} style={styles.icon} />
+                    <Text style={styles.detailValue}>{data.gender}</Text>
+                  </View>
+                </View>
+                <View style={styles.detailsContainer}>
+                  <Image source={addressImg} style={styles.icon} />
+                  <Text style={styles.detailValue}>{data.address}</Text>
+                </View>
+              </>
+            )}
             <View
               style={{
                 flexDirection: 'row',
@@ -163,16 +176,12 @@ const ProfileBox = ({ data, setFootprintFigureVisible, isMinimized }) => {
             >
               <View style={styles.detailsContainer}>
                 <Text style={styles.runningLabel}>달린 거리</Text>
-                <Text style={styles.runningValue}>
-                  {data.running_distance.toLocaleString()}
-                </Text>
+                <Text style={styles.runningValue}>{data.running_distance}</Text>
                 <Text style={styles.runningLabel}>km</Text>
               </View>
               <View style={styles.detailsContainer}>
                 <Text style={styles.runningLabel}>달린 횟수</Text>
-                <Text style={styles.runningValue}>
-                  {data.running_count.toLocaleString()}
-                </Text>
+                <Text style={styles.runningValue}>{data.running_count}</Text>
                 <Text style={styles.runningLabel}>회</Text>
               </View>
             </View>
@@ -208,7 +217,7 @@ const ProfileBox = ({ data, setFootprintFigureVisible, isMinimized }) => {
           </View>
         )}
       </Animated.View>
-    </View>
+    </TouchableOpacity>
   );
 };
 
@@ -220,6 +229,7 @@ const styles = StyleSheet.create({
     borderColor: '#DDDDDD',
     overflow: 'hidden',
     paddingHorizontal: 20,
+    paddingVertical: 10,
   },
   contentWrapper: {
     flex: 1,
@@ -352,6 +362,12 @@ ProfileBox.propTypes = {
   }).isRequired,
   setFootprintFigureVisible: PropTypes.func.isRequired,
   isMinimized: PropTypes.bool.isRequired,
+  setIsMinimized: PropTypes.func.isRequired, // 상태 변경 함수 propTypes에 추가
+  hideDetails: PropTypes.bool,
+};
+
+ProfileBox.defaultProps = {
+  hideDetails: false,
 };
 
 export default ProfileBox;
