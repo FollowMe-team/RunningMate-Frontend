@@ -25,22 +25,30 @@ const refreshAccessToken = async () => {
   }
 };
 
-const getRecommendedCourses = async () => {
+const getRecommendedCourses = async (
+  keyword = '',
+  city = '',
+  district = '',
+) => {
   try {
     const accessToken = await AsyncStorage.getItem('accessToken');
     if (!accessToken) {
       throw new Error('No access token found');
     }
     console.log('Fetching recommended courses with access token:', accessToken);
-    const response = await api.get('/courses', {
+    const response = await api.get('/courses/search', {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
       params: {
+        keyword,
+        city,
+        district,
         latitude: '',
         longitude: '',
-        difficulty: '',
-        runningGoal: '',
+        distance: '',
+        difficulties: '',
+        options: '',
       },
     });
     console.log('Recommended courses response:', response.data);

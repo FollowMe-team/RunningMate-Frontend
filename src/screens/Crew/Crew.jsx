@@ -1,4 +1,4 @@
-import React, { useRef, useCallback, useEffect, useState } from 'react';
+import React, { useRef, useCallback, useState } from 'react';
 import {
   View,
   Text,
@@ -13,11 +13,7 @@ import {
   BottomSheetBackdrop,
   BottomSheetModalProvider,
 } from '@gorhom/bottom-sheet';
-import {
-  useNavigation,
-  useRoute,
-  useFocusEffect,
-} from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 
 import CreateCrewButton from '../../components/Crew/CreateCrewButton';
 import MyCrewList from '../../components/Crew/MyCrewList';
@@ -31,40 +27,40 @@ import { getCrewDetail } from '../../utils/crew/crew';
 
 const Crew = () => {
   const navigation = useNavigation();
-  const route = useRoute();
+  // const route = useRoute();
   const bottomSheetRef = useRef(null);
   const snapPoints = ['70%'];
   const [filteredApplicableCrew, setFilteredApplicableCrew] = useState([]);
   const [myCrews, setMyCrews] = useState([]);
 
-  useEffect(() => {
-    if (route.params?.type === 'search' && route.params?.searchParams) {
-      const { name, location, week, rank } = route.params.searchParams;
-      const filtered = crewData.crew.filter(crew => {
-        const matchesName = name ? crew.name.includes(name) : true;
-        const matchesLocation = location
-          ? crew.city.includes(location) || crew.district.includes(location)
-          : true;
-        const matchesWeek =
-          week.length > 0 ? week.some(day => crew.week.includes(day)) : true;
-        const matchesRank = rank ? crew.rank === rank : true;
-        return (
-          matchesName &&
-          matchesLocation &&
-          matchesWeek &&
-          matchesRank &&
-          !crew.is_my_crew
-        );
-      });
-      setFilteredApplicableCrew(filtered);
-    }
-  }, [route.params?.searchParams]);
+  // useEffect(() => {
+  //   if (route.params?.type === 'search' && route.params?.searchParams) {
+  //     const { name, location, week, rank } = route.params.searchParams;
+  //     const filtered = crewData.crew.filter(crew => {
+  //       const matchesName = name ? crew.name.includes(name) : true;
+  //       const matchesLocation = location
+  //         ? crew.city.includes(location) || crew.district.includes(location)
+  //         : true;
+  //       const matchesWeek =
+  //         week.length > 0 ? week.some(day => crew.week.includes(day)) : true;
+  //       const matchesRank = rank ? crew.rank === rank : true;
+  //       return (
+  //         matchesName &&
+  //         matchesLocation &&
+  //         matchesWeek &&
+  //         matchesRank &&
+  //         !crew.is_my_crew
+  //       );
+  //     });
+  //     setFilteredApplicableCrew(filtered);
+  //   }
+  // }, [route.params?.searchParams]);
 
-  useFocusEffect(
-    useCallback(() => {
-      setFilteredApplicableCrew(crewData.crew.filter(crew => !crew.is_my_crew));
-    }, [crewData]),
-  );
+  // useFocusEffect(
+  //   useCallback(() => {
+  //     setFilteredApplicableCrew(crewData.crew.filter(crew => !crew.is_my_crew));
+  //   }, [crewData]),
+  // );
 
   useFocusEffect(
     useCallback(() => {

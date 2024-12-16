@@ -53,6 +53,7 @@ const MyCrew = () => {
   const [favoriteCourses, setFavoriteCourses] = useState([]);
   const [monthlySchedule, setMonthlySchedule] = useState([]);
   const [selectedCourse, setSelectedCourse] = useState(null);
+  const editCrewActivityPictureRef = useRef(null);
 
   useEffect(() => {
     if (crew) {
@@ -205,9 +206,14 @@ const MyCrew = () => {
     setIsEditing(true);
   };
 
+  const handleCancelEditGallery = () => {
+    setIsEditing(false);
+  };
+
   const handleSaveGallery = async () => {
     try {
-      await uploadCrewImages(crew.id, crew.profile_urls);
+      const newPhotos = editCrewActivityPictureRef.current.getPhotos();
+      await uploadCrewImages(crew.id, newPhotos);
       alert('사진이 성공적으로 업로드되었습니다.');
       setIsEditing(false);
       fetchCrewDetail();
@@ -286,7 +292,7 @@ const MyCrew = () => {
     const minutes = date.getMinutes();
     const period = hours >= 12 ? '오후' : '오전';
     const formattedHours = hours % 12 || 12;
-    const formattedMinutes = minutes === 0 ? '' : ` (${minutes}분)`;
+    const formattedMinutes = minutes === 0 ? '' : ` ${minutes}분`;
     return includeDate
       ? `${year}년 ${month}월 ${day}일 ${period} ${formattedHours}시${formattedMinutes}`
       : `${period} ${formattedHours}시${formattedMinutes}`;
@@ -297,12 +303,24 @@ const MyCrew = () => {
     fetchCrewApplicantsCount();
   }, []);
 
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', async () => {
+      fetchCrewDetail();
+      fetchCrewApplicantsCount();
+    });
+
+    return unsubscribe;
+  }, [navigation, selectedSchedule]);
+
   return (
     <ScrollView onScroll={handleScroll} scrollEventThrottle={16}>
       {showActivityPictures && (
         <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
           {isEditing ? (
-            <EditCrewActivityPicture profileUrls={crew.profile_urls || []} />
+            <EditCrewActivityPicture
+              ref={editCrewActivityPictureRef}
+              profileUrls={crew.profile_urls || []}
+            />
           ) : (
             <CrewActivityPicture profileUrls={crew.profile_urls || []} />
           )}
@@ -314,7 +332,7 @@ const MyCrew = () => {
             <View style={styles.crewScheduleTitleHeader}>
               <Text style={styles.mainTitle}>크루 일정</Text>
               <View style={{ flexDirection: 'row' }}>
-                {
+                {!isEditing && (
                   <TouchableOpacity
                     onPress={handleViewMembers}
                     style={styles.membersButton}
@@ -324,16 +342,24 @@ const MyCrew = () => {
                       멤버 조회
                     </Text>
                   </TouchableOpacity>
-                }
+                )}
                 {crew.is_master &&
                   (isEditing ? (
-                    <TouchableOpacity
-                      onPress={handleSaveGallery}
-                      style={styles.galleryButton}
-                    >
-                      <Image source={picture} style={styles.icon} />
-                      <Text style={styles.galleryButtonText}>저장하기</Text>
-                    </TouchableOpacity>
+                    <>
+                      <TouchableOpacity
+                        onPress={handleCancelEditGallery}
+                        style={styles.galleryButton}
+                      >
+                        <Text style={styles.galleryButtonText}>취소하기</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        onPress={handleSaveGallery}
+                        style={styles.galleryButton}
+                      >
+                        <Image source={picture} style={styles.icon} />
+                        <Text style={styles.galleryButtonText}>저장하기</Text>
+                      </TouchableOpacity>
+                    </>
                   ) : (
                     <TouchableOpacity
                       onPress={handleEditGallery}
