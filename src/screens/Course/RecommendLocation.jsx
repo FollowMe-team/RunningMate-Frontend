@@ -6,7 +6,7 @@ import { useNavigation } from '@react-navigation/native';
 import Geolocation from '@react-native-community/geolocation';
 
 // Google Maps API 키를 여기에 입력하세요
-Geocoder.init('AIzaSyCQdugA7ICLSYCnuAvsf_pfgtJYzM0sfTs');
+Geocoder.init('AIzaSyCQdugA7ICLSYCnuAvsf_pfgtJYzM0sfTs', {language : "ko"});
 
 const RunningTrackingScreen = () => {
   const navigation = useNavigation();
