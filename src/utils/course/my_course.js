@@ -25,29 +25,30 @@ const refreshAccessToken = async () => {
   }
 };
 
-export const getMonthlyRecords = async yearMonth => {
+const getRecommendedCourses = async () => {
   try {
     const accessToken = await AsyncStorage.getItem('accessToken');
     if (!accessToken) {
-      console.error('No access token found');
-      return { success: false, message: '인증되지 않은 사용자입니다.' };
+      throw new Error('No access token found');
     }
-    console.log(`Fetching records for ${yearMonth}`);
-    const response = await api.get(
-      `/members/records/monthly?yearMonth=${yearMonth}`,
-      {
-        headers: { Authorization: `Bearer ${accessToken}` },
+    console.log('Fetching recommended courses with access token:', accessToken);
+    const response = await api.get('/courses', {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
       },
-    );
-    if (response.status === 200) {
-      console.log(
-        'Monthly records fetch successful:',
-        response.data.data.records,
-      );
-      return { success: true, data: response.data.data.records };
-    }
+      params: {
+        latitude: '',
+        longitude: '',
+        difficulty: '',
+        runningGoal: '',
+      },
+    });
+    console.log('Recommended courses response:', response.data);
+    return response.data.data.courses;
   } catch (error) {
-    console.error('Monthly records fetch failed:', error);
-    return { success: false, message: '월별 기록을 가져오는데 실패했습니다.' };
+    console.error('Failed to fetch recommended courses:', error);
+    throw error;
   }
 };
+
+export { refreshAccessToken, getRecommendedCourses };

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -6,39 +6,106 @@ import {
   ScrollView,
   TouchableOpacity,
   Modal,
+  Image,
 } from 'react-native';
-import CrewActivityPicture from '../Crew/CrewActivityPicture';
 
 import { useRoute, useNavigation } from '@react-navigation/native';
-import Footprint from '../Footprint';
-import myProfile from '../MyProfile/myprofileInfo.json';
+import Rank from '../Rank';
+import { applyToCrew, cancelCrewApplication } from '../../utils/crew/crew2';
+import { getCrewDetail } from '../../utils/crew/crew';
+
+import defaultProfileImage from '../../assets/images/Settings/profile.png';
 
 const CrewInformation = () => {
   const route = useRoute();
   const { crew } = route.params;
   const [modalVisible, setModalVisible] = useState(false);
   const [modalMessage, setModalMessage] = useState('');
+  const [isApplied, setIsApplied] = useState(false);
+  const [crewDetail, setCrewDetail] = useState(crew);
   const navigation = useNavigation();
 
-  const handleJoinCrew = () => {
-    if (myProfile.footprint >= crew.footprint) {
-      setModalMessage('신청 완료!');
-    } else {
-      setModalMessage('티어가 낮아 신청이 불가능합니다.');
+  const daysOfWeek = {
+    MONDAY: '월요일',
+    TUESDAY: '화요일',
+    WEDNESDAY: '수요일',
+    THURSDAY: '목요일',
+    FRIDAY: '금요일',
+    SATURDAY: '토요일',
+    SUNDAY: '일요일',
+  };
+
+  useEffect(() => {
+    const fetchCrewDetail = async () => {
+      try {
+        const detail = await getCrewDetail(crew.id);
+        setCrewDetail(detail);
+        setIsApplied(detail.status === '신청 중');
+      } catch (error) {
+        console.error('Failed to fetch crew detail:', error);
+      }
+    };
+
+    fetchCrewDetail();
+  }, [crew.id]);
+
+  const handleJoinCrew = async () => {
+    try {
+      const response = await applyToCrew(crew.id);
+      console.log('Join Crew Response:', response);
+      if (response && response.status === '신청 중') {
+        setIsApplied(true);
+        setModalMessage('신청 완료!');
+      } else {
+        throw new Error('Invalid response data');
+      }
+    } catch (error) {
+      console.error('Failed to join crew:', error);
+      setModalMessage('신청 실패!');
+    }
+    setModalVisible(true);
+  };
+
+  const handleCancelApplication = async () => {
+    try {
+      const response = await cancelCrewApplication(crew.id);
+      console.log('Cancel Application Response:', response);
+      if (response && response.status === '가입 거절') {
+        setIsApplied(false);
+        setModalMessage('신청 취소 완료!');
+      } else {
+        throw new Error('Invalid response data');
+      }
+    } catch (error) {
+      console.error('Failed to cancel application:', error);
+      setModalMessage('신청 취소 실패!');
     }
     setModalVisible(true);
   };
 
   const handleModalClose = () => {
     setModalVisible(false);
-    if (modalMessage === '신청 완료!') {
-      navigation.navigate('Navigation', { screen: 'Crew' });
+    if (modalMessage === '신청 완료!' || modalMessage === '신청 취소 완료!') {
+      navigation.navigate('Crew');
     }
   };
 
   return (
     <ScrollView>
-      <CrewActivityPicture profileUrls={crew.profile_url} />
+      <Image
+        source={
+          crewDetail.profileImageUrl
+            ? { uri: crewDetail.profileImageUrl }
+            : defaultProfileImage
+        }
+        style={{
+          width: 100,
+          height: 100,
+          borderRadius: 50,
+          justifyContent: 'center',
+          alignSelf: 'center',
+        }}
+      />
       <View style={styles.container}>
         <View style={styles.profileForm}>
           <View
@@ -48,32 +115,45 @@ const CrewInformation = () => {
               alignItems: 'center',
             }}
           >
-            <Text style={styles.crewName}>{crew.name}</Text>
-            <Footprint experience={crew.footprint} />
+            <Text style={styles.crewName}>{crewDetail.name}</Text>
+            <Rank rank={crewDetail.ranking} />
           </View>
         </View>
         <View style={styles.formBox}>
           <Text style={styles.title}>크루 소개</Text>
-          <Text style={styles.detail}>{crew.description}</Text>
+          <Text style={styles.detail}>{crewDetail.detailDescription}</Text>
         </View>
         <View style={styles.formBox}>
-          <Text style={styles.title}>크루 조건</Text>
-          <Text style={styles.detail}>대충 조건들 나열</Text>
+          <Text style={styles.title}>크루 참여 최소 랭크</Text>
+          <Text style={styles.detail}>{crewDetail.ranking}</Text>
         </View>
         <View style={styles.formBox}>
           <Text style={styles.title}>주 활동 시간대</Text>
           <Text style={styles.detail}>
-            ({crew.week.join(', ')}) {crew.start_time} ~ {crew.end_time}
+            {(crewDetail.crewActivityTimeList || [])
+              .map(
+                time =>
+                  `${daysOfWeek[time.activityTimes]} ${time.startTime} ~ ${
+                    time.endTime
+                  }`,
+              )
+              .join('\n')}
           </Text>
         </View>
         <View style={styles.formBox}>
           <Text style={styles.title}>크루 활동 지역</Text>
           <Text style={styles.detail}>
-            {crew.city} {crew.district}
+            {crewDetail.crewLocationInfos?.city || ''}{' '}
+            {crewDetail.crewLocationInfos?.district || ''}
           </Text>
         </View>
-        <TouchableOpacity style={styles.button} onPress={handleJoinCrew}>
-          <Text style={styles.buttonText}>크루 신청하기</Text>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={isApplied ? handleCancelApplication : handleJoinCrew}
+        >
+          <Text style={styles.buttonText}>
+            {isApplied ? '신청 취소하기' : '크루 신청하기'}
+          </Text>
         </TouchableOpacity>
 
         <Modal
@@ -139,7 +219,7 @@ const styles = StyleSheet.create({
   button: {
     width: '85%',
     paddingVertical: 22,
-    marginTop: 100,
+    marginTop: 50,
     marginBottom: 100,
     backgroundColor: '#73D393',
     borderRadius: 15,

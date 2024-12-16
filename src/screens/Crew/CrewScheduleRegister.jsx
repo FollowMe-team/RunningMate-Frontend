@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -10,19 +10,49 @@ import {
   ScrollView,
 } from 'react-native';
 import TimePicker from '../../components/TimePicker';
+import PropTypes from 'prop-types';
 import { useNavigation } from '@react-navigation/native';
-import schedule from '../../components/Crew/schedule.json';
+import { getFavoriteCourses } from '../../utils/crew/crew_course';
+import SimpleCourse from '../../components/Course/SimpleCourse';
+import { registerCrewSchedule } from '../../utils/crew/crew_schedule';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import { RadioButton } from 'react-native-paper';
 
 import wave from '../../assets/images/Crew/wave.png';
 
-const CrewScheduleRegister = () => {
+const CrewScheduleRegister = ({ route }) => {
+  const { crewId } = route.params;
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
+  const [date, setDate] = useState(new Date());
+  const [showDatePicker, setShowDatePicker] = useState(false);
   const [startTime, setStartTime] = useState(null);
   const [endTime, setEndTime] = useState(null);
   const [maxParticipants, setMaxParticipants] = useState('');
   const [location, setLocation] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
+  const [favoriteCourses, setFavoriteCourses] = useState([]);
+  const [selectedCourseId, setSelectedCourseId] = useState(null);
   const navigation = useNavigation();
+
+  useEffect(() => {
+    const fetchFavoriteCourses = async () => {
+      try {
+        const courses = await getFavoriteCourses(crewId);
+        setFavoriteCourses(courses);
+      } catch (error) {
+        console.error('Failed to fetch favorite courses:', error);
+      }
+    };
+
+    fetchFavoriteCourses();
+  }, []);
+
+  const handleDateChange = (event, selectedDate) => {
+    const currentDate = selectedDate || date;
+    setShowDatePicker(false);
+    setDate(currentDate);
+    checkFormCompletion();
+  };
 
   const handleTimeChange = (type, value) => {
     if (type === 'startTime') {
@@ -30,6 +60,11 @@ const CrewScheduleRegister = () => {
     } else {
       setEndTime(value);
     }
+    checkFormCompletion();
+  };
+
+  const handleCourseSelect = courseId => {
+    setSelectedCourseId(courseId);
     checkFormCompletion();
   };
 
@@ -41,23 +76,30 @@ const CrewScheduleRegister = () => {
     }
   };
 
-  const handleRegisterCrew = () => {
-    const newSchedule = {
-      date: new Date().toISOString().split('T')[0],
-      start_time: startTime.toLocaleTimeString('ko-KR', {
-        hour: '2-digit',
-        minute: '2-digit',
-      }),
-      end_time: endTime.toLocaleTimeString('ko-KR', {
-        hour: '2-digit',
-        minute: '2-digit',
-      }),
-      participants: 0,
-      max_participants: parseInt(maxParticipants),
-      location: location,
+  const handleRegisterCrew = async () => {
+    console.log('Selected course ID:', selectedCourseId); // 추가된 로그
+
+    const formatDateTime = (date, time) => {
+      const datePart = date.toISOString().split('T')[0];
+      const timePart = time.toTimeString().split(' ')[0];
+      return `${datePart}T${timePart}`;
     };
-    schedule.push(newSchedule);
-    setModalVisible(true);
+
+    const newSchedule = {
+      courseId: selectedCourseId,
+      startTime: formatDateTime(date, startTime),
+      endTime: formatDateTime(date, endTime),
+      meetingPlace: location,
+      memberMax: parseInt(maxParticipants),
+    };
+
+    try {
+      await registerCrewSchedule(crewId, newSchedule);
+      setModalVisible(true);
+    } catch (error) {
+      console.error('Failed to register crew schedule:', error);
+      alert('일정 등록에 실패했습니다. 다시 시도해주세요.');
+    }
   };
 
   const handleModalClose = () => {
@@ -70,7 +112,44 @@ const CrewScheduleRegister = () => {
       <View style={styles.container}>
         <View style={styles.crewScheduleBox}>
           <Text style={styles.crewScheduleText}>코스 즐겨찾기</Text>
-          {/* 코스 즐겨찾기 내용 */}
+          {favoriteCourses.length > 0 ? (
+            favoriteCourses.map((course, index) => (
+              <TouchableOpacity
+                key={index}
+                onPress={() => handleCourseSelect(course.id)}
+                style={styles.courseItem}
+              >
+                <RadioButton
+                  value={course.id}
+                  status={
+                    selectedCourseId === course.id ? 'checked' : 'unchecked'
+                  }
+                  color="#73D393"
+                  onPress={() => handleCourseSelect(course.id)}
+                />
+                <SimpleCourse data={course} />
+              </TouchableOpacity>
+            ))
+          ) : (
+            <Text style={styles.noCoursesText}>해당 코스가 없습니다...</Text>
+          )}
+        </View>
+        <View style={styles.formContainer}>
+          <Text style={styles.title}>날짜 선택</Text>
+          <TouchableOpacity
+            onPress={() => setShowDatePicker(true)}
+            style={styles.datePicker}
+          >
+            <Text style={styles.dateText}>{date.toLocaleDateString()}</Text>
+          </TouchableOpacity>
+          {showDatePicker && (
+            <DateTimePicker
+              value={date}
+              mode="date"
+              display="default"
+              onChange={handleDateChange}
+            />
+          )}
         </View>
         <View style={styles.formContainer}>
           <Text style={styles.title}>일시 선택</Text>
@@ -136,16 +215,18 @@ const CrewScheduleRegister = () => {
           visible={modalVisible}
           onRequestClose={() => setModalVisible(false)}
         >
-          <View style={styles.modalView}>
-            <Text style={styles.modalText}>
-              크루 일정 등록이 완료되었습니다!
-            </Text>
-            <TouchableOpacity
-              style={styles.okButton}
-              onPress={handleModalClose}
-            >
-              <Text style={styles.okButtonText}>OK</Text>
-            </TouchableOpacity>
+          <View style={styles.modalBackground}>
+            <View style={styles.modalView}>
+              <Text style={styles.modalText}>
+                크루 일정 등록이 완료되었습니다!
+              </Text>
+              <TouchableOpacity
+                style={styles.okButton}
+                onPress={handleModalClose}
+              >
+                <Text style={styles.okButtonText}>OK</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </Modal>
       </View>
@@ -171,6 +252,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     color: 'black',
+    marginBottom: 15,
   },
   formContainer: {
     width: '100%',
@@ -195,6 +277,16 @@ const styles = StyleSheet.create({
     borderColor: '#9B9B9D',
     paddingLeft: 21,
     paddingVertical: 6,
+  },
+  datePicker: {
+    width: '40%',
+    color: 'black',
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#9B9B9D',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 16,
   },
   registerCrewButton: {
     width: '85%',
@@ -221,28 +313,59 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
   },
-  modalView: {
+  modalBackground: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalView: {
+    width: 300,
+    paddingHorizontal: 20,
+    paddingVertical: 30,
+    backgroundColor: 'white',
+    borderRadius: 10,
+    alignItems: 'center',
   },
   modalText: {
-    fontSize: 20,
+    color: 'black',
+    fontSize: 12,
     fontWeight: 'bold',
-    color: '#fff',
-    marginBottom: 20,
+    textAlign: 'center',
+    marginBottom: 50,
   },
   okButton: {
-    backgroundColor: '#73D393',
     padding: 10,
     borderRadius: 10,
   },
   okButtonText: {
-    color: '#fff',
-    fontSize: 18,
+    color: '#73D393',
+    fontSize: 15,
     fontWeight: 'bold',
   },
+  noCoursesText: {
+    fontSize: 16,
+    color: 'grey',
+    textAlign: 'center',
+    marginTop: 20,
+  },
+  dateText: {
+    fontSize: 16,
+    color: 'black',
+  },
+  courseItem: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
 });
+
+CrewScheduleRegister.propTypes = {
+  route: PropTypes.shape({
+    params: PropTypes.shape({
+      crewId: PropTypes.number.isRequired,
+    }).isRequired,
+  }).isRequired,
+};
 
 export default CrewScheduleRegister;
