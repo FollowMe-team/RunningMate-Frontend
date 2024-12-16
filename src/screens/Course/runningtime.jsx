@@ -68,66 +68,66 @@ const RunningScreen = ({ route }) => {
             setRemainingWaypointsformap([...waypoints]); // 모든 경로를 remainingWaypoints에 설정
         }
     }, [waypoints]);
- /*
-    // 현재 위치 업데이트 및 경로 진행 확인
-    useEffect(() => {
-        const interval = setInterval(() => {
-            Geolocation.getCurrentPosition(
-                (position) => {
-                    const { latitude, longitude } = position.coords;
-                    console.log("latitude", latitude, "longitude", longitude);
-                    if (latitude == waypoints[0].latitude || currentcheck) {
-                        // 이전 위치와 현재 위치 간의 거리 계산
-                        const distance = calculateDistance(
-                            currentLocation.latitude,
-                            currentLocation.longitude,
-                            latitude,
-                            longitude
-                        );
-
-                        // 총 이동 거리 업데이트
-                        setTotalDistance((prevTotal) => prevTotal + distance);
-                        setcurrentcheck(true);
-                    }
-
-                    setCurrentLocation({
-                        latitude,
-                        longitude,
-                        latitudeDelta: 0.01,
-                        longitudeDelta: 0.01,
-                    });
-
-                    //console.log("latitude!", currentLocation.latitude, "longitude!", currentLocation.longitude);
-                    // 지나온 경로를 업데이트
-                    if (remainingWaypoints.length > 0) {
-                        const nextWaypoint = remainingWaypoints[0];
-                        const distanceToNext = calculateDistance(
-                            latitude,
-                            longitude,
-                            nextWaypoint.latitude,
-                            nextWaypoint.longitude
-                        );
-
-                        // 특정 거리 내에 들어오면 해당 포인트를 완료로 이동
-                        if (distanceToNext <= 5) { // 5m 이내
-                            setCompletedWaypoints((prev) => [...prev, nextWaypoint]);
-                            setRemainingWaypoints((prev) => prev.slice(1));
-                            // 첫 번째 포인트 제거
-                            if (completedWaypoints.length > 2) {
-                                setRemainingWaypointsformap((prev) => prev.slice(1));
-
-                            }
-                        }
-                    }
-                },
-                (error) => console.error(error),
-                { enableHighAccuracy: true, timeout: 20000 }
-            );
-        }, 1000);
-
-        return () => clearInterval(interval); // 클린업
-    }, [remainingWaypoints]);
-*/
+    /*
+       // 현재 위치 업데이트 및 경로 진행 확인
+       useEffect(() => {
+           const interval = setInterval(() => {
+               Geolocation.getCurrentPosition(
+                   (position) => {
+                       const { latitude, longitude } = position.coords;
+                       console.log("latitude", latitude, "longitude", longitude);
+                       if (latitude == waypoints[0].latitude || currentcheck) {
+                           // 이전 위치와 현재 위치 간의 거리 계산
+                           const distance = calculateDistance(
+                               currentLocation.latitude,
+                               currentLocation.longitude,
+                               latitude,
+                               longitude
+                           );
+   
+                           // 총 이동 거리 업데이트
+                           setTotalDistance((prevTotal) => prevTotal + distance);
+                           setcurrentcheck(true);
+                       }
+   
+                       setCurrentLocation({
+                           latitude,
+                           longitude,
+                           latitudeDelta: 0.01,
+                           longitudeDelta: 0.01,
+                       });
+   
+                       //console.log("latitude!", currentLocation.latitude, "longitude!", currentLocation.longitude);
+                       // 지나온 경로를 업데이트
+                       if (remainingWaypoints.length > 0) {
+                           const nextWaypoint = remainingWaypoints[0];
+                           const distanceToNext = calculateDistance(
+                               latitude,
+                               longitude,
+                               nextWaypoint.latitude,
+                               nextWaypoint.longitude
+                           );
+   
+                           // 특정 거리 내에 들어오면 해당 포인트를 완료로 이동
+                           if (distanceToNext <= 5) { // 5m 이내
+                               setCompletedWaypoints((prev) => [...prev, nextWaypoint]);
+                               setRemainingWaypoints((prev) => prev.slice(1));
+                               // 첫 번째 포인트 제거
+                               if (completedWaypoints.length > 2) {
+                                   setRemainingWaypointsformap((prev) => prev.slice(1));
+   
+                               }
+                           }
+                       }
+                   },
+                   (error) => console.error(error),
+                   { enableHighAccuracy: true, timeout: 20000 }
+               );
+           }, 1000);
+   
+           return () => clearInterval(interval); // 클린업
+       }, [remainingWaypoints]);
+   */
 
     // 거리 계산 함수
     const calculateDistance = (lat1, lon1, lat2, lon2) => {
@@ -287,23 +287,23 @@ const RunningScreen = ({ route }) => {
         }
     };
 */
-const haversineDistance = (lat1, lon1, lat2, lon2) => {
-    const toRad = (value) => (value * Math.PI) / 180; // 도를 라디안으로 변환
+    const haversineDistance = (lat1, lon1, lat2, lon2) => {
+        const toRad = (value) => (value * Math.PI) / 180; // 도를 라디안으로 변환
 
-    const R = 6371; // 지구 반지름 (km)
-    const dLat = toRad(lat2 - lat1); // 위도의 차이 (라디안)
-    const dLon = toRad(lon2 - lon1); // 경도의 차이 (라디안)
+        const R = 6371; // 지구 반지름 (km)
+        const dLat = toRad(lat2 - lat1); // 위도의 차이 (라디안)
+        const dLon = toRad(lon2 - lon1); // 경도의 차이 (라디안)
 
-    const a =
-        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-        Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
-        Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        const a =
+            Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+            Math.sin(dLon / 2) * Math.sin(dLon / 2);
 
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    const distance = R * c; // 거리 (km)
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        const distance = R * c; // 거리 (km)
 
-    return distance * 1000; // 거리 (m)로 변환
-};
+        return distance * 1000; // 거리 (m)로 변환
+    };
 
     // 고도 계산 함수
     const getElevation = async (latitude, longitude) => {
@@ -369,7 +369,10 @@ const haversineDistance = (lat1, lon1, lat2, lon2) => {
                     // 첫 경로 포인트를 현재 위치로 설정
                     setwalking((prevWaypoints) => [...prevWaypoints, initialLocation]);
                     console.log("waypoint", walking.length)
-                    setTotalDistance((prev) => prev + haversineDistance(walking[walking.length - 1].latitude, walking[walking.length - 1].longitude, walking[walking.length - 2].latitude, walking[walking.length - 2].longitude))
+                    if (walking.length > 2) {
+                        setTotalDistance((prev) => prev + haversineDistance(walking[walking.length - 1].latitude, walking[walking.length - 1].longitude, walking[walking.length - 2].latitude, walking[walking.length - 2].longitude))
+
+                    }
                     console.log("totaldistance", totalDistance)
 
                 },
@@ -459,7 +462,7 @@ const haversineDistance = (lat1, lon1, lat2, lon2) => {
                         strokeWidth={4}
                     />
                 )}
-                {/* 지나온 경로 */}             
+                {/* 지나온 경로 */}
                 {walking.length > 1 && (
                     <Polyline
                         coordinates={walking}
