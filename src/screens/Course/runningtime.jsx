@@ -264,6 +264,7 @@ const RunningScreen = ({ route }) => {
 
 
     // 거리 계산 함수
+    /*
     const getDistance = async (lat1, lon1, lat2, lon2) => {
         const origin = `${lat1},${lon1}`;
         const destination = `${lat2},${lon2}`;
@@ -285,6 +286,24 @@ const RunningScreen = ({ route }) => {
             return null;
         }
     };
+*/
+const haversineDistance = (lat1, lon1, lat2, lon2) => {
+    const toRad = (value) => (value * Math.PI) / 180; // 도를 라디안으로 변환
+
+    const R = 6371; // 지구 반지름 (km)
+    const dLat = toRad(lat2 - lat1); // 위도의 차이 (라디안)
+    const dLon = toRad(lon2 - lon1); // 경도의 차이 (라디안)
+
+    const a =
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+        Math.sin(dLon / 2) * Math.sin(dLon / 2);
+
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    const distance = R * c; // 거리 (km)
+
+    return distance * 1000; // 거리 (m)로 변환
+};
 
     // 고도 계산 함수
     const getElevation = async (latitude, longitude) => {
@@ -349,15 +368,18 @@ const RunningScreen = ({ route }) => {
                     });
                     // 첫 경로 포인트를 현재 위치로 설정
                     setwalking((prevWaypoints) => [...prevWaypoints, initialLocation]);
+                    console.log("waypoint", walking.length)
+                    setTotalDistance((prev) => prev + haversineDistance(walking[walking.length - 1].latitude, walking[walking.length - 1].longitude, walking[walking.length - 2].latitude, walking[walking.length - 2].longitude))
+                    console.log("totaldistance", totalDistance)
 
                 },
                 (error) => Alert.alert('위치 오류', error.message),
                 { timeout: 20000, enableHighAccuracy: false, }
 
             );
-        }, 1000)
-        return () => clearInterval(interval); // 클린업
 
+        }, 5000)
+        return () => clearInterval(interval); // 클린업
     }, [walking]);
     const addWaypoint2 = () => {
         for (let i = 0; i < data.data.coursePointInfos.length; i++) {
@@ -437,8 +459,8 @@ const RunningScreen = ({ route }) => {
                         strokeWidth={4}
                     />
                 )}
-                {/* 지나온 경로 */}
-                {completedWaypoints.length > 1 && (
+                {/* 지나온 경로 */}             
+                {walking.length > 1 && (
                     <Polyline
                         coordinates={walking}
                         strokeColor="blue" // 회색
@@ -449,7 +471,7 @@ const RunningScreen = ({ route }) => {
                 {/* 각 포인트에 마커 추가 */}
                 {waypoints.map((point, index) => (
                     <Marker
-                        pinColor={index === 0 ? '#73D393' : 'red'}
+                        pinColor={index === 0 ? 'green' : 'green'}
                         key={index}
                         coordinate={point}
                         opacity={index === 0 ? 1 : index === (waypoints.length - 1) ? 1 : 0}
@@ -458,10 +480,10 @@ const RunningScreen = ({ route }) => {
                 ))}
                 {walking.map((point, index) => (
                     <Marker
-                        pinColor={index === 0 ? '#blue' : 'blue'}
+                        pinColor={index === 0 ? 'blue' : 'blue'}
                         key={index}
                         coordinate={point}
-                        opacity={index === 0 ? 1 : index === (waypoints.length - 1) ? 1 : 0}
+                        opacity={index === 0 ? 1 : 0}
                         title={index === 0 ? '출발지' : index === (waypoints.length - 1) ? '도착지' : ``}
                     />
                 ))}
