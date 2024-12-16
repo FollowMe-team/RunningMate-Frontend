@@ -96,7 +96,7 @@ const Course_basic = () => {
     };
     fetchbookedCourse();
   }
-  }, [isFocused/*, bookedCourse*/]);
+  }, [isFocused, bookedCourse]);
 
   return (
     <ScrollView>

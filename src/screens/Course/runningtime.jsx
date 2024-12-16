@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { View, StyleSheet, Alert, TouchableOpacity, Text, TextInput, Modal } from 'react-native';
 import MapView, { PROVIDER_GOOGLE, Marker, Polyline } from 'react-native-maps';
 import Geolocation from '@react-native-community/geolocation';
+import haversine from 'haversine';
 
 import { Image, ImageBackground } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
@@ -51,6 +52,7 @@ const RunningScreen = ({ route }) => {
     const [starttime, setStarttime] = useState();
     const [endtime, setEndtime] = useState();
     const [voicelist, setvoicelist] = useState([]);
+    const [currentcheck, setcurrentcheck] = useState(false);
 
     const [completedWaypoints, setCompletedWaypoints] = useState([]);
     const [remainingWaypoints, setRemainingWaypoints] = useState([]);
@@ -66,15 +68,15 @@ const RunningScreen = ({ route }) => {
             setRemainingWaypointsformap([...waypoints]); // 모든 경로를 remainingWaypoints에 설정
         }
     }, [waypoints]);
-
+ /*
     // 현재 위치 업데이트 및 경로 진행 확인
     useEffect(() => {
         const interval = setInterval(() => {
             Geolocation.getCurrentPosition(
                 (position) => {
                     const { latitude, longitude } = position.coords;
-
-                    if (currentLocation) {
+                    console.log("latitude", latitude, "longitude", longitude);
+                    if (latitude == waypoints[0].latitude || currentcheck) {
                         // 이전 위치와 현재 위치 간의 거리 계산
                         const distance = calculateDistance(
                             currentLocation.latitude,
@@ -85,6 +87,7 @@ const RunningScreen = ({ route }) => {
 
                         // 총 이동 거리 업데이트
                         setTotalDistance((prevTotal) => prevTotal + distance);
+                        setcurrentcheck(true);
                     }
 
                     setCurrentLocation({
@@ -94,6 +97,7 @@ const RunningScreen = ({ route }) => {
                         longitudeDelta: 0.01,
                     });
 
+                    //console.log("latitude!", currentLocation.latitude, "longitude!", currentLocation.longitude);
                     // 지나온 경로를 업데이트
                     if (remainingWaypoints.length > 0) {
                         const nextWaypoint = remainingWaypoints[0];
@@ -111,18 +115,19 @@ const RunningScreen = ({ route }) => {
                             // 첫 번째 포인트 제거
                             if (completedWaypoints.length > 2) {
                                 setRemainingWaypointsformap((prev) => prev.slice(1));
-                                
+
                             }
                         }
                     }
                 },
                 (error) => console.error(error),
-                { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 }
+                { enableHighAccuracy: true, timeout: 20000 }
             );
         }, 1000);
 
         return () => clearInterval(interval); // 클린업
     }, [remainingWaypoints]);
+*/
 
     // 거리 계산 함수
     const calculateDistance = (lat1, lon1, lat2, lon2) => {
@@ -305,6 +310,7 @@ const RunningScreen = ({ route }) => {
         return !isNaN(num) && isFinite(num);
     };
     // 사용자의 현재 위치 가져오기
+    const [walking, setwalking] = useState([]);
     useEffect(() => {
         if (waypoints.length === 0) {
             Geolocation.getCurrentPosition(
@@ -317,9 +323,10 @@ const RunningScreen = ({ route }) => {
                         longitudeDelta: 0.01,
                     });
                     setWaypoints([initialLocation]); // 첫 경로 포인트를 현재 위치로 설정
+                    setwalking([initialLocation]);
                 },
                 (error) => Alert.alert('위치 오류', error.message),
-                { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 }
+                { timeout: 20000, enableHighAccuracy: false, }
 
             );
         }
@@ -328,17 +335,41 @@ const RunningScreen = ({ route }) => {
         }
 
     }, [waypoints]);
+    useEffect(() => {
+        const interval = setInterval(() => {
+            Geolocation.getCurrentPosition(
+                (position) => {
+                    console.log("walking");
+                    const { latitude, longitude } = position.coords;
+                    const initialLocation = { latitude, longitude };
+                    setCurrentLocation({
+                        ...initialLocation,
+                        latitudeDelta: 0.01,
+                        longitudeDelta: 0.01,
+                    });
+                    // 첫 경로 포인트를 현재 위치로 설정
+                    setwalking((prevWaypoints) => [...prevWaypoints, initialLocation]);
+
+                },
+                (error) => Alert.alert('위치 오류', error.message),
+                { timeout: 20000, enableHighAccuracy: false, }
+
+            );
+        }, 1000)
+        return () => clearInterval(interval); // 클린업
+
+    }, [walking]);
     const addWaypoint2 = () => {
         for (let i = 0; i < data.data.coursePointInfos.length; i++) {
             const a = data.data.coursePointInfos[i].latitude;
             const b = data.data.coursePointInfos[i].longitude;
             const lat = parseFloat(a);
             const lng = parseFloat(b);
-            const voice = Coursedetails.coursePoints[i].voice
+            //const voice = Coursedetails.coursePoints[i].voice
 
             if (isValidCoordinate(a) && isValidCoordinate(b)) {
                 setWaypoints((prevWaypoints) => [...prevWaypoints, { latitude: lat, longitude: lng }]);
-                setvoicelist((prev) => [...prev, {voice : voice}]);
+                //setvoicelist((prev) => [...prev, {voice : voice}]);
             } else {
                 Alert.alert('오류', '유효한 좌표를 입력하세요.');
             }
@@ -409,8 +440,8 @@ const RunningScreen = ({ route }) => {
                 {/* 지나온 경로 */}
                 {completedWaypoints.length > 1 && (
                     <Polyline
-                        coordinates={completedWaypoints}
-                        strokeColor="#B0BEC5" // 회색
+                        coordinates={walking}
+                        strokeColor="blue" // 회색
                         strokeWidth={4}
                     />
                 )}
@@ -419,6 +450,15 @@ const RunningScreen = ({ route }) => {
                 {waypoints.map((point, index) => (
                     <Marker
                         pinColor={index === 0 ? '#73D393' : 'red'}
+                        key={index}
+                        coordinate={point}
+                        opacity={index === 0 ? 1 : index === (waypoints.length - 1) ? 1 : 0}
+                        title={index === 0 ? '출발지' : index === (waypoints.length - 1) ? '도착지' : ``}
+                    />
+                ))}
+                {walking.map((point, index) => (
+                    <Marker
+                        pinColor={index === 0 ? '#blue' : 'blue'}
                         key={index}
                         coordinate={point}
                         opacity={index === 0 ? 1 : index === (waypoints.length - 1) ? 1 : 0}
@@ -522,7 +562,7 @@ const RunningScreen = ({ route }) => {
                                     <Text style={{ color: 'black', alignSelf: 'center', fontWeight: 'bold' }}>Cancel</Text>
                                 </View>
                             </TouchableOpacity>
-                            <TouchableOpacity onPress={() => navigation.navigate('Runningend', { time: time, totalDistance: totalDistance, id: data.data.id, starttime: starttime, endtime: endtime, startlatitude: waypoints[0].latitude, startlongitude: waypoints[0].longitude, endlatitude: waypoints[waypoints.length - 1].latitude, endlongitude: waypoints[waypoints.length - 1].longitude })}
+                            <TouchableOpacity onPress={stopTracking}
                                 style={{ width: '50%', height: '100%', justifyContent: 'center' }}>
                                 <View style={{ alignSelf: 'center', justifyContent: 'center' }}>
                                     <Text style={{ color: 'black', alignSelf: 'center', fontWeight: 'bold', color: 'red' }}>Finish</Text>
