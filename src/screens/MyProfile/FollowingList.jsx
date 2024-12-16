@@ -7,6 +7,9 @@ import {
   StyleSheet,
   TouchableOpacity,
 } from 'react-native';
+import Rank from '../../components/Rank';
+import Footprint from '../../components/Footprint';
+
 import { getFollowings } from '../../utils/api';
 import { followUser, unfollowUser } from '../../utils/follow';
 
@@ -23,7 +26,7 @@ const FollowingList = () => {
     const fetchFollowings = async () => {
       const result = await getFollowings();
       if (result.success) {
-        setFollowing(result.data);
+        setFollowing(result.data.followings || []);
       } else {
         console.error(result.message);
       }
@@ -52,17 +55,23 @@ const FollowingList = () => {
   };
 
   const renderItem = ({ item }) => (
-    <View style={styles.itemContainer}>
-      <Image
-        source={{ uri: item.profile_url || defaultProfile }}
-        style={styles.profileImage}
-      />
+    <View style={styles.itemContainer} key={item.memberId}>
       <View style={styles.infoLayout}>
+        <Image
+          source={
+            item.profileImageUrl
+              ? { uri: item.profileImageUrl }
+              : defaultProfile
+          }
+          style={styles.profileImage}
+        />
         <Text style={styles.nickname}>{item.nickname}</Text>
-        <Text style={styles.info}>{item.info}</Text>
+        <Rank rank={item.ranking} />
+        <View style={{ marginLeft: 5 }} />
+        <Footprint experience={item.footPrint} />
       </View>
       <TouchableOpacity
-        onPress={() => handleFollowToggle(item.id, item.isFollowing)}
+        onPress={() => handleFollowToggle(item.memberId, item.isFollowing)}
       >
         <Image
           source={item.isFollowing ? unfollow : follow}
@@ -91,12 +100,16 @@ const FollowingList = () => {
           {renderSkeleton()}
         </>
       ) : following.length === 0 ? (
-        <Text style={styles.emptyMessage}>팔로잉한 러너가 없습니다...ㅠㅠ</Text>
+        <View style={styles.emptyContainer}>
+          <Text style={styles.emptyMessage}>
+            팔로잉한 러너가 없습니다...ㅠㅠ
+          </Text>
+        </View>
       ) : (
         <FlatList
           data={following}
           renderItem={renderItem}
-          keyExtractor={item => item.id.toString()}
+          keyExtractor={item => item.memberId.toString()}
         />
       )}
     </View>
@@ -106,13 +119,17 @@ const FollowingList = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
+    paddingHorizontal: 20,
+  },
+  infoLayout: {
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
     alignItems: 'center',
+    padding: 10,
   },
   itemContainer: {
     flexDirection: 'row',
-    alignItems: 'center',
-    padding: 10,
   },
   profileImage: {
     width: 50,
@@ -120,17 +137,11 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     marginRight: 10,
   },
-  infoLayout: {
-    flexDirection: 'column',
-  },
   nickname: {
-    fontSize: 16,
     color: 'black',
+    fontSize: 16,
     fontWeight: 'bold',
-  },
-  info: {
-    fontSize: 14,
-    color: '#666',
+    marginRight: 5,
   },
   emptyMessage: {
     fontSize: 18,

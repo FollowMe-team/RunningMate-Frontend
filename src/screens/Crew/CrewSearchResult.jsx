@@ -1,16 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  Image,
-} from 'react-native';
+import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import ApplicableCrewList from '../../components/Crew/ApplicableCrewList';
-import search from '../../assets/images/Crew/searching.png';
-import crewData from '../../components/Crew/crew.json';
+
+import { searchCrews } from '../../utils/crew/crew3';
+import { getCrewDetail } from '../../utils/crew/crew';
 
 const CrewSearchResult = () => {
   const navigation = useNavigation();
@@ -18,46 +12,38 @@ const CrewSearchResult = () => {
   const [filteredApplicableCrew, setFilteredApplicableCrew] = useState([]);
 
   useEffect(() => {
-    if (route.params?.type === 'search' && route.params?.searchParams) {
-      const { name, location, week, startTime, endTime, footprint } =
-        route.params.searchParams;
-      const filtered = crewData.crew.filter(crew => {
-        const matchesName = name ? crew.name.includes(name) : true;
-        const matchesLocation = location
-          ? crew.city.includes(location) || crew.district.includes(location)
-          : true;
-        const matchesWeek =
-          week.length > 0 ? week.some(day => crew.week.includes(day)) : true;
-        const matchesTime =
-          startTime && endTime
-            ? crew.start_time >= startTime && crew.end_time <= endTime
-            : true;
-        const matchesFootprint =
-          footprint.length > 0
-            ? footprint.some(f => {
-                if (f === 6) return crew.footprint >= 85;
-                if (f === 5) return crew.footprint >= 70 && crew.footprint < 85;
-                if (f === 4) return crew.footprint >= 55 && crew.footprint < 70;
-                if (f === 3) return crew.footprint >= 40 && crew.footprint < 55;
-                if (f === 2) return crew.footprint >= 25 && crew.footprint < 40;
-                return crew.footprint < 25;
-              })
-            : true;
-        return (
-          matchesName &&
-          matchesLocation &&
-          matchesWeek &&
-          matchesTime &&
-          matchesFootprint &&
-          !crew.is_my_crew
-        );
-      });
-      setFilteredApplicableCrew(filtered);
-    }
+    const fetchCrews = async () => {
+      if (route.params?.type === 'search' && route.params?.searchParams) {
+        const { name, city, district, activityTimes, ranking, orderBy } =
+          route.params.searchParams;
+        const params = {
+          keyword: name,
+          city: city,
+          district: district,
+          activityTimes: activityTimes.join(','),
+          ranking: ranking,
+          orderBy,
+        };
+        try {
+          const crews = await searchCrews(params);
+          setFilteredApplicableCrew(crews);
+        } catch (error) {
+          console.error('Failed to fetch crews:', error);
+        }
+      }
+    };
+
+    fetchCrews();
   }, [route.params?.searchParams]);
 
-  const handleCrewPress = crew => {
-    navigation.navigate('CrewInformation', { crew });
+  const handleApplicableCrewPress = async crewId => {
+    try {
+      const crewDetail = await getCrewDetail(crewId);
+      navigation.navigate('CrewInformation', { crew: crewDetail });
+    } catch (error) {
+      console.error('Failed to fetch crew detail:', error);
+      alert('크루 정보를 불러오는데 실패했습니다.');
+    }
   };
 
   return (
@@ -66,14 +52,11 @@ const CrewSearchResult = () => {
         <View style={styles.crewListSet}>
           <View style={styles.titleSet}>
             <Text style={styles.title}>검색 결과</Text>
-            <TouchableOpacity onPress={() => navigation.navigate('CrewSearch')}>
-              <Image source={search} style={styles.searchIcon} />
-            </TouchableOpacity>
           </View>
           {filteredApplicableCrew.length > 0 ? (
             <ApplicableCrewList
               crewData={filteredApplicableCrew}
-              onCrewPress={handleCrewPress}
+              onCrewPress={handleApplicableCrewPress}
             />
           ) : (
             <Text style={styles.noCrewText}>

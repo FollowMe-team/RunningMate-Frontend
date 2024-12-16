@@ -2040,6 +2040,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@callstack/react-theme-provider@npm:^3.0.9":
+  version: 3.0.9
+  resolution: "@callstack/react-theme-provider@npm:3.0.9"
+  dependencies:
+    deepmerge: ^3.2.0
+    hoist-non-react-statics: ^3.3.0
+  peerDependencies:
+    react: ">=16.3.0"
+  checksum: f888ef0b8f993d393a9d49864f75b04b5cf7259e72f290ec570fc5e314315f75c979b03b391243a72578ab55db4ffcdd4dc9dc1a2f8ec2b516cabb958971a85e
+  languageName: node
+  linkType: hard
+
 "@egjs/hammerjs@npm:^2.0.17":
   version: 2.0.17
   resolution: "@egjs/hammerjs@npm:2.0.17"
@@ -2145,6 +2157,13 @@ __metadata:
   dependencies:
     levn: ^0.4.1
   checksum: 2c358c816575b8338e017cff59bf8b7a186510bc0e6c1b234e889156bfea9e00ce588ce424a0aa5d322e316f1ad08e8fdc7450a7fd966c64cbb911e64eaffbb9
+  languageName: node
+  linkType: hard
+
+"@freakycoder/react-native-bounceable@npm:^1.0.3":
+  version: 1.0.3
+  resolution: "@freakycoder/react-native-bounceable@npm:1.0.3"
+  checksum: d80e1297ddbde7348803007051e118ae1e380aeaf905785e6a73d302d45195d1efbe1293dd5ecee43157925373fa7d79a7f78fd057227fff7af38e58e91007ca
   languageName: node
   linkType: hard
 
@@ -3711,12 +3730,14 @@ __metadata:
     react-native: 0.75.4
     react-native-actions-sheet: ^0.9.7
     react-native-actionsheet: ^2.4.2
+    react-native-bouncy-checkbox: ^4.1.2
     react-native-calendars: ^1.1307.0
     react-native-date-picker: ^5.0.7
+    react-native-dropdown-picker: 5.4.7-beta.1
     react-native-element-dropdown: ^2.12.2
     react-native-geocoding: ^0.5.0
     react-native-geolocation-service: ^5.3.1
-    react-native-gesture-handler: ^2.20.2
+    react-native-gesture-handler: ^2.21.2
     react-native-google-places-autocomplete: ^2.5.7
     react-native-image-crop-picker: ^0.41.5
     react-native-image-picker: ^7.1.2
@@ -3724,6 +3745,7 @@ __metadata:
     react-native-maps: ^1.20.1
     react-native-masked-view: ^0.2.0
     react-native-modal: ^13.0.1
+    react-native-paper: ^5.12.5
     react-native-picker-select: ^9.3.1
     react-native-progress: ^5.0.1
     react-native-reanimated: ^3.16.3
@@ -5277,7 +5299,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"color-convert@npm:^1.9.0":
+"color-convert@npm:^1.9.0, color-convert@npm:^1.9.3":
   version: 1.9.3
   resolution: "color-convert@npm:1.9.3"
   dependencies:
@@ -5309,13 +5331,23 @@ __metadata:
   languageName: node
   linkType: hard
 
-"color-string@npm:^1.9.0":
+"color-string@npm:^1.6.0, color-string@npm:^1.9.0":
   version: 1.9.1
   resolution: "color-string@npm:1.9.1"
   dependencies:
     color-name: ^1.0.0
     simple-swizzle: ^0.2.2
   checksum: c13fe7cff7885f603f49105827d621ce87f4571d78ba28ef4a3f1a104304748f620615e6bf065ecd2145d0d9dad83a3553f52bb25ede7239d18e9f81622f1cc5
+  languageName: node
+  linkType: hard
+
+"color@npm:^3.1.2":
+  version: 3.2.1
+  resolution: "color@npm:3.2.1"
+  dependencies:
+    color-convert: ^1.9.3
+    color-string: ^1.6.0
+  checksum: f81220e8b774d35865c2561be921f5652117638dcda7ca4029262046e37fc2444ac7bbfdd110cf1fd9c074a4ee5eda8f85944ffbdda26186b602dd9bb05f6400
   languageName: node
   linkType: hard
 
@@ -5832,6 +5864,13 @@ __metadata:
   version: 0.1.4
   resolution: "deep-is@npm:0.1.4"
   checksum: edb65dd0d7d1b9c40b2f50219aef30e116cedd6fc79290e740972c132c09106d2e80aa0bc8826673dd5a00222d4179c84b36a790eef63a4c4bca75a37ef90804
+  languageName: node
+  linkType: hard
+
+"deepmerge@npm:^3.2.0":
+  version: 3.3.0
+  resolution: "deepmerge@npm:3.3.0"
+  checksum: 4322195389e0170a0443c07b36add19b90249802c4b47b96265fdc5f5d8beddf491d5e50cbc5bfd65f85ccf76598173083863c202f5463b3b667aca8be75d5ac
   languageName: node
   linkType: hard
 
@@ -10623,6 +10662,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-native-bouncy-checkbox@npm:^4.1.2":
+  version: 4.1.2
+  resolution: "react-native-bouncy-checkbox@npm:4.1.2"
+  dependencies:
+    "@freakycoder/react-native-bounceable": ^1.0.3
+  checksum: d197e60db0ee7909f62be963b36ca5e1fd7cc164367e00a43c57d11382dba3b8d728fcb20d805a4768c168167107135ec88559bc239553926947c9386f82b71f
+  languageName: node
+  linkType: hard
+
 "react-native-calendars@npm:^1.1307.0":
   version: 1.1307.0
   resolution: "react-native-calendars@npm:1.1307.0"
@@ -10652,6 +10700,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-native-dropdown-picker@npm:5.4.7-beta.1":
+  version: 5.4.7-beta.1
+  resolution: "react-native-dropdown-picker@npm:5.4.7-beta.1"
+  dependencies:
+    react-native-gesture-handler: "*"
+  peerDependencies:
+    react: "*"
+    react-native: "*"
+  checksum: 84bed8223c69ab505d46ab913408797c78657de765651549c5fcb8630ebca97afc1f20d6ec22416ef0506f6fb99d150c30acc2687563a4f84a5df62dc385f91d
+  languageName: node
+  linkType: hard
+
 "react-native-element-dropdown@npm:^2.12.2":
   version: 2.12.2
   resolution: "react-native-element-dropdown@npm:2.12.2"
@@ -10678,9 +10738,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-gesture-handler@npm:^2.20.2":
-  version: 2.20.2
-  resolution: "react-native-gesture-handler@npm:2.20.2"
+"react-native-gesture-handler@npm:*, react-native-gesture-handler@npm:^2.21.2":
+  version: 2.21.2
+  resolution: "react-native-gesture-handler@npm:2.21.2"
   dependencies:
     "@egjs/hammerjs": ^2.0.17
     hoist-non-react-statics: ^3.3.0
@@ -10689,7 +10749,7 @@ __metadata:
   peerDependencies:
     react: "*"
     react-native: "*"
-  checksum: 8d9e7496615dad4e6bb6dd1c750c2d3b2e57c6173a1d466b4503b28b159b1dbbb1e7527c3d4bda12324422200c07835f34d81c9bd3cd1b7f594b22949bef274a
+  checksum: 0a42cedb8860a326b465085d0f7622ba03f038b0f0bdd1b1fe5703e58d62cb08bfb82a686c069a1a1410705c2ae0d82971b0449d83796fdd6d071131cf88e68b
   languageName: node
   linkType: hard
 
@@ -10771,6 +10831,22 @@ __metadata:
     react: "*"
     react-native: ">=0.65.0"
   checksum: 15985fd6aaae7a2134ec1003c63abd384f4a17beabd0a80b74033c98eccee29161aa07150f479373fb43106cfb33b5837b7a4f1d2b721ff03b3727490c830a07
+  languageName: node
+  linkType: hard
+
+"react-native-paper@npm:^5.12.5":
+  version: 5.12.5
+  resolution: "react-native-paper@npm:5.12.5"
+  dependencies:
+    "@callstack/react-theme-provider": ^3.0.9
+    color: ^3.1.2
+    use-latest-callback: ^0.1.5
+  peerDependencies:
+    react: "*"
+    react-native: "*"
+    react-native-safe-area-context: "*"
+    react-native-vector-icons: "*"
+  checksum: 35ce56e0bb19c46ce85adc47a504527b7ec455d1a15f3ace0d6fd438abd51b1fe30e1b44351950e16d6376ddbc18ecc94b558e267767d0a9fd886a5f66a4c322
   languageName: node
   linkType: hard
 
@@ -12741,6 +12817,15 @@ __metadata:
   dependencies:
     punycode: ^2.1.0
   checksum: 7167432de6817fe8e9e0c9684f1d2de2bb688c94388f7569f7dbdb1587c9f4ca2a77962f134ec90be0cc4d004c939ff0d05acc9f34a0db39a3c797dada262633
+  languageName: node
+  linkType: hard
+
+"use-latest-callback@npm:^0.1.5":
+  version: 0.1.11
+  resolution: "use-latest-callback@npm:0.1.11"
+  peerDependencies:
+    react: ">=16.8"
+  checksum: cc6df404a4ed3a39d0eb014a815c2e568a6abbe8c5ff09f9205a08bf68e86201826ed633865a6056ca0fd9581e0e7e70f18ca26c592a9eaccea5d244cf283b1f
   languageName: node
   linkType: hard
 

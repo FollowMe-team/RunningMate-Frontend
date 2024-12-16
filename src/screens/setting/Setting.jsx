@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -10,14 +10,28 @@ import {
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
-import myprofile from '../../components/MyProfile/myprofileInfo.json';
 import { logout } from '../../utils/loginlogout_api';
+import { fetchEmail } from '../../utils/api';
 
 const Setting = () => {
   const navigation = useNavigation();
   const [isNotificationEnabled, setIsNotificationEnabled] = useState(false);
   const [isVibrationEnabled, setIsVibrationEnabled] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [email, setEmail] = useState('');
+
+  useEffect(() => {
+    const getEmail = async () => {
+      try {
+        const email = await fetchEmail();
+        setEmail(email);
+      } catch (error) {
+        console.error('Failed to fetch email:', error);
+      }
+    };
+
+    getEmail();
+  }, []);
 
   const toggleNotificationSwitch = () =>
     setIsNotificationEnabled(previousState => !previousState);
@@ -44,7 +58,7 @@ const Setting = () => {
           <View style={styles.buttonDetail}>
             <Text style={styles.nonButton}>로그인 계정</Text>
             <Text style={{ color: '#A8A5AF', fontSize: 13, paddingBottom: 19 }}>
-              {myprofile.login_id}
+              {email}
             </Text>
           </View>
           <TouchableOpacity
@@ -84,14 +98,7 @@ const Setting = () => {
           />
         </View>
       </View>
-      <View style={styles.bundle}>
-        <Text style={styles.title}>프리미엄</Text>
-        <View>
-          <TouchableOpacity>
-            <Text style={styles.button}>프리미엄 구독</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
+
       <View style={styles.bundle}>
         <View style={styles.resignNLogout}>
           <TouchableOpacity onPress={() => navigation.navigate('Withdrawal')}>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   StyleSheet,
@@ -9,15 +9,15 @@ import {
   Text,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import Footprint from '../../components/Footprint';
-import TimePicker from '../../components/TimePicker';
+import Rank from '../../components/Rank';
 
 import search from '../../assets/images/Crew/searching.png';
 import locate from '../../assets/images/Crew/locate.png';
-import wave from '../../assets/images/Crew/wave.png';
 import back from '../../assets/images/Crew/back.png';
 
 import PropTypes from 'prop-types';
+import DropDownPicker from 'react-native-dropdown-picker';
+import cityData from '../../components/Crew/city.json';
 
 const CrewSearchHeader = ({ searchParams, setSearchParams, crewList }) => {
   const navigation = useNavigation();
@@ -62,75 +62,129 @@ const CrewSearchHeader = ({ searchParams, setSearchParams, crewList }) => {
 CrewSearchHeader.propTypes = {
   searchParams: PropTypes.shape({
     name: PropTypes.string,
-    footprint: PropTypes.arrayOf(PropTypes.number),
+    ranking: PropTypes.string, // 문자열로 수정
     location: PropTypes.string,
-    week: PropTypes.arrayOf(PropTypes.string),
-    startTime: PropTypes.string,
-    endTime: PropTypes.string,
+    activityTimes: PropTypes.arrayOf(PropTypes.string),
   }).isRequired,
   setSearchParams: PropTypes.func.isRequired,
   crewList: PropTypes.array.isRequired,
 };
 
 const CrewSearch = () => {
+  const navigation = useNavigation(); // navigation 변수를 정의
   const [searchParams, setSearchParams] = useState({
     name: '',
-    location: '',
-    week: [],
-    startTime: '',
-    endTime: '',
-    footprint: [],
+    city: '',
+    district: '',
+    activityTimes: [],
+    ranking: '',
+    orderBy: 'RECENT',
   });
   const [selectedDays, setSelectedDays] = useState([]);
-  const [activityTime, setActivityTime] = useState({
-    startTime: null,
-    endTime: null,
-  });
+  const [selectedRanking, setSelectedRanking] = useState('');
+  const [openCity, setOpenCity] = useState(false);
+  const [openDistrict, setOpenDistrict] = useState(false);
+  const [city, setCity] = useState('');
+  const [district, setDistrict] = useState('');
+  const [districtOptions, setDistrictOptions] = useState([]);
+
+  const cityOptions = cityData.cities.map(city =>
+    typeof city === 'string'
+      ? { label: city, value: city }
+      : { label: city.name, value: city.name },
+  );
+
+  useEffect(() => {
+    if (city) {
+      const selectedCity = cityData.cities.find(c => c.name === city);
+      if (selectedCity && selectedCity.districts) {
+        setDistrictOptions(
+          selectedCity.districts.map(district => ({
+            label: district,
+            value: district,
+          })),
+        );
+      } else {
+        setDistrictOptions([]);
+      }
+    } else {
+      setDistrictOptions([]);
+    }
+  }, [city]);
 
   const crewList = []; // crewList를 정의하거나 props로 전달받도록 수정
 
-  const handleDaySelect = day => {
+  const handleDaySelect = activityTimes => {
     let updatedDays = [...selectedDays];
-    if (updatedDays.includes(day)) {
-      updatedDays = updatedDays.filter(d => d !== day);
+    if (updatedDays.includes(activityTimes)) {
+      updatedDays = updatedDays.filter(d => d !== activityTimes);
     } else {
-      updatedDays.push(day);
+      updatedDays.push(activityTimes);
     }
     setSelectedDays(updatedDays);
-    setSearchParams({ ...searchParams, week: updatedDays });
-  };
-
-  const isDaySelected = day => selectedDays.includes(day);
-
-  const handleFootprintSelect = footprint => {
-    let updatedFootprints = [...searchParams.footprint];
-    if (updatedFootprints.includes(footprint)) {
-      updatedFootprints = updatedFootprints.filter(f => f !== footprint);
-    } else {
-      updatedFootprints.push(footprint);
-    }
-    setSearchParams({ ...searchParams, footprint: updatedFootprints });
-  };
-
-  const isFootprintSelected = footprint =>
-    searchParams.footprint.includes(footprint);
-
-  const handleTimeChange = (type, value) => {
-    const newTime = { ...activityTime, [type]: value };
-    setActivityTime(newTime);
+    const dayMap = {
+      월: 'MONDAY',
+      화: 'TUESDAY',
+      수: 'WEDNESDAY',
+      목: 'THURSDAY',
+      금: 'FRIDAY',
+      토: 'SATURDAY',
+      일: 'SUNDAY',
+    };
     setSearchParams({
       ...searchParams,
-      startTime: newTime.startTime
-        ? newTime.startTime.toTimeString().slice(0, 5)
-        : '',
-      endTime: newTime.endTime
-        ? newTime.endTime.toTimeString().slice(0, 5)
-        : '',
+      activityTimes: updatedDays.map(day => dayMap[day]),
+    });
+  };
+
+  const isDaySelected = activityTimes => selectedDays.includes(activityTimes);
+
+  const handleRankSelect = ranking => {
+    if (selectedRanking === ranking) {
+      setSelectedRanking('');
+      setSearchParams({ ...searchParams, ranking: '' });
+    } else {
+      setSelectedRanking(ranking);
+      setSearchParams({ ...searchParams, ranking });
+    }
+  };
+
+  const isRankSelected = ranking => selectedRanking === ranking;
+
+  const handleOrderByChange = orderBy => {
+    setSearchParams({ ...searchParams, orderBy });
+  };
+
+  const handleCityChange = value => {
+    setCity(value);
+    setSearchParams(prevState => ({
+      ...prevState,
+      city: value,
+      district: '',
+    }));
+  };
+
+  const handleDistrictChange = value => {
+    setDistrict(value);
+    setSearchParams(prevState => ({
+      ...prevState,
+      district: value,
+    }));
+  };
+
+  const handleSearch = () => {
+    const filteredCrew = crewList.filter(crew =>
+      crew.name.toLowerCase().includes(searchParams.name.toLowerCase()),
+    );
+    navigation.navigate('CrewSearchResult', {
+      searchParams: { ...searchParams, city, district },
+      type: 'search',
+      filteredCrew,
     });
   };
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={{ flex: 1, alignItems: 'center' }}>
       <CrewSearchHeader
         searchParams={searchParams}
         setSearchParams={setSearchParams}
@@ -139,35 +193,73 @@ const CrewSearch = () => {
       <ScrollView style={{ paddingHorizontal: 26 }}>
         <View style={styles.container}>
           <View style={styles.titleContainer}>
-            <Text style={styles.title}>상세 검색</Text>
+            <Text style={styles.title}>활동 지역</Text>
             <Text style={styles.subTitle}> · 미선택 시 전체 검색</Text>
           </View>
-          <View style={{ flexDirection: 'row', marginBottom: 15 }}>
-            <Image source={locate} style={{ width: 50, height: 50 }} />
-            <TextInput
-              value={searchParams.location}
-              onChangeText={text =>
-                setSearchParams({ ...searchParams, location: text })
-              }
-              placeholder="지역명"
-              style={styles.input}
-              placeholderTextColor="#9B9B9D"
+          <View style={styles.locationLayout}>
+            <Image
+              source={locate}
+              style={{ width: 35, height: 50, marginRight: 20 }}
             />
+            <View style={styles.dropdownWrapper}>
+              <DropDownPicker
+                open={openCity}
+                value={city}
+                items={cityOptions}
+                setOpen={setOpenCity}
+                setValue={handleCityChange}
+                setItems={() => {}}
+                placeholder="시/도 선택"
+                style={styles.locationDropdown}
+                dropDownContainerStyle={styles.dropDownContainer}
+                placeholderStyle={{ color: '#101010' }}
+                itemTextStyle={{ color: '#101010' }}
+                selectedTextStyle={{ color: '#101010' }}
+                nestedScrollEnabled={true}
+                dropDownDirection="AUTO"
+              />
+            </View>
+            <View style={styles.dropdownWrapper}>
+              <DropDownPicker
+                open={openDistrict}
+                value={district}
+                items={districtOptions}
+                setOpen={setOpenDistrict}
+                setValue={handleDistrictChange}
+                setItems={() => {}}
+                placeholder="구/군 선택"
+                style={styles.locationDropdown}
+                dropDownContainerStyle={styles.dropDownContainer}
+                placeholderStyle={{ color: '#101010' }}
+                itemTextStyle={{ color: '#101010' }}
+                selectedTextStyle={{ color: '#101010' }}
+                nestedScrollEnabled={true}
+                dropDownDirection="AUTO"
+              />
+            </View>
           </View>
           <View>
             <Text style={styles.title}>크루 최소 조건</Text>
-            <View style={styles.footprintButtonLayout}>
-              {[1, 2, 3, 4, 5, 6].map((footprint, index) => (
+            <View style={styles.rankButtonLayout}>
+              {[
+                'JOGGER',
+                'RUNNER',
+                'RACER',
+                'SPRINTER',
+                'MARATHONER',
+                'ULTRA_RUNNER',
+                'IRON_LEGS',
+                'SPEED_DEMON',
+              ].map((ranking, index) => (
                 <TouchableOpacity
                   key={index}
                   style={[
-                    styles.footprintSelectButton,
-                    isFootprintSelected(footprint) &&
-                      styles.footprintSelectButtonActive,
+                    styles.rankSelectButton,
+                    isRankSelected(ranking) && styles.rankSelectButtonActive,
                   ]}
-                  onPress={() => handleFootprintSelect(footprint)}
+                  onPress={() => handleRankSelect(ranking)}
                 >
-                  <Footprint experience={footprint * 15} />
+                  <Rank rank={ranking} />
                 </TouchableOpacity>
               ))}
             </View>
@@ -175,44 +267,62 @@ const CrewSearch = () => {
           <View>
             <Text style={styles.title}>주 활동 시간대</Text>
             <View style={styles.weekButtonLayout}>
-              {['월', '화', '수', '목', '금', '토', '일'].map(day => (
+              {['월', '화', '수', '목', '금', '토', '일'].map(activityTimes => (
                 <TouchableOpacity
-                  key={day}
+                  key={activityTimes}
                   style={[
                     styles.weekSelectButton,
-                    isDaySelected(day) && styles.weekSelectButtonActive,
+                    isDaySelected(activityTimes) &&
+                      styles.weekSelectButtonActive,
                   ]}
-                  onPress={() => handleDaySelect(day)}
+                  onPress={() => handleDaySelect(activityTimes)}
                 >
                   <View>
                     <Text
                       style={[
                         styles.weekSelectButtonText,
-                        isDaySelected(day) && styles.weekSelectButtonTextActive,
+                        isDaySelected(activityTimes) &&
+                          styles.weekSelectButtonTextActive,
                       ]}
                     >
-                      {day}
+                      {activityTimes}
                     </Text>
                   </View>
                 </TouchableOpacity>
               ))}
             </View>
-            <View style={styles.activityTimeDropdownLayout}>
-              <TimePicker
-                time={activityTime.startTime}
-                setTime={value => handleTimeChange('startTime', value)}
-                placeholder="시작 시간"
-              />
-              <Image source={wave} style={{ width: 25, height: 11 }} />
-              <TimePicker
-                time={activityTime.endTime}
-                setTime={value => handleTimeChange('endTime', value)}
-                placeholder="끝 시간"
-              />
+          </View>
+          <View>
+            <Text style={styles.title}>정렬 기준</Text>
+            <View style={styles.orderByButtonLayout}>
+              {['RECENT', 'OLDEST'].map(orderBy => (
+                <TouchableOpacity
+                  key={orderBy}
+                  style={[
+                    styles.orderByButton,
+                    searchParams.orderBy === orderBy &&
+                      styles.orderByButtonActive,
+                  ]}
+                  onPress={() => handleOrderByChange(orderBy)}
+                >
+                  <Text
+                    style={[
+                      styles.orderByButtonText,
+                      searchParams.orderBy === orderBy &&
+                        styles.orderByButtonTextActive,
+                    ]}
+                  >
+                    {orderBy === 'RECENT' ? '최신 순' : '오래된 순'}
+                  </Text>
+                </TouchableOpacity>
+              ))}
             </View>
           </View>
         </View>
       </ScrollView>
+      <TouchableOpacity style={styles.searchButton} onPress={handleSearch}>
+        <Text style={styles.searchButtonText}>검색</Text>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -261,7 +371,7 @@ const styles = StyleSheet.create({
   titleContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: 3,
   },
   title: {
     color: '#352555',
@@ -360,6 +470,91 @@ const styles = StyleSheet.create({
   footprintImage: {
     width: 20,
     height: 20,
+  },
+  rankButtonLayout: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    marginBottom: 10,
+    marginTop: 8,
+  },
+  rankSelectButton: {
+    height: 40,
+    width: '48%',
+    backgroundColor: 'white',
+    borderColor: '#D6D6D6',
+    borderWidth: 1,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 10,
+  },
+  rankSelectButtonActive: {
+    backgroundColor: '#73D393',
+    borderWidth: 0,
+  },
+  orderByButtonLayout: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 10,
+    marginTop: 8,
+  },
+  orderByButton: {
+    height: 40,
+    width: 80,
+    backgroundColor: 'white',
+    borderColor: '#D6D6D6',
+    borderWidth: 1,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  orderByButtonActive: {
+    backgroundColor: '#73D393',
+    borderWidth: 0,
+  },
+  orderByButtonText: {
+    fontSize: 14,
+    color: '#101010',
+  },
+  orderByButtonTextActive: {
+    color: 'white',
+  },
+  locationLayout: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  dropdownWrapper: {
+    flex: 1,
+    marginRight: 8,
+    marginBottom: 15,
+    justifyContent: 'flex-end',
+  },
+  locationDropdown: {
+    width: '105%',
+    borderColor: '#D6D6D6',
+    borderWidth: 1,
+    borderRadius: 8,
+    padding: 16,
+    marginTop: 15,
+  },
+  dropDownContainer: {
+    borderColor: '#D6D6D6',
+  },
+  searchButton: {
+    justifyContent: 'center',
+    width: '75%',
+    backgroundColor: '#73D393',
+    padding: 15,
+    borderRadius: 10,
+    alignItems: 'center',
+    margin: 20,
+  },
+  searchButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });
 

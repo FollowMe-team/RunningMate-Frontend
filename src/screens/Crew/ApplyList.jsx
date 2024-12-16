@@ -8,21 +8,22 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import applyMemberData from './applyMember.json';
+import PropTypes from 'prop-types';
+import Rank from '../../components/Rank';
+import Footprint from '../../components/Footprint';
 
 // import Header from '../../components/Header';
 import defaultProfile from '../../assets/images/Settings/profile.png';
 
-const ApplyList = () => {
-  //   const route = useRoute();
+const ApplyList = ({ route }) => {
   const navigation = useNavigation();
+  const { applicants } = route.params;
 
-  //   const crew = route.params?.crew;
   const [followers, setFollowers] = useState([]);
 
   useEffect(() => {
-    setFollowers(applyMemberData);
-  }, []);
+    setFollowers(applicants);
+  }, [applicants]);
 
   //   React.useLayoutEffect(() => {
   //     navigation.setOptions({
@@ -39,18 +40,16 @@ const ApplyList = () => {
 
   const renderItem = ({ item }) => (
     <TouchableOpacity onPress={() => handlePress(item)}>
-      <View style={styles.itemContainer}>
+      <View style={styles.infoLayout}>
         <Image
-          source={
-            item.profile_url && item.profile_url !== null
-              ? { uri: item.profile_url }
-              : defaultProfile
-          }
+          source={item.profile_url ? { uri: item.profile_url } : defaultProfile}
           style={styles.profileImage}
         />
-        <View style={styles.infoLayout}>
+        <View style={styles.itemContainer}>
           <Text style={styles.nickname}>{item.nickname}</Text>
-          <Text style={styles.info}>{item.info}</Text>
+          <Rank rank={item.ranking} />
+          <View style={{ marginLeft: 5 }} />
+          <Footprint experience={item.footPrint} />
         </View>
       </View>
     </TouchableOpacity>
@@ -69,12 +68,18 @@ const ApplyList = () => {
 
 const styles = StyleSheet.create({
   container: {
-    marginHorizontal: 10,
+    flex: 1,
+    paddingHorizontal: 20,
+  },
+  infoLayout: {
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    padding: 10,
   },
   itemContainer: {
     flexDirection: 'row',
-    alignItems: 'center',
-    padding: 10,
   },
   profileImage: {
     width: 50,
@@ -82,18 +87,25 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     marginRight: 10,
   },
-  infoLayout: {
-    flexDirection: 'column',
-  },
   nickname: {
     color: 'black',
     fontSize: 16,
     fontWeight: 'bold',
+    marginRight: 5,
   },
-  info: {
+  emptyMessage: {
+    fontSize: 18,
     color: '#666',
-    fontSize: 14,
+    textAlign: 'center',
   },
 });
+
+ApplyList.propTypes = {
+  route: PropTypes.shape({
+    params: PropTypes.shape({
+      applicants: PropTypes.array.isRequired,
+    }).isRequired,
+  }).isRequired,
+};
 
 export default ApplyList;
