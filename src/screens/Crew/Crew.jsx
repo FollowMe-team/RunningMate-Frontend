@@ -22,7 +22,7 @@ import {
 import CreateCrewButton from '../../components/Crew/CreateCrewButton';
 import MyCrewList from '../../components/Crew/MyCrewList';
 import ApplicableCrewList from '../../components/Crew/ApplicableCrewList';
-import crewData from '../../components/Crew/crew.json';
+
 import search from '../../assets/images/Crew/searching.png';
 import { getMyCrews } from '../../utils/crew/crew';
 import { getCrewSelect } from '../../utils/crew/crew2';

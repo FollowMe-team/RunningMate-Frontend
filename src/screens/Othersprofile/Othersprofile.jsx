@@ -6,7 +6,6 @@ import {
 
 import ProfileBox from '../../components/Othersprofile/Othersprofilebox';
 import Tabs from '../../components/Othersprofile/OthersTabs';
-import record from '../../components/MyProfile/record.json';
 import { getProfile } from '../../utils/api';
 import Skeleton from '../../components/MyProfile/Skeleton';
 import RecordView from '../../components/Othersprofile/OthersRecordView';

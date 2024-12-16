@@ -4,7 +4,6 @@ import PropTypes from 'prop-types';
 
 import Calendars from '../Calendars';
 import RecordDetails from './OthersRecordDetails';
-import records from '../MyProfile/record.json';
 
 
 const RecordView = ({ handleDayPress, selectedRecord }) => {

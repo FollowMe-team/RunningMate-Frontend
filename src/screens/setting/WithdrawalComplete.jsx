@@ -9,7 +9,6 @@ import {
   Image,
 } from 'react-native';
 
-import record from '../../components/MyProfile/myprofileInfo.json';
 
 import plane from '../../assets/images/Settings/free-icon-paper-plane-439379.png';
 

@@ -7,10 +7,15 @@ import stopbutton from '../../assets/images/Course/stopbutton.png';
 import playbutton from '../../assets/images/Course/playbutton.png';
 import endbutton from '../../assets/images/Course/endbutton.png';
 
+
 const styles = StyleSheet.create({
   space: { height: 15 },
 
+
+
 });
+
+
 
 export default function Course() {
   return (
@@ -23,22 +28,18 @@ export default function Course() {
 
       </View>
       </ImageBackground>
-
+      
     </View>
   );
 }
 */
 
+
+
+
+
 import React, { useState, useEffect, useRef } from 'react';
-import {
-  View,
-  StyleSheet,
-  Alert,
-  TouchableOpacity,
-  Text,
-  TextInput,
-  Modal,
-} from 'react-native';
+import { View, StyleSheet, Alert, TouchableOpacity, Text, TextInput, Modal } from 'react-native';
 import MapView, { PROVIDER_GOOGLE, Marker, Polyline } from 'react-native-maps';
 import Geolocation from '@react-native-community/geolocation';
 
@@ -75,7 +76,7 @@ const RunningScreen = () => {
       setDistance(distance);
 
       // 경사 계산 (고도 차이 / 수평 거리)
-      const slopeValue = (elevation2 - elevation1) / (distance / 1000); // 킬로미터로 계산
+      const slopeValue = ((elevation2 - elevation1) / (distance / 1000)); // 킬로미터로 계산
       setSlope(slopeValue);
       setElevation1(elevation1);
       setElevation2(elevation2);
@@ -101,65 +102,64 @@ const RunningScreen = () => {
       setLon2(null);
     } else {
       // 새로운 경사 계산
-      const lat1 = 37.7749; // 샌프란시스코 예시 위도
+      const lat1 = 37.7749;  // 샌프란시스코 예시 위도
       const lon1 = -122.4194; // 샌프란시스코 예시 경도
-      const lat2 = 37.8044; // 오클랜드 예시 위도
+      const lat2 = 37.8044;  // 오클랜드 예시 위도
       const lon2 = -122.2711; // 오클랜드 예시 경도
       calculateSlope(lat1, lon1, lat2, lon2);
     }
   };
 
-  // 거리 계산 함수
-  const getDistance = async (lat1, lon1, lat2, lon2) => {
-    const origin = `${lat1},${lon1}`;
-    const destination = `${lat2},${lon2}`;
-
-    try {
-      const response = await fetch(
-        `https://maps.googleapis.com/maps/api/directions/json?origin=${origin}&destination=${destination}&key=${GOOGLE_MAPS_API_KEY}`,
-      );
-      const data = await response.json();
-
-      if (data.status === 'OK') {
-        const distance = data.routes[0].legs[0].distance.value; // 거리 (미터 단위)
-        return distance; // 미터로 반환
-      } else {
-        Alert.alert('경로 오류', '경로를 찾을 수 없습니다.');
-        return null;
-      }
-    } catch (error) {
-      console.error('API 호출 오류:', error);
-      Alert.alert('네트워크 오류', 'API 호출에 실패했습니다.');
+// 거리 계산 함수
+const getDistance = async (lat1, lon1, lat2, lon2) => {
+  const origin = `${lat1},${lon1}`;
+  const destination = `${lat2},${lon2}`;
+  
+  try {
+    const response = await fetch(`https://maps.googleapis.com/maps/api/directions/json?origin=${origin}&destination=${destination}&key=${GOOGLE_MAPS_API_KEY}`);
+    const data = await response.json();
+    
+    if (data.status === 'OK') {
+      const distance = data.routes[0].legs[0].distance.value; // 거리 (미터 단위)
+      return distance; // 미터로 반환
+    } else {
+      Alert.alert('경로 오류', '경로를 찾을 수 없습니다.');
       return null;
     }
-  };
+  } catch (error) {
+    console.error('API 호출 오류:', error);
+    Alert.alert('네트워크 오류', 'API 호출에 실패했습니다.');
+    return null;
+  }
+};
 
-  // 고도 계산 함수
-  const getElevation = async (latitude, longitude) => {
-    const url = `https://maps.googleapis.com/maps/api/elevation/json?locations=${latitude},${longitude}&key=${GOOGLE_MAPS_API_KEY}`;
-    try {
-      const response = await fetch(url);
-      const data = await response.json();
-      if (data.status === 'OK') {
-        return data.results[0].elevation; // 고도 반환
-      } else {
-        Alert.alert('고도 오류', '고도를 가져올 수 없습니다.');
-        return null;
-      }
-    } catch (error) {
-      Alert.alert('네트워크 오류', '네트워크 오류가 발생했습니다.');
+// 고도 계산 함수
+const getElevation = async (latitude, longitude) => {
+  const url = `https://maps.googleapis.com/maps/api/elevation/json?locations=${latitude},${longitude}&key=${GOOGLE_MAPS_API_KEY}`;
+  try {
+    const response = await fetch(url);
+    const data = await response.json();
+    if (data.status === 'OK') {
+      return data.results[0].elevation; // 고도 반환
+    } else {
+      Alert.alert('고도 오류', '고도를 가져올 수 없습니다.');
       return null;
     }
-  };
+  } catch (error) {
+    Alert.alert('네트워크 오류', '네트워크 오류가 발생했습니다.');
+    return null;
+  }
+};
 
-  const isValidCoordinate = value => {
+  
+  const isValidCoordinate = (value) => {
     const num = parseFloat(value);
     return !isNaN(num) && isFinite(num);
   };
   // 사용자의 현재 위치 가져오기
   useEffect(() => {
     Geolocation.getCurrentPosition(
-      position => {
+      (position) => {
         const { latitude, longitude } = position.coords;
         const initialLocation = { latitude, longitude };
         setCurrentLocation({
@@ -169,8 +169,8 @@ const RunningScreen = () => {
         });
         setWaypoints([initialLocation]); // 첫 경로 포인트를 현재 위치로 설정
       },
-      error => Alert.alert('위치 오류', error.message),
-      { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 },
+      (error) => Alert.alert('위치 오류', error.message),
+      { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 }
     );
   }, []);
 
@@ -178,14 +178,8 @@ const RunningScreen = () => {
     const lat = parseFloat(newPoint.latitude);
     const lng = parseFloat(newPoint.longitude);
 
-    if (
-      isValidCoordinate(newPoint.latitude) &&
-      isValidCoordinate(newPoint.longitude)
-    ) {
-      setWaypoints(prevWaypoints => [
-        ...prevWaypoints,
-        { latitude: lat, longitude: lng },
-      ]);
+    if (isValidCoordinate(newPoint.latitude) && isValidCoordinate(newPoint.longitude)) {
+      setWaypoints((prevWaypoints) => [...prevWaypoints, { latitude: lat, longitude: lng }]);
       setNewPoint({ latitude: '', longitude: '' });
     } else {
       Alert.alert('오류', '유효한 좌표를 입력하세요.');
@@ -193,13 +187,13 @@ const RunningScreen = () => {
   };
 
   const resetWaypoints = () => {
-    setWaypoints(prev => (prev.length > 0 ? [prev[0]] : []));
+    setWaypoints((prev) => (prev.length > 0 ? [prev[0]] : []));
   };
   const focusOnRoute = () => {
     if (waypoints.length === 0) return;
 
-    const latitudes = waypoints.map(point => point.latitude);
-    const longitudes = waypoints.map(point => point.longitude);
+    const latitudes = waypoints.map((point) => point.latitude);
+    const longitudes = waypoints.map((point) => point.longitude);
 
     const minLatitude = Math.min(...latitudes);
     const maxLatitude = Math.max(...latitudes);
@@ -267,14 +261,14 @@ const RunningScreen = () => {
               placeholder="위도 (latitude)"
               keyboardType="default"
               value={newPoint.latitude}
-              onChangeText={lat => setNewPoint({ ...newPoint, latitude: lat })}
+              onChangeText={(lat) => setNewPoint({ ...newPoint, latitude: lat })}
             />
             <TextInput
               style={styles.input}
               placeholder="경도 (longitude)"
               keyboardType="default"
               value={newPoint.longitude}
-              onChangeText={lng => setNewPoint({ ...newPoint, longitude: lng })}
+              onChangeText={(lng) => setNewPoint({ ...newPoint, longitude: lng })}
             />
             <View style={styles.modalButtons}>
               <TouchableOpacity
@@ -328,30 +322,19 @@ const RunningScreen = () => {
 
       {slope !== null && (
         <View style={styles.resultContainer}>
-          <Text style={styles.slopeText}>
-            경사: {slope.toFixed(4)} (고도 차이 / 수평 거리)
-          </Text>
-          <Text style={styles.infoText}>
-            첫 번째 지점 (위도, 경도): {lat1}, {lon1}
-          </Text>
-          <Text style={styles.infoText}>
-            첫 번째 지점 고도: {elevation1} 미터
-          </Text>
-          <Text style={styles.infoText}>
-            두 번째 지점 (위도, 경도): {lat2}, {lon2}
-          </Text>
-          <Text style={styles.infoText}>
-            두 번째 지점 고도: {elevation2} 미터
-          </Text>
+          <Text style={styles.slopeText}>경사: {slope.toFixed(4)} (고도 차이 / 수평 거리)</Text>
+          <Text style={styles.infoText}>첫 번째 지점 (위도, 경도): {lat1}, {lon1}</Text>
+          <Text style={styles.infoText}>첫 번째 지점 고도: {elevation1} 미터</Text>
+          <Text style={styles.infoText}>두 번째 지점 (위도, 경도): {lat2}, {lon2}</Text>
+          <Text style={styles.infoText}>두 번째 지점 고도: {elevation2} 미터</Text>
           <Text style={styles.infoText}>두 지점 간의 거리: {distance} km</Text>
-          <Text style={styles.infoText}>
-            두 지점 간의 고도 차이: {elevation2 - elevation1} m
-          </Text>
+          <Text style={styles.infoText}>두 지점 간의 고도 차이: {elevation2 - elevation1} m</Text>
         </View>
       )}
     </View>
   );
 };
+
 
 const styles = StyleSheet.create({
   container: {
@@ -425,3 +408,5 @@ const styles = StyleSheet.create({
 });
 
 export default RunningScreen;
+
+

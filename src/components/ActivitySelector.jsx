@@ -62,4 +62,3 @@ ActivitySelector.propTypes = {
 };
 
 export default ActivitySelector;
-

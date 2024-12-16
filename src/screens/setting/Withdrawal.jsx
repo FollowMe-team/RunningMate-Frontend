@@ -11,7 +11,6 @@ import {
   SafeAreaView,
 } from 'react-native';
 
-import profile from '../../components/MyProfile/myprofileInfo.json';
 import { withdraw } from '../../utils/loginlogout_api';
 
 import down from '../../assets/images/Settings/free-icon-down-arrow-748063.png';
