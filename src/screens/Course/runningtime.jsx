@@ -307,7 +307,7 @@ const RunningScreen = ({ route }) => {
     // 사용자의 현재 위치 가져오기
     useEffect(() => {
         if (waypoints.length === 0) {
-            Geolocation.getCurrentPosition(
+            Geolocation.getCurrentPosition( 
                 (position) => {
                     const { latitude, longitude } = position.coords;
                     const initialLocation = { latitude, longitude };
