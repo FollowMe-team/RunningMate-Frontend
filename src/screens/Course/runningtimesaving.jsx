@@ -1,15 +1,6 @@
 
-
 import React, { useState, useEffect, useRef } from 'react';
-import {
-  View,
-  StyleSheet,
-  Alert,
-  TouchableOpacity,
-  Text,
-  TextInput,
-  Modal,
-} from 'react-native';
+import { View, StyleSheet, Alert, TouchableOpacity, Text, TextInput, Modal } from 'react-native';
 import MapView, { PROVIDER_GOOGLE, Marker, Polyline } from 'react-native-maps';
 import Geolocation from '@react-native-community/geolocation';
 
@@ -28,7 +19,10 @@ import playbutton from '../../assets/images/Course/playbutton.png';
 import endbutton from '../../assets/images/Course/endbutton.png';
 import { combineTransition } from 'react-native-reanimated';
 
-let runpause = false;
+let runpause = false
+
+
+
 
 const RunningScreen = () => {
     const [currentLocation, setCurrentLocation] = useState(null);
@@ -63,54 +57,54 @@ const RunningScreen = () => {
     useEffect(() => {
         setStarttime(curr.toISOString());
     }, []);
-
-    // 현재 위치 업데이트 및 경로 진행 확인
-    useEffect(() => {
-        const interval = setInterval(() => {
-            Geolocation.getCurrentPosition(
-                (position) => {
-                    const { latitude, longitude } = position.coords;
-
-                    if (currentLocation) {
-                        // 이전 위치와 현재 위치 간의 거리 계산
-                        const distance = calculateDistance(
-                            currentLocation.latitude,
-                            currentLocation.longitude,
+    /*
+        // 현재 위치 업데이트 및 경로 진행 확인
+        useEffect(() => {
+            const interval = setInterval(() => {
+                Geolocation.getCurrentPosition(
+                    (position) => {
+                        const { latitude, longitude } = position.coords;
+    
+                        if (currentLocation) {
+                            // 이전 위치와 현재 위치 간의 거리 계산
+                            const distance = calculateDistance(
+                                currentLocation.latitude,
+                                currentLocation.longitude,
+                                latitude,
+                                longitude
+                            );
+    
+                            // 총 이동 거리 업데이트
+                            setTotalDistance((prevTotal) => prevTotal + distance);
+                        }
+    
+                        if (distance > 50) {
+                            setNewPoint({ ...newPoint, latitude: latitude });
+                            setNewPoint({ ...newPoint, longitude: longitude });
+    
+                            
+                            //const elevation = getElevation(latitude, longitude);
+                            const elevation = 0;
+                            setNewPoint({ ...newPoint, elevation: elevation });
+                            addWaypoint();
+                        }
+    
+                        setCurrentLocation({
                             latitude,
-                            longitude
-                        );
-
-                        // 총 이동 거리 업데이트
-                        setTotalDistance((prevTotal) => prevTotal + distance);
-                    }
-
-                    if (distance > 50) {
-                        setNewPoint({ ...newPoint, latitude: latitude });
-                        setNewPoint({ ...newPoint, longitude: longitude });
-
-                        
-                        //const elevation = getElevation(latitude, longitude);
-                        const elevation = 0;
-                        setNewPoint({ ...newPoint, elevation: elevation });
-                        addWaypoint();
-                    }
-
-                    setCurrentLocation({
-                        latitude,
-                        longitude,
-                        latitudeDelta: 0.01,
-                        longitudeDelta: 0.01,
-                    });
-
-                },
-                (error) => console.error(error),
-                { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 }
-            );
-        }, 1000);
-
-        return () => clearInterval(interval); // 클린업
-    }, [waypoints]);
-
+                            longitude,
+                            latitudeDelta: 0.01,
+                            longitudeDelta: 0.01,
+                        });
+    
+                    },
+                    (error) => console.error(error),
+                    { timeout: 20000 }
+                );
+            }, 1000);
+    
+            return () => clearInterval(interval); // 클린업
+        }, [waypoints]);
+    */
     // 거리 계산 함수
     const calculateDistance = (lat1, lon1, lat2, lon2) => {
         const R = 6371e3; // 지구 반경 (미터)
@@ -128,153 +122,35 @@ const RunningScreen = () => {
         return distance;
     };
 
-  const timer = useInterval(() => {
-    if (isRunning && focus) {
-      tick();
-    }
-  }, 1000);
-
-  const toggleTimer = () => {
-    setIsRunning(!isRunning);
-  };
-
-  if (!focus) {
-    clearInterval(timer);
-  }
-
-  useEffect(() => {
-    const focusListener = navigation.addListener('focus', () => {
-      setFocus(true);
-      //getLocationUpdates(); // 위치 업데이트 시작
-    });
-
-    const blurListener = navigation.addListener('blur', () => {
-      setFocus(false);
-      setIsRunning(false);
-      //removeLocationUpdates(); // 위치 업데이트 중지
-    });
-
-    // 클린업 함수
-    return () => {
-      //focusListener();
-      //blurListener();
+    const tick = () => {
+        setTime(prevTime => prevTime.clone().add(1, 'seconds'));
     };
-  }, [navigation]);
 
-  const formatTime = duration => {
-    const hours = duration.hours().toString().padStart(2, '0');
-    const minutes = duration.minutes().toString().padStart(2, '0');
-    const seconds = duration.seconds().toString().padStart(2, '0');
-    return `${hours}:${minutes}:${seconds}`;
-  };
+    const timer = useInterval(() => {
+        if (isRunning && focus) {
+            tick();
+        }
+    }, 1000);
 
-  // 경사 계산 함수
-  const calculateSlope = async (lat1, lon1, lat2, lon2) => {
-    // 고도 얻기
-    const elevation1 = await getElevation(lat1, lon1);
-    const elevation2 = await getElevation(lat2, lon2);
 
-    if (elevation1 !== null && elevation2 !== null) {
-      // 거리 계산
-      const distance = await getDistance(lat1, lon1, lat2, lon2);
-      if (distance === null) {
-        return;
-      }
+    const toggleTimer = () => {
+        setIsRunning(!isRunning);
+    };
 
-      setDistance(distance);
-
-      // 경사 계산 (고도 차이 / 수평 거리)
-      const slopeValue = (elevation2 - elevation1) / (distance / 1000); // 킬로미터로 계산
-      setSlope(slopeValue);
-      setElevation1(elevation1);
-      setElevation2(elevation2);
-      setLat1(lat1);
-      setLon1(lon1);
-      setLat2(lat2);
-      setLon2(lon2);
-    } else {
-      Alert.alert('고도 정보', '고도를 가져오는 데 실패했습니다.');
+    if (!focus) {
+        clearInterval(timer);
     }
-  };
-  // 경사 계산 버튼 클릭 시 동작
-  const handleCalculateSlope = () => {
-    if (slope !== null) {
-      // 이미 정보가 표시된 상태라면, 정보 초기화 (토글 효과)
-      setSlope(null);
-      setDistance(null);
-      setElevation1(null);
-      setElevation2(null);
-      setLat1(null);
-      setLon1(null);
-      setLat2(null);
-      setLon2(null);
-    } else {
-      // 새로운 경사 계산
-      const lat1 = 37.7749; // 샌프란시스코 예시 위도
-      const lon1 = -122.4194; // 샌프란시스코 예시 경도
-      const lat2 = 37.8044; // 오클랜드 예시 위도
-      const lon2 = -122.2711; // 오클랜드 예시 경도
-      calculateSlope(lat1, lon1, lat2, lon2);
-    }
-  };
 
-  // 거리 계산 함수
-  const getDistance = async (lat1, lon1, lat2, lon2) => {
-    const origin = `${lat1},${lon1}`;
-    const destination = `${lat2},${lon2}`;
+    useEffect(() => {
+        const focusListener = navigation.addListener('focus', () => {
+            setFocus(true);
+            //getLocationUpdates(); // 위치 업데이트 시작
+        });
 
-    try {
-      const response = await fetch(
-        `https://maps.googleapis.com/maps/api/directions/json?origin=${origin}&destination=${destination}&key=${GOOGLE_MAPS_API_KEY}`,
-      );
-      const data = await response.json();
-
-      if (data.status === 'OK') {
-        const distance = data.routes[0].legs[0].distance.value; // 거리 (미터 단위)
-        return distance; // 미터로 반환
-      } else {
-        Alert.alert('경로 오류', '경로를 찾을 수 없습니다.');
-        return null;
-      }
-    } catch (error) {
-      console.error('API 호출 오류:', error);
-      Alert.alert('네트워크 오류', 'API 호출에 실패했습니다.');
-      return null;
-    }
-  };
-
-  // 고도 계산 함수
-  const getElevation = async (latitude, longitude) => {
-    const url = `https://maps.googleapis.com/maps/api/elevation/json?locations=${latitude},${longitude}&key=${GOOGLE_MAPS_API_KEY}`;
-    try {
-      const response = await fetch(url);
-      const data = await response.json();
-      if (data.status === 'OK') {
-        return data.results[0].elevation; // 고도 반환
-      } else {
-        Alert.alert('고도 오류', '고도를 가져올 수 없습니다.');
-        return null;
-      }
-    } catch (error) {
-      Alert.alert('네트워크 오류', '네트워크 오류가 발생했습니다.');
-      return null;
-    }
-  };
-
-  const isValidCoordinate = value => {
-    const num = parseFloat(value);
-    return !isNaN(num) && isFinite(num);
-  };
-  // 사용자의 현재 위치 가져오기
-  useEffect(() => {
-    Geolocation.getCurrentPosition(
-      position => {
-        const { latitude, longitude } = position.coords;
-        const initialLocation = { latitude, longitude };
-        setCurrentLocation({
-          ...initialLocation,
-          latitudeDelta: 0.01,
-          longitudeDelta: 0.01,
+        const blurListener = navigation.addListener('blur', () => {
+            setFocus(false);
+            setIsRunning(false);
+            //removeLocationUpdates(); // 위치 업데이트 중지
         });
 
         // 클린업 함수
@@ -390,6 +266,23 @@ const RunningScreen = () => {
             return null;
         }
     };
+    const haversineDistance = (lat1, lon1, lat2, lon2) => {
+        const toRad = (value) => (value * Math.PI) / 180; // 도를 라디안으로 변환
+
+        const R = 6371; // 지구 반지름 (km)
+        const dLat = toRad(lat2 - lat1); // 위도의 차이 (라디안)
+        const dLon = toRad(lon2 - lon1); // 경도의 차이 (라디안)
+
+        const a =
+            Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+            Math.sin(dLon / 2) * Math.sin(dLon / 2);
+
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        const distance = R * c; // 거리 (km)
+
+        return distance * 1000; // 거리 (m)로 변환
+    };
 
     // 고도 계산 함수
     const getElevation = async (latitude, longitude) => {
@@ -414,32 +307,39 @@ const RunningScreen = () => {
         const num = parseFloat(value);
         return !isNaN(num) && isFinite(num);
     };
-    // 사용자의 현재 위치 가져오기
+    const [walking, setwalking] = useState([]);
+
+    const interval = useRef(null);
+    const [trackinterval, settrackinterval] = useState(true);
     useEffect(() => {
 
-        console.log("waypoints", waypoints[0]);
-        if (waypoints.length === 0) {
+        const interval = setInterval(() => {
             Geolocation.getCurrentPosition(
                 (position) => {
+                    console.log("walking");
                     const { latitude, longitude } = position.coords;
-                    //const elevation = getElevation(latitude, longitude);
-                    const elevation = 0;
-                    const initialLocation = { latitude, longitude, elevation };
+                    const initialLocation = { latitude, longitude };
                     setCurrentLocation({
                         ...initialLocation,
                         latitudeDelta: 0.01,
                         longitudeDelta: 0.01,
                     });
-                    setWaypoints([initialLocation]); // 첫 경로 포인트를 현재 위치로 설정
+                    // 첫 경로 포인트를 현재 위치로 설정
+                    setWaypoints((prevWaypoints) => [...prevWaypoints, initialLocation]);
+                    console.log("waypoints", waypoints.length);
+                    if (waypoints.length > 2) {
+                        setTotalDistance((prevTotal) => prevTotal + haversineDistance(waypoints[waypoints.length - 1].latitude, waypoints[waypoints.length - 1].longitude, waypoints[waypoints.length - 2].latitude, waypoints[waypoints.length - 2].longitude,));
+                    }
 
                 },
                 (error) => Alert.alert('위치 오류', error.message),
-                { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 }
+                { timeout: 20000, enableHighAccuracy: false, }
 
             );
-        }
-
+        }, 1000)
+        return () => clearInterval(interval); // 클린업
     }, [waypoints]);
+
     const addWaypoint = () => {
         const lat = parseFloat(newPoint.latitude);
         const lng = parseFloat(newPoint.longitude);
@@ -476,14 +376,6 @@ const RunningScreen = () => {
 
         mapRef.current?.animateToRegion(region, 1000);
     };
-
-    const moveToCurrentLocation = () => {
-        if (currentLocation) {
-            mapRef.current?.animateToRegion(currentLocation, 1000);
-        } else {
-            Alert.alert('오류', '현재 위치를 가져오는 중입니다.');
-        }
-    };
     return (
 
         <View style={styles.container}>
@@ -494,19 +386,11 @@ const RunningScreen = () => {
                 region={currentLocation}
                 showsUserLocation={true}
             >
-                {/* 남은 경로 */}
-                {remainingWaypointsformap.length > 1 && (
-                    <Polyline
-                        coordinates={remainingWaypointsformap}
-                        strokeColor="#73D393" // 초록색
-                        strokeWidth={4}
-                    />
-                )}
                 {/* 지나온 경로 */}
-                {completedWaypoints.length > 1 && (
+                {waypoints.length > 1 && (
                     <Polyline
-                        coordinates={completedWaypoints}
-                        strokeColor="#B0BEC5" // 회색
+                        coordinates={waypoints}
+                        strokeColor="#73D393"
                         strokeWidth={4}
                     />
                 )}
@@ -536,38 +420,24 @@ const RunningScreen = () => {
                         </View>
                         <View>
                             <Text style={{ alignSelf: 'center' }}>평균 페이스</Text>
-                            <Text style={{ color: 'black', fontSize: 16, alignSelf: 'center' }}>{distance > 0
-                                ? ((distance / 1000) / (time.hours() * 3600 + time.minutes() * 60 + time.seconds())).toFixed(2)
-                                : '0'} km/h</Text>
+                            <Text style={{ color: 'black', fontSize: 16, alignSelf: 'center' }}>{totalDistance > 0
+                                ? (((time.hours() * 3600 + time.minutes() * 60 + time.seconds()) / totalDistance) / 60000).toFixed() + '\'' + (((time.hours() * 3600 + time.minutes() * 60 + time.seconds()) / (totalDistance / 1000)) % 60).toFixed().toString().padStart(2, '0') + '\"'
+                                : '0'}</Text>
                         </View>
                         <View>
                             <Text style={{ alignSelf: 'center' }}>칼로리</Text>
-                            <Text style={{ color: 'black', fontSize: 16, alignSelf: 'center' }}>{(0.0055 * distance).toFixed(1)}</Text>
+                            <Text style={{ color: 'black', fontSize: 16, alignSelf: 'center' }}>{(0.0055 * totalDistance).toFixed(1)}</Text>
                         </View>
                     </View>
                 </View>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => navigation.navigate('Savingcourse')}
-                style={{
-                  width: '50%',
-                  height: '100%',
-                  justifyContent: 'center',
-                }}
-              >
-                <View style={{ alignSelf: 'center', justifyContent: 'center' }}>
-                  <Text
-                    style={{
-                      color: 'black',
-                      alignSelf: 'center',
-                      fontWeight: 'bold',
-                      color: 'red',
-                    }}
-                  >
-                    Finish
-                  </Text>
+                <View style={{ flexDirection: 'row', justifyContent: 'center', marginTop: 30 }}>
+                    <TouchableOpacity onPress={toggleTimer}>
+                        <Image style={{ height: 55, width: 55 }} source={isRunning ? stopbutton : playbutton} />
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={handleEnd}>
+                        <Image style={{ height: 55, width: 55, marginLeft: 20 }} source={endbutton} />
+                    </TouchableOpacity>
                 </View>
-              </TouchableOpacity>
             </View>
 
             {end !== null && (
@@ -592,81 +462,81 @@ const RunningScreen = () => {
                 </View>
             )}
         </View>
-      )}
-    </View>
-  );
+    );
 };
 
+
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  map: {
-    flex: 1,
-  },
-  modalContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-  },
-  modalContent: {
-    backgroundColor: 'white',
-    padding: 20,
-    borderRadius: 10,
-    width: '80%',
-  },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: '#ddd',
-    padding: 10,
-    marginBottom: 10,
-    borderRadius: 5,
-  },
-  modalButtons: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-  },
-  routeButton: {
-    position: 'absolute',
-    top: 20,
-    right: 20,
-    backgroundColor: '#4285F4',
-    padding: 10,
-    borderRadius: 5,
-  },
-  button: {
-    padding: 10,
-    borderRadius: 5,
-  },
-  buttonText: {
-    color: 'white',
-    fontWeight: 'bold',
-  },
-  resultContainer: {
-    position: 'absolute',
-    marginTop: 20,
-    padding: 10,
-    backgroundColor: '#fff',
-    borderRadius: 5,
-    borderWidth: 1,
-    borderColor: '#ddd',
-  },
-  slopeText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
-  infoText: {
-    fontSize: 14,
-    marginBottom: 5,
-  },
-  space: { height: 15 },
+    container: {
+        flex: 1,
+    },
+    map: {
+        flex: 1,
+    },
+    modalContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    },
+    modalContent: {
+        backgroundColor: 'white',
+        padding: 20,
+        borderRadius: 10,
+        width: '80%',
+    },
+    modalTitle: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        marginBottom: 10,
+    },
+    input: {
+        borderWidth: 1,
+        borderColor: '#ddd',
+        padding: 10,
+        marginBottom: 10,
+        borderRadius: 5,
+    },
+    modalButtons: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+    },
+    routeButton: {
+        position: 'absolute',
+        top: 20,
+        right: 20,
+        backgroundColor: '#4285F4',
+        padding: 10,
+        borderRadius: 5,
+    },
+    button: {
+        padding: 10,
+        borderRadius: 5,
+    },
+    buttonText: {
+        color: 'white',
+        fontWeight: 'bold',
+    },
+    resultContainer: {
+        position: 'absolute',
+        marginTop: 20,
+        padding: 10,
+        backgroundColor: '#fff',
+        borderRadius: 5,
+        borderWidth: 1,
+        borderColor: '#ddd',
+    },
+    slopeText: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        marginBottom: 10,
+    },
+    infoText: {
+        fontSize: 14,
+        marginBottom: 5,
+    },
+    space: { height: 15 },
+
 });
 
 export default RunningScreen;

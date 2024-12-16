@@ -6,7 +6,6 @@ import {
 
 import ProfileBox from '../../components/Othersprofile/Othersprofilebox_notteam';
 import Tabs from '../../components/Othersprofile/OthersTabs';
-import record from '../../components/MyProfile/record.json';
 import Skeleton from '../../components/MyProfile/Skeleton';
 import RecordView from '../../components/Othersprofile/OthersRecordView';
 import ActivityView from '../../components/Othersprofile/OthersFootprint';

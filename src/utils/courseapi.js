@@ -3,6 +3,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const api = axios.create({
     baseURL: 'https://api.running-mate.kro.kr/api',
+    timeout: 30000,
 });
 
 
@@ -41,30 +42,39 @@ export const SavesavS = async (Request, representativeImage, startImage, finishI
             console.error('No access token found');
             return { success: false, message: '인증되지 않은 사용자입니다.' };
         }
-        const l = {
-            name: "nicknames",
-            description: "content",
-            city: "address",
-            district: "",
-            distance: 0,
-            options: [
-            ],
-            coursePoints: [{
-                "latitude": 0,
-                "longitude": 0,
-                "elevation": 0
-            }, {
-                "latitude": 0,
-                "longitude": 0,
-                "elevation": 0
-            }]
-        };
+        let l;
+        if (Request.options[0] != ""){
+            l = {
+                name: Request.name,
+                description: Request.description,
+                city: Request.city,
+                district: Request.district,
+                distance: Request.distance,
+                options: Request.options,
+                coursePoints: Request.coursePoints
+            };
+            console.log("start");
+        }
+        else {
+            l = {
+                name: Request.name,
+                description: Request.description,
+                city: Request.city,
+                district: Request.district,
+                distance: Request.distance,
+                options: [],
+                coursePoints: Request.coursePoints
+            };
+            console.log("end");
+        }
+
+        
         console.log("l",l);
         console.log("request", Request);
         console.log("jsonl", JSON.stringify(l));
         console.log("jsonrequeset", JSON.stringify(Request));
         const formData = new FormData();
-        formData.append('request', JSON.stringify(Request));
+        formData.append('request', JSON.stringify(l));
         if (representativeImage) {
             formData.append('representativeImage', {
                 uri: representativeImage,

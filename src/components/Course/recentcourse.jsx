@@ -2,16 +2,6 @@ import React, { useState } from 'react';
 import { TextInput, TouchableOpacity, StyleSheet, View, Text, Alert, Pressable, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
-import subscribe from '../../assets/images/Course/subscribe.png';
-import location from '../../assets/images/Course/location.png';
-import time from '../../assets/images/Course/time.png';
-import subscribed from '../../assets/images/Course/subscribed.png'
-import star from '../../assets/images/Course/star.png';
-import runner from '../../assets/images/Course/runner.png';
-import mapview from '../../assets/images/Course/mapforcourseview.png';
-import runningman from '../../assets/images/Course/runningman.png';
-import greenQmark from '../../assets/images/Course/Qmark_green.png';
-
 import SimpleNoCourse from '../../components/Course/SimpleNoCourse';
 import SimpleCourse from '../../components/Course/SimpleCourse';
 

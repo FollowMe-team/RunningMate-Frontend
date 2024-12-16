@@ -8,8 +8,11 @@ import {
   TouchableOpacity,
   TextInput,
   Modal,
+  Image,
 } from 'react-native';
 import BouncyCheckbox from 'react-native-bouncy-checkbox';
+import SkeletonPlaceholder from 'react-native-skeleton-placeholder';
+
 import { getRecommendedCourses } from '../../utils/course/my_course';
 import {
   getFavoriteCourses,
@@ -19,6 +22,8 @@ import {
 import SimpleCourse from '../../components/Course/SimpleCourse';
 import CrewCourseTab from '../../components/Crew/CrewCourseTab';
 
+import search from '../../assets/images/Crew/searching.png';
+
 const MyCrewCourse = ({ route, navigation }) => {
   const { crewId } = route.params;
   const [myCourses, setMyCourses] = useState([]);
@@ -27,16 +32,21 @@ const MyCrewCourse = ({ route, navigation }) => {
   const [searchKeyword, setSearchKeyword] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
   const [activeTab, setActiveTab] = useState('add');
+  const [loadingCourses, setLoadingCourses] = useState(true);
+  const [loadingSearch, setLoadingSearch] = useState(false);
 
   useEffect(() => {
     const fetchCourses = async () => {
       try {
+        setLoadingCourses(true);
         const myCoursesData = await getRecommendedCourses();
         setMyCourses(myCoursesData);
         const favoriteCoursesData = await getFavoriteCourses(crewId);
         setFavoriteCourses(favoriteCoursesData);
       } catch (error) {
         console.error('Failed to fetch courses:', error);
+      } finally {
+        setLoadingCourses(false);
       }
     };
     fetchCourses();
@@ -78,10 +88,24 @@ const MyCrewCourse = ({ route, navigation }) => {
     navigation.goBack();
   };
 
+  const handleSearch = async () => {
+    try {
+      setLoadingSearch(true);
+      const myCoursesData = await getRecommendedCourses(searchKeyword);
+      setMyCourses(myCoursesData);
+    } catch (error) {
+      console.error('Failed to search courses:', error);
+    } finally {
+      setLoadingSearch(false);
+    }
+  };
+
   const filteredCourses =
     activeTab === 'add'
-      ? myCourses.filter(course =>
-          course.name.toLowerCase().includes(searchKeyword.toLowerCase()),
+      ? myCourses.filter(
+          course =>
+            !favoriteCourses.some(favCourse => favCourse.id === course.id) &&
+            course.name.toLowerCase().includes(searchKeyword.toLowerCase()),
         )
       : favoriteCourses.filter(course =>
           course.name.toLowerCase().includes(searchKeyword.toLowerCase()),
@@ -90,61 +114,68 @@ const MyCrewCourse = ({ route, navigation }) => {
   return (
     <ScrollView style={styles.container}>
       <CrewCourseTab activeTab={activeTab} setActiveTab={setActiveTab} />
-      <TextInput
-        style={styles.searchInput}
-        placeholder="코스 이름 검색"
-        placeholderTextColor={'#CCCCCC'}
-        value={searchKeyword}
-        onChangeText={setSearchKeyword}
-      />
+      <View style={styles.searchContainer}>
+        <TextInput
+          style={styles.searchInput}
+          placeholder="코스명 및 위치 검색"
+          placeholderTextColor={'#CCCCCC'}
+          value={searchKeyword}
+          onChangeText={setSearchKeyword}
+        />
+        <TouchableOpacity onPress={handleSearch}>
+          <Image source={search} style={styles.searchIcon} />
+        </TouchableOpacity>
+      </View>
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>크루 즐겨찾기 코스</Text>
-        {favoriteCourses.map(course => (
-          <View key={course.id} style={styles.courseItem}>
-            {activeTab === 'remove' && (
-              <BouncyCheckbox
-                style={{
-                  width: 20,
-                  height: 20,
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  marginBottom: 13,
-                }}
-                isChecked={selectedCourses.includes(course.id)}
-                onPress={() => {
-                  if (selectedCourses.includes(course.id)) {
-                    handleRemoveFavorite(course.id);
-                  } else {
-                    handleAddFavorite(course.id);
-                  }
-                }}
-                fillColor="#73D393"
-              />
-            )}
-            <SimpleCourse data={course} />
-          </View>
-        ))}
+        {loadingCourses ? (
+          <SkeletonLoader />
+        ) : favoriteCourses.length === 0 ? (
+          <Text style={styles.emptyText}>
+            코스 리스트에서 코스를 추가해 주세요!
+          </Text>
+        ) : (
+          favoriteCourses.map(course => (
+            <View key={course.id} style={styles.courseItem}>
+              {activeTab === 'remove' && (
+                <BouncyCheckbox
+                  style={styles.checkbox}
+                  isChecked={selectedCourses.includes(course.id)}
+                  onPress={() => {
+                    if (selectedCourses.includes(course.id)) {
+                      handleRemoveFavorite(course.id);
+                    } else {
+                      handleAddFavorite(course.id);
+                    }
+                  }}
+                  fillColor="#73D393"
+                />
+              )}
+              <SimpleCourse data={course} />
+            </View>
+          ))
+        )}
       </View>
       {activeTab === 'add' && (
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>내 코스</Text>
-          {filteredCourses.map(course => (
-            <View key={course.id} style={styles.courseItem}>
-              <BouncyCheckbox
-                style={{
-                  width: 20,
-                  height: 20,
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  marginBottom: 13,
-                }}
-                isChecked={selectedCourses.includes(course.id)}
-                onPress={() => handleAddFavorite(course.id)}
-                fillColor="#73D393"
-              />
-              <SimpleCourse data={course} />
-            </View>
-          ))}
+          <Text style={styles.sectionTitle}>코스 리스트</Text>
+          {loadingSearch ? (
+            <SkeletonLoader />
+          ) : filteredCourses.length === 0 ? (
+            <Text style={styles.emptyText}>현재 코스가 없습니다.</Text>
+          ) : (
+            filteredCourses.map(course => (
+              <View key={course.id} style={styles.courseItem}>
+                <BouncyCheckbox
+                  style={styles.checkbox}
+                  isChecked={selectedCourses.includes(course.id)}
+                  onPress={() => handleAddFavorite(course.id)}
+                  fillColor="#73D393"
+                />
+                <SimpleCourse data={course} />
+              </View>
+            ))
+          )}
         </View>
       )}
       <TouchableOpacity onPress={handleSaveChanges} style={styles.saveButton}>
@@ -173,19 +204,46 @@ const MyCrewCourse = ({ route, navigation }) => {
   );
 };
 
+const SkeletonLoader = () => (
+  <SkeletonPlaceholder>
+    <SkeletonPlaceholder.Item flexDirection="row" alignItems="center">
+      <SkeletonPlaceholder.Item width={60} height={60} borderRadius={50} />
+      <SkeletonPlaceholder.Item marginLeft={20}>
+        <SkeletonPlaceholder.Item width={120} height={20} borderRadius={4} />
+        <SkeletonPlaceholder.Item
+          marginTop={6}
+          width={80}
+          height={20}
+          borderRadius={4}
+        />
+      </SkeletonPlaceholder.Item>
+    </SkeletonPlaceholder.Item>
+  </SkeletonPlaceholder>
+);
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
   },
+  searchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: 16,
+  },
   searchInput: {
+    flex: 1,
     color: 'black',
     height: 40,
     borderColor: '#CCCCCC',
     borderWidth: 1,
     borderRadius: 8,
     paddingHorizontal: 8,
-    marginVertical: 16,
+  },
+  searchIcon: {
+    width: 24,
+    height: 24,
+    marginLeft: 8,
   },
   section: {
     marginBottom: 24,
@@ -251,6 +309,22 @@ const styles = StyleSheet.create({
     color: '#73D393',
     fontSize: 15,
     fontWeight: 'bold',
+  },
+  checkbox: {
+    width: 20,
+    height: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 13,
+  },
+  skeletonContainer: {
+    // Skeleton UI 스타일
+  },
+  emptyText: {
+    textAlign: 'center',
+    marginVertical: 20,
+    fontSize: 16,
+    color: '#CCCCCC',
   },
 });
 

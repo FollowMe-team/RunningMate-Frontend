@@ -189,7 +189,7 @@ const CrewScheduleRegister = ({ route }) => {
               setLocation(text);
               checkFormCompletion();
             }}
-            placeholder="크루명 또는 지역명"
+            placeholder="모집 장소 지역명명"
             style={styles.input}
             placeholderTextColor="#9B9B9D"
           />
@@ -205,7 +205,7 @@ const CrewScheduleRegister = ({ route }) => {
             disabled={isButtonDisabled}
             style={styles.button}
           >
-            <Text style={styles.buttonText}>크루 생성 신청</Text>
+            <Text style={styles.buttonText}>크루 일정 등록</Text>
           </TouchableOpacity>
         </View>
 
