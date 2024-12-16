@@ -13,15 +13,15 @@ import Header from './Header';
 
 // Screens (화면 메인 페이지)
 import Course_basic from '../screens/Course/Course_basic';
-import Community from '../screens/Community/Community';
+// import Community from '../screens/Community/Community';
 import Crew from '../screens/Crew/Crew';
 import MyProfile from '../screens/MyProfile/MyProfile';
 
 // Navigation Icon (-Ac: Active Icon)
 import courseIcon from '../assets/images/NaviIcon/course_icon.png';
 import courseIconAc from '../assets/images/NaviIcon/course_icon_ac.png';
-import communityIcon from '../assets/images/NaviIcon/community_icon.png';
-import communityIconAc from '../assets/images/NaviIcon/community_icon_ac.png';
+// import communityIcon from '../assets/images/NaviIcon/community_icon.png';
+// import communityIconAc from '../assets/images/NaviIcon/community_icon_ac.png';
 import crewIcon from '../assets/images/NaviIcon/crew_icon.png';
 import crewIconAc from '../assets/images/NaviIcon/crew_icon_ac.png';
 import myProfileIcon from '../assets/images/NaviIcon/myprofile_icon.png';
@@ -98,11 +98,11 @@ const Main = () => {
           tabBarButton: props => <TabButton {...props} />,
         }}
       />
-      <Tab.Screen
+      {/* <Tab.Screen
         name="Community"
         component={Community}
         options={{
-          title: '기대 및 효과과',
+          title: '기대 및 효과',
           header: ({ navigation }) => (
             <Header
               title="기대 및 효과"
@@ -119,7 +119,7 @@ const Main = () => {
           ),
           tabBarButton: props => <TabButton {...props} />,
         }}
-      />
+      /> */}
       <Tab.Screen
         name="Crew"
         component={Crew}
