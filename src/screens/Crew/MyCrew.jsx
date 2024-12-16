@@ -383,12 +383,14 @@ const MyCrew = () => {
             <View style={styles.crewScheduleBox}>
               <View style={styles.crewScheduleHeader}>
                 <Text style={styles.crewScheduleText}>크루 일정</Text>
-                <TouchableOpacity
-                  onPress={handleAddSchedule}
-                  style={styles.crewScheduleAddButton}
-                >
-                  <Image source={add} style={{ width: 20, height: 20 }} />
-                </TouchableOpacity>
+                {crew.is_master && (
+                  <TouchableOpacity
+                    onPress={handleAddSchedule}
+                    style={styles.crewScheduleAddButton}
+                  >
+                    <Image source={add} style={{ width: 20, height: 20 }} />
+                  </TouchableOpacity>
+                )}
               </View>
               <View style={styles.crewScheduleDetail}>
                 {selectedSchedule ? (

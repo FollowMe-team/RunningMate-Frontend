@@ -19,17 +19,17 @@ import RecordView from '../../components/MyProfile/RecordView';
 import {
   getProfile,
   getMonthlyRecords,
-  updateCrewMemberStatus,
+  // updateCrewMemberStatus,
 } from '../../utils/other_profile';
 
-const CrewApplicant = ({ route, navigation }) => {
+const CrewApplicant = ({ route }) => {
   const { applicant } = route.params;
   const [selectedRecord, setSelectedRecord] = useState(null);
   const [profileData, setProfileData] = useState({ loading: true, data: null });
   const [monthlyRecords, setMonthlyRecords] = useState([]);
   const [isFootprintFigureVisible, setFootprintFigureVisible] = useState(false);
-  const [modalVisible, setModalVisible] = useState(false);
-  const [modalMessage, setModalMessage] = useState('');
+  // const [modalVisible, setModalVisible] = useState(false);
+  // const [modalMessage, setModalMessage] = useState('');
 
   const [isMinimized, setIsMinimized] = useState(false);
 
@@ -80,22 +80,22 @@ const CrewApplicant = ({ route, navigation }) => {
     setIsMinimized(true); // 날짜 선택 시 ProfileBox 간소화
   };
 
-  const handleStatusUpdate = async status => {
-    try {
-      await updateCrewMemberStatus(applicant.crewId, applicant.id, status);
-      setModalMessage(
-        `신청 ${status === 'COMPLETE' ? '수락' : '거절'}하였습니다!`,
-      );
-      setModalVisible(true);
-    } catch (error) {
-      console.error(`Failed to update status to ${status}:`, error);
-    }
-  };
+  // const handleStatusUpdate = async status => {
+  //   try {
+  //     await updateCrewMemberStatus(applicant.crewId, applicant.id, status);
+  //     setModalMessage(
+  //       `신청 ${status === 'COMPLETE' ? '수락' : '거절'}하였습니다!`,
+  //     );
+  //     setModalVisible(true);
+  //   } catch (error) {
+  //     console.error(`Failed to update status to ${status}:`, error);
+  //   }
+  // };
 
-  const handleModalClose = () => {
-    setModalVisible(false);
-    navigation.goBack();
-  };
+  // const handleModalClose = () => {
+  //   setModalVisible(false);
+  //   navigation.goBack();
+  // };
 
   const profileDataWithDefaults = {
     ...profileData.data,
@@ -142,7 +142,7 @@ const CrewApplicant = ({ route, navigation }) => {
           />
         </View>
       </ScrollView>
-      <View
+      {/* <View
         style={{
           flexDirection: 'row',
           justifyContent: 'center',
@@ -161,7 +161,7 @@ const CrewApplicant = ({ route, navigation }) => {
         >
           <Text style={styles.applyButtonText}>수락</Text>
         </TouchableOpacity>
-      </View>
+      </View> */}
 
       {isFootprintFigureVisible && (
         <Modal
@@ -174,7 +174,7 @@ const CrewApplicant = ({ route, navigation }) => {
         </Modal>
       )}
 
-      <Modal
+      {/* <Modal
         transparent={true}
         animationType="fade"
         visible={modalVisible}
@@ -188,7 +188,7 @@ const CrewApplicant = ({ route, navigation }) => {
             </TouchableOpacity>
           </View>
         </View>
-      </Modal>
+      </Modal> */}
     </View>
   );
 };
