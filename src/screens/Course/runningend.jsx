@@ -71,28 +71,56 @@ const Runningend = ({ route }) => {
     return hours;
   };
   const recordRUN = async () => {
-    const request = {
-      startTime: starttime,
-      endTime: endtime,
-      distance: totalDistance,
-      averagePace: ((totalDistance / 1000) / (formatTime2(time) / 3600)),
-      duration: formatTime2(time),
-      caloriesBurned: (0.0055 * totalDistance),
-      recordPoints: [
-        {
-          latitude: startlatitude,
-          longitude: startlongitude,
-          recordedTime: starttime
-        },
-        {
-          latitude: endlatitude,
-          longitude: endlongitude,
-          recordedTime: endtime
-        }
-      ]
-    };
-    console.log("id : ", id, ", request : ", request);
-    const result = await RecordRunning(id, request);
+    if (totalDistance != 0) {
+
+      const request = {
+        startTime: starttime,
+        endTime: endtime,
+        distance: totalDistance,
+        averagePace: ((formatTime2(time)) / (totalDistance / 1000)),
+        duration: formatTime2(time),
+        caloriesBurned: (0.0055 * totalDistance),
+        recordPoints: [
+          {
+            latitude: startlatitude,
+            longitude: startlongitude,
+            recordedTime: starttime
+          },
+          {
+            latitude: endlatitude,
+            longitude: endlongitude,
+            recordedTime: endtime
+          }
+        ]
+      };
+      console.log("id : ", id, ", request : ", request);
+      const result = await RecordRunning(id, request);
+    }
+    else {
+
+      const request = {
+        startTime: starttime,
+        endTime: endtime,
+        distance: totalDistance,
+        averagePace: 0,
+        duration: formatTime2(time),
+        caloriesBurned: (0.0055 * totalDistance),
+        recordPoints: [
+          {
+            latitude: startlatitude,
+            longitude: startlongitude,
+            recordedTime: starttime
+          },
+          {
+            latitude: endlatitude,
+            longitude: endlongitude,
+            recordedTime: endtime
+          }
+        ]
+      };
+      console.log("id : ", id, ", request : ", request);
+      const result = await RecordRunning(id, request);
+    }
   }
 
   useEffect(() => {
