@@ -2,14 +2,22 @@ import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import PropTypes from 'prop-types';
 
-import Calendars from '../Calendars';
 import RecordDetails from './OthersRecordDetails';
 
-
-const RecordView = ({ handleDayPress, selectedRecord }) => {
+const RecordView = ({
+  handleDayPress,
+  selectedRecord,
+  records,
+  fetchMonthlyRecords,
+  Calendars, // Calendars 컴포넌트를 props로 받음
+}) => {
   return (
     <View style={styles.recordView}>
-      <Calendars onDayPress={handleDayPress}  dataSource={records}/>
+      <Calendars
+        dataSource={records}
+        onDayPress={handleDayPress}
+        fetchMonthlyRecords={fetchMonthlyRecords}
+      />
       <RecordDetails selectedRecord={selectedRecord} />
     </View>
   );
@@ -18,6 +26,9 @@ const RecordView = ({ handleDayPress, selectedRecord }) => {
 RecordView.propTypes = {
   handleDayPress: PropTypes.func.isRequired,
   selectedRecord: PropTypes.object,
+  records: PropTypes.array.isRequired,
+  fetchMonthlyRecords: PropTypes.func.isRequired,
+  Calendars: PropTypes.elementType.isRequired,
 };
 
 const styles = StyleSheet.create({

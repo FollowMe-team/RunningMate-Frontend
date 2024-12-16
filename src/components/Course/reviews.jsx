@@ -105,14 +105,27 @@ const Course_basic = ({ data }) => {
     return (
         <View style={styles.smallboxlist2}>
             <View style={{ flexDirection: 'row' }}>
-                <TouchableOpacity onPress={() => navigation.navigate('Othersprofile_notteam', {id:data.writer.id})}>
+                {
+                    data.isMine && <TouchableOpacity onPress={() => navigation.navigate('MyProfile')}>
 
-                    <Image
-                        style={{ borderRadius: 21, borderWidth: 1, borderColor: 'grey', width: 42, height: 42, alignSelf: 'center', marginLeft: 10, marginRight: 5, marginTop: 7 }}
-                        source={data.writer.profileImageUrl && data.writer.profileImageUrl !== null
-                            ? { uri: data.writer.profileImageUrl }
-                            : profileimage} />
-                </TouchableOpacity>
+                        <Image
+                            style={{ borderRadius: 21, borderWidth: 1, borderColor: 'grey', width: 42, height: 42, alignSelf: 'center', marginLeft: 10, marginRight: 5, marginTop: 7 }}
+                            source={data.writer.profileImageUrl && data.writer.profileImageUrl !== null
+                                ? { uri: data.writer.profileImageUrl }
+                                : profileimage} />
+                    </TouchableOpacity>
+                }
+
+                {
+                    !data.isMine && <TouchableOpacity onPress={() => navigation.navigate('Othersprofile_notteam', { id: data.writer.id })}>
+
+                        <Image
+                            style={{ borderRadius: 21, borderWidth: 1, borderColor: 'grey', width: 42, height: 42, alignSelf: 'center', marginLeft: 10, marginRight: 5, marginTop: 7 }}
+                            source={data.writer.profileImageUrl && data.writer.profileImageUrl !== null
+                                ? { uri: data.writer.profileImageUrl }
+                                : profileimage} />
+                    </TouchableOpacity>
+                }
                 <View style={{ justifyContent: 'center', width: "84%" }}>
                     <View style={{ flexWrap: 'wrap', justifyContent: 'space-between' }}>
                         <View style={{ flexWrap: 'wrap', flexDirection: 'row', justifyContent: 'space-between' }}>
