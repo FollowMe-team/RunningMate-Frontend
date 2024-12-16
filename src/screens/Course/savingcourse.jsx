@@ -7,7 +7,7 @@ import Geocoder from 'react-native-geocoding';
 import { SavesavS } from '../../utils/courseapi';
 
 // Google Maps API 키를 여기에 입력하세요
-Geocoder.init('AIzaSyCQdugA7ICLSYCnuAvsf_pfgtJYzM0sfTs');
+Geocoder.init('AIzaSyCQdugA7ICLSYCnuAvsf_pfgtJYzM0sfTs', {language:"ko"});
 
 import runningman from '../../assets/images/Course/runningmanforchoosebutton.png';
 import whiteplus from '../../assets/images/Course/whiteplus.png';
@@ -244,29 +244,36 @@ const Savingcourse = ({ route }) => {
             const request = {
                 name: nickname,
                 description: content,
-                city: address,
-                district: "",
+                city: address.split(' ')[1],
+                district: address.split(' ')[2],
                 distance: distance,
                 options: [],
                 coursePoints: waypoints
             };
+            console.log("ss");
+            console.log("request", request);        
+            const result = await SavesavS(request, photo, startphoto, endphoto);
+            navigation.navigate('MyCourse');
+
         }
         else {
 
             const request = {
                 name: nickname,
                 description: content,
-                city: address,
-                district: "",
+                city: address.split(' ')[1],
+                district: address.split(' ')[2],
                 distance: distance,
                 options: [option],
                 coursePoints: waypoints
             };
-        }
-        console.log("request", request);
+            console.log("bb");
+            console.log("request", request);
+            const result = await SavesavS(request, photo, startphoto, endphoto);
+            navigation.navigate('MyCourse');
 
-        const result = await SavesavS(request, photo, startphoto, endphoto);
-        navigation.navigate('MyCourse');
+        }
+
     }
     useEffect(() => {
         addressreturn(waypoints[0].latitude, waypoints[0].longitude);
@@ -365,12 +372,12 @@ const Savingcourse = ({ route }) => {
                 <View style={{ flexDirection: 'row', marginTop: 20, justifyContent: 'space-around' }}>
                     <View>
                         <Text style={{ alignSelf: 'center' }}>거리</Text>
-                        <Text style={{ color: 'black', fontSize: 16, alignSelf: 'center' }}>{distance}KM</Text>
+                        <Text style={{ color: 'black', fontSize: 16, alignSelf: 'center' }}>{distance/1000}KM</Text>
                     </View>
                     <View>
                         <Text style={{ alignSelf: 'center' }}>평균 페이스</Text>
                         <Text style={{ color: 'black', fontSize: 16, alignSelf: 'center' }}>{distance > 0
-                            ? ((distance / 1000) / (time.hours() * 3600 + time.minutes() * 60 + time.seconds())).toFixed(2)
+                            ? ((distance / 1000) * 3600 / (times.hours() * 3600 + times.minutes() * 60 + times.seconds())).toFixed(2)
                             : '0'} km/h</Text>
                     </View>
                     <View>

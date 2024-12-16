@@ -60,5 +60,4 @@ ActivitySelector.propTypes = {
   }).isRequired,
   updateActivityTime: PropTypes.func.isRequired,
 };
-
 export default ActivitySelector;
