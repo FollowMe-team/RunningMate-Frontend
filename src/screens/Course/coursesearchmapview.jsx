@@ -419,9 +419,9 @@ const RunningScreen = ({ route }) => {
                     <View style={{ marginTop: 2, marginLeft: 10 }}>
 
                         <Text
-                            style={[data.data.difficulty === 'EASY' && styles.lowlevel,
-                            data.data.difficulty === 'NORMAL' && styles.middlelevel,
-                            data.data.difficulty === 'HARD' && styles.highlevel,
+                            style={[data.data.difficulty === '쉬움' && styles.lowlevel,
+                            data.data.difficulty === '보통' && styles.middlelevel,
+                            data.data.difficulty === '어려윰' && styles.highlevel,
                             ]}
                         >{data.data.difficulty}</Text>
                         <Text
@@ -575,7 +575,7 @@ const styles = StyleSheet.create({
     }, space: { height: 5 },
 
     greensharptext: {
-        height: 24, marginRight: 10, width: 'auto', paddingLeft: 10, paddingRight: 10,
+        height: 24, marginRight: 10, width: 'auto', paddingLeft: 10, paddingRight: 10, marginBottom:5,
         borderColor: 'white',
         backgroundColor: '#4A9B8C',
         borderWidth: 0,

@@ -288,7 +288,9 @@ const Course_basic = ({ data }) => {
                     </View>
                     <Image
                         style={{ width: 276, height: 160, marginRight: 7, alignSelf: 'center' }}
-                        source={mapview}
+                        source={data.thumbnailUrl && data.thumbnailUrl !== null
+                            ? { uri: data.thumbnailUrl }
+                            : mapview}
                     />
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                         <TouchableOpacity onPress={() => navigation.navigate('Reviewed', {id : data.id})}>

@@ -169,7 +169,8 @@ const Course_basic = ({ data }) => {
                                 style={[
                                 data.status === '승인 완료' && styles.lowlevel,
                                 data.status === '대기 중' && styles.middlelevel,
-                                data.status === '승인 거부' && styles.highlevel,
+                                data.status === '신청 중' && styles.middlelevel,
+                                data.status === '승인 거절' && styles.highlevel,
                                 ]}
                             >{data.status}</Text>
                         </View>

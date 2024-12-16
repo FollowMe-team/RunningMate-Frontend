@@ -31,7 +31,7 @@ const styles = StyleSheet.create({
 
 
     greensharptext: {
-        height: 24, marginRight: 10, width: 'auto', paddingLeft: 10, paddingRight: 10,
+        height: 24, marginRight: 10, width: 'auto', paddingLeft: 10, paddingRight: 10, marginBottom:5,
         borderColor: 'white',
         backgroundColor: '#4A9B8C',
         borderWidth: 0,

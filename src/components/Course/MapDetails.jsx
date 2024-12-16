@@ -31,7 +31,7 @@ const styles = StyleSheet.create({
     },
 
     greensharptext: {
-        height: 24, marginRight: 10, width: 'auto', paddingLeft: 10, paddingRight: 10,
+        height: 24, marginRight: 10, width: 'auto', paddingLeft: 10, paddingRight: 10, marginBottom:5,
         borderColor: 'white',
         backgroundColor: '#4A9B8C',
         borderWidth: 0,
@@ -151,7 +151,9 @@ const Reviewed = ({ data }) => {
             </View>
             <Image
                 style={{ width: '90%', height: 210, alignSelf: 'center', marginBottom: 10 }}
-                source={mapview}
+                source={data.thumbnailUrl && data.thumbnailUrl !== null
+                    ? { uri: data.thumbnailUrl }
+                    : mapview}
             />
             <View style={{ flexDirection: 'row', marginLeft: 22 }}>
                 {

@@ -34,7 +34,7 @@ const RunningTrackingScreen = () => {
             setAddress('주소를 찾을 수 없습니다');
         }
     };
-
+/*
     useEffect(() => {
         Geolocation.getCurrentPosition(
             (position) => {
@@ -50,7 +50,7 @@ const RunningTrackingScreen = () => {
             { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 }
         );
     }, []);
-
+*/
     return (
         <View style={styles.container}>
             <MapView

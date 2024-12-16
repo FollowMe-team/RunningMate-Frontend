@@ -314,13 +314,13 @@ const Savingcourse = ({ route }) => {
                 <View style={{ flexDirection: 'row', marginTop: 20, justifyContent: 'space-around' }}>
                     <View>
                         <Text style={{ alignSelf: 'center' }}>거리</Text>
-                        <Text style={{ color: 'black', fontSize: 16, alignSelf: 'center' }}>{distance/1000}KM</Text>
+                        <Text style={{ color: 'black', fontSize: 16, alignSelf: 'center' }}>{(distance/1000).toFixed(2)}KM</Text>
                     </View>
                     <View>
                         <Text style={{ alignSelf: 'center' }}>평균 페이스</Text>
                         <Text style={{ color: 'black', fontSize: 16, alignSelf: 'center' }}>{distance > 0
-                            ? ((distance / 1000) * 3600 / (times.hours() * 3600 + times.minutes() * 60 + times.seconds())).toFixed(2)
-                            : '0'} km/h</Text>
+                                ? ((times.hours() * 3600 + times.minutes() * 60 + times.seconds()) / distance / 60000).toFixed() + '\'' + (((times.hours() * 3600 + times.minutes() * 60 + times.seconds()) / (distance / 1000)) % 60).toFixed().toString().padStart(2, '0') + '\"'
+                                : '0'}</Text>
                     </View>
                     <View>
                         <Text style={{ alignSelf: 'center' }}>칼로리</Text>

@@ -159,7 +159,6 @@ const RunningScreen = ({ route }) => {
 
     const toggleTimer = () => {
         setIsRunning(!isRunning);
-        settrackinterval(!trackinterval);
     };
 
     if (!focus) {
@@ -355,12 +354,8 @@ const RunningScreen = ({ route }) => {
         }
 
     }, [waypoints]);
-    const interval = useRef(null);
-    const [trackinterval, settrackinterval] = useState(true);
-    const startint = () => {
-        interval.current = setInterval(() => {
-
-            console.log("changedtostart");
+    useEffect(() => {
+        const interval = setInterval(() => {
             Geolocation.getCurrentPosition(
                 (position) => {
                     console.log("walking");
@@ -373,40 +368,20 @@ const RunningScreen = ({ route }) => {
                     });
                     // 첫 경로 포인트를 현재 위치로 설정
                     setwalking((prevWaypoints) => [...prevWaypoints, initialLocation]);
-                    console.log("walkingpoint", walking.length)
                     if (walking.length > 2) {
-                        setTotalDistance((prev) => prev + haversineDistance(walking[walking.length - 1].latitude, walking[walking.length - 1].longitude, walking[walking.length - 2].latitude, walking[walking.length - 2].longitude))
-
+                        setTotalDistance((prevTotal) => prevTotal + haversineDistance(walking[walking.length - 1].latitude, walking[walking.length - 1].longitude, walking[walking.length - 2].latitude, walking[walking.length - 2].longitude));
                     }
-                    console.log("totaldistance", totalDistance)
+                    console.log("walkingpoints", walking.length);
 
                 },
                 (error) => Alert.alert('위치 오류', error.message),
                 { timeout: 20000, enableHighAccuracy: false, }
 
             );
+        }, 1000)
+        return () => clearInterval(interval); // 클린업
 
-        }, 5000)
-    }
-
-    const stopinterval = () => {
-        if (interval.current) {
-            clearInterval(interval.current)
-            interval.current = null;
-
-            console.log("changedtostop");
-        }
-    }
-    useEffect(() => {
-        if (trackinterval) {
-            startint();
-            console.log("changetostart");
-        } else {
-            stopinterval();
-            console.log("changetostop");
-        }
-        return () => stopinterval(); 
-    }, [trackinterval]);
+    }, [walking]);
     const addWaypoint2 = () => {
         for (let i = 0; i < data.data.coursePointInfos.length; i++) {
             const a = data.data.coursePointInfos[i].latitude;
@@ -569,13 +544,13 @@ const RunningScreen = ({ route }) => {
                         </View>
                         <View>
                             <Text style={{ alignSelf: 'center' }}>평균 페이스</Text>
-                            <Text style={{ color: 'black', fontSize: 16, alignSelf: 'center' }}>{distance > 0
+                            <Text style={{ color: 'black', fontSize: 16, alignSelf: 'center' }}>{totalDistance > 0
                                 ? ((time.hours() * 3600 + time.minutes() * 60 + time.seconds()) / totalDistance / 60000).toFixed() + '\'' + (((time.hours() * 3600 + time.minutes() * 60 + time.seconds()) / (totalDistance / 1000)) % 60).toFixed().toString().padStart(2, '0') + '\"'
                                 : '0'} </Text>
                         </View>
                         <View>
                             <Text style={{ alignSelf: 'center' }}>칼로리</Text>
-                            <Text style={{ color: 'black', fontSize: 16, alignSelf: 'center' }}>{(0.0055 * distance).toFixed(2)}</Text>
+                            <Text style={{ color: 'black', fontSize: 16, alignSelf: 'center' }}>{(0.0055 * totalDistance).toFixed(2)}</Text>
                         </View>
                     </View>
                 </View>
@@ -610,7 +585,7 @@ const RunningScreen = ({ route }) => {
                                     <Text style={{ color: 'black', alignSelf: 'center', fontWeight: 'bold' }}>Cancel</Text>
                                 </View>
                             </TouchableOpacity>
-                            <TouchableOpacity onPress={() => navigation.navigate('Runningend', { time: time, totalDistance: totalDistance, id: data.data.id, starttime: starttime, endtime: endtime, startlatitude: waypoints[0].latitude, startlongitude: waypoints[0].longitude, endlatitude: waypoints[waypoints.length - 1].latitude, endlongitude: waypoints[waypoints.length - 1].longitude })}
+                            <TouchableOpacity onPress={() => navigation.navigate('Runningend', { time: time, totalDistance: totalDistance, id: data.data.id, starttime: starttime, endtime: endtime, startlatitude: walking[0].latitude, startlongitude: walking[0].longitude, endlatitude: walking[walking.length - 1].latitude, endlongitude: walking[walking.length - 1].longitude, thumbnailUrl: data.data.thumbnailUrl })}
                                 style={{ width: '50%', height: '100%', justifyContent: 'center' }}>
                                 <View style={{ alignSelf: 'center', justifyContent: 'center' }}>
                                     <Text style={{ color: 'black', alignSelf: 'center', fontWeight: 'bold', color: 'red' }}>Finish</Text>

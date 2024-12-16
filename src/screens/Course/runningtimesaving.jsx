@@ -57,54 +57,54 @@ const RunningScreen = () => {
     useEffect(() => {
         setStarttime(curr.toISOString());
     }, []);
-
-    // 현재 위치 업데이트 및 경로 진행 확인
-    useEffect(() => {
-        const interval = setInterval(() => {
-            Geolocation.getCurrentPosition(
-                (position) => {
-                    const { latitude, longitude } = position.coords;
-
-                    if (currentLocation) {
-                        // 이전 위치와 현재 위치 간의 거리 계산
-                        const distance = calculateDistance(
-                            currentLocation.latitude,
-                            currentLocation.longitude,
+    /*
+        // 현재 위치 업데이트 및 경로 진행 확인
+        useEffect(() => {
+            const interval = setInterval(() => {
+                Geolocation.getCurrentPosition(
+                    (position) => {
+                        const { latitude, longitude } = position.coords;
+    
+                        if (currentLocation) {
+                            // 이전 위치와 현재 위치 간의 거리 계산
+                            const distance = calculateDistance(
+                                currentLocation.latitude,
+                                currentLocation.longitude,
+                                latitude,
+                                longitude
+                            );
+    
+                            // 총 이동 거리 업데이트
+                            setTotalDistance((prevTotal) => prevTotal + distance);
+                        }
+    
+                        if (distance > 50) {
+                            setNewPoint({ ...newPoint, latitude: latitude });
+                            setNewPoint({ ...newPoint, longitude: longitude });
+    
+                            
+                            //const elevation = getElevation(latitude, longitude);
+                            const elevation = 0;
+                            setNewPoint({ ...newPoint, elevation: elevation });
+                            addWaypoint();
+                        }
+    
+                        setCurrentLocation({
                             latitude,
-                            longitude
-                        );
-
-                        // 총 이동 거리 업데이트
-                        setTotalDistance((prevTotal) => prevTotal + distance);
-                    }
-
-                    if (distance > 50) {
-                        setNewPoint({ ...newPoint, latitude: latitude });
-                        setNewPoint({ ...newPoint, longitude: longitude });
-
-                        
-                        //const elevation = getElevation(latitude, longitude);
-                        const elevation = 0;
-                        setNewPoint({ ...newPoint, elevation: elevation });
-                        addWaypoint();
-                    }
-
-                    setCurrentLocation({
-                        latitude,
-                        longitude,
-                        latitudeDelta: 0.01,
-                        longitudeDelta: 0.01,
-                    });
-
-                },
-                (error) => console.error(error),
-                { timeout: 20000 }
-            );
-        }, 1000);
-
-        return () => clearInterval(interval); // 클린업
-    }, [waypoints]);
-
+                            longitude,
+                            latitudeDelta: 0.01,
+                            longitudeDelta: 0.01,
+                        });
+    
+                    },
+                    (error) => console.error(error),
+                    { timeout: 20000 }
+                );
+            }, 1000);
+    
+            return () => clearInterval(interval); // 클린업
+        }, [waypoints]);
+    */
     // 거리 계산 함수
     const calculateDistance = (lat1, lon1, lat2, lon2) => {
         const R = 6371e3; // 지구 반경 (미터)
@@ -266,6 +266,23 @@ const RunningScreen = () => {
             return null;
         }
     };
+    const haversineDistance = (lat1, lon1, lat2, lon2) => {
+        const toRad = (value) => (value * Math.PI) / 180; // 도를 라디안으로 변환
+
+        const R = 6371; // 지구 반지름 (km)
+        const dLat = toRad(lat2 - lat1); // 위도의 차이 (라디안)
+        const dLon = toRad(lon2 - lon1); // 경도의 차이 (라디안)
+
+        const a =
+            Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+            Math.sin(dLon / 2) * Math.sin(dLon / 2);
+
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        const distance = R * c; // 거리 (km)
+
+        return distance * 1000; // 거리 (m)로 변환
+    };
 
     // 고도 계산 함수
     const getElevation = async (latitude, longitude) => {
@@ -290,32 +307,39 @@ const RunningScreen = () => {
         const num = parseFloat(value);
         return !isNaN(num) && isFinite(num);
     };
-    // 사용자의 현재 위치 가져오기
+    const [walking, setwalking] = useState([]);
+
+    const interval = useRef(null);
+    const [trackinterval, settrackinterval] = useState(true);
     useEffect(() => {
 
-        console.log("waypoints", waypoints[0]);
-        if (waypoints.length === 0) {
+        const interval = setInterval(() => {
             Geolocation.getCurrentPosition(
                 (position) => {
+                    console.log("walking");
                     const { latitude, longitude } = position.coords;
-                    //const elevation = getElevation(latitude, longitude);
-                    const elevation = 0;
-                    const initialLocation = { latitude, longitude, elevation };
+                    const initialLocation = { latitude, longitude };
                     setCurrentLocation({
                         ...initialLocation,
                         latitudeDelta: 0.01,
                         longitudeDelta: 0.01,
                     });
-                    setWaypoints([initialLocation]); // 첫 경로 포인트를 현재 위치로 설정
+                    // 첫 경로 포인트를 현재 위치로 설정
+                    setWaypoints((prevWaypoints) => [...prevWaypoints, initialLocation]);
+                    console.log("waypoints", waypoints.length);
+                    if (waypoints.length > 2) {
+                        setTotalDistance((prevTotal) => prevTotal + haversineDistance(waypoints[waypoints.length - 1].latitude, waypoints[waypoints.length - 1].longitude, waypoints[waypoints.length - 2].latitude, waypoints[waypoints.length - 2].longitude,));
+                    }
 
                 },
                 (error) => Alert.alert('위치 오류', error.message),
-                { enableHighAccuracy: false, timeout: 20000, maximumAge: 1000 }
+                { timeout: 20000, enableHighAccuracy: false, }
 
             );
-        }
-
+        }, 1000)
+        return () => clearInterval(interval); // 클린업
     }, [waypoints]);
+
     const addWaypoint = () => {
         const lat = parseFloat(newPoint.latitude);
         const lng = parseFloat(newPoint.longitude);
@@ -352,14 +376,6 @@ const RunningScreen = () => {
 
         mapRef.current?.animateToRegion(region, 1000);
     };
-
-    const moveToCurrentLocation = () => {
-        if (currentLocation) {
-            mapRef.current?.animateToRegion(currentLocation, 1000);
-        } else {
-            Alert.alert('오류', '현재 위치를 가져오는 중입니다.');
-        }
-    };
     return (
 
         <View style={styles.container}>
@@ -370,19 +386,11 @@ const RunningScreen = () => {
                 region={currentLocation}
                 showsUserLocation={true}
             >
-                {/* 남은 경로 */}
-                {remainingWaypointsformap.length > 1 && (
-                    <Polyline
-                        coordinates={remainingWaypointsformap}
-                        strokeColor="#73D393" // 초록색
-                        strokeWidth={4}
-                    />
-                )}
                 {/* 지나온 경로 */}
-                {completedWaypoints.length > 1 && (
+                {waypoints.length > 1 && (
                     <Polyline
-                        coordinates={completedWaypoints}
-                        strokeColor="#B0BEC5" // 회색
+                        coordinates={waypoints}
+                        strokeColor="#73D393"
                         strokeWidth={4}
                     />
                 )}
@@ -413,8 +421,8 @@ const RunningScreen = () => {
                         <View>
                             <Text style={{ alignSelf: 'center' }}>평균 페이스</Text>
                             <Text style={{ color: 'black', fontSize: 16, alignSelf: 'center' }}>{totalDistance > 0
-                                ? ((totalDistance / 1000) / (time.hours() * 3600 + time.minutes() * 60 + time.seconds())).toFixed(2)
-                                : '0'} km/h</Text>
+                                ? (((time.hours() * 3600 + time.minutes() * 60 + time.seconds()) / totalDistance) / 60000).toFixed() + '\'' + (((time.hours() * 3600 + time.minutes() * 60 + time.seconds()) / (totalDistance / 1000)) % 60).toFixed().toString().padStart(2, '0') + '\"'
+                                : '0'}</Text>
                         </View>
                         <View>
                             <Text style={{ alignSelf: 'center' }}>칼로리</Text>

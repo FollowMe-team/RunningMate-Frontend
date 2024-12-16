@@ -60,6 +60,7 @@ const Runningend = ({ route }) => {
   const startlongitude = data.startlongitude;
   const endlatitude = data.endlatitude;
   const endlongitude = data.endlongitude;
+  const thumbnailUrl = data.thumbnailUrl;
   const formatTime = (duration) => {
     const hours = duration.hours().toString().padStart(2, '0');
     const minutes = duration.minutes().toString().padStart(2, '0');
@@ -136,11 +137,13 @@ const Runningend = ({ route }) => {
         <View style={{ flexDirection: 'row', marginTop: 20, justifyContent: 'space-around' }}>
           <View>
             <Text style={{ alignSelf: 'center' }}>거리</Text>
-            <Text style={{ color: 'black', fontSize: 16, alignSelf: 'center' }}>{totalDistance}KM</Text>
+            <Text style={{ color: 'black', fontSize: 16, alignSelf: 'center' }}>{(totalDistance/1000).toFixed(2)}KM</Text>
           </View>
           <View>
             <Text style={{ alignSelf: 'center' }}>평균 페이스</Text>
-            <Text style={{ color: 'black', fontSize: 16, alignSelf: 'center' }}>{totalDistance / formatTime2(time)}km/h</Text>
+            <Text style={{ color: 'black', fontSize: 16, alignSelf: 'center' }}>{totalDistance > 0
+                                ? ((time.hours() * 3600 + time.minutes() * 60 + time.seconds()) / totalDistance / 60000).toFixed() + '\'' + (((time.hours() * 3600 + time.minutes() * 60 + time.seconds()) / (totalDistance / 1000)) % 60).toFixed().toString().padStart(2, '0') + '\"'
+                                : '0'}</Text>
           </View>
           <View>
             <Text style={{ alignSelf: 'center' }}>칼로리</Text>
@@ -149,7 +152,9 @@ const Runningend = ({ route }) => {
         </View>
         <Image
           style={{ width: '87%', height: 240, alignSelf: 'center', marginVertical: 10 }}
-          source={mapforcourseview}
+          source={thumbnailUrl && thumbnailUrl !== null
+            ? { uri: thumbnailUrl }
+            : mapforcourseview}
         />
       </View>
 
