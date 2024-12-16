@@ -104,7 +104,7 @@ const RunningScreen = () => {
 
                 },
                 (error) => console.error(error),
-                { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 }
+                { timeout: 20000 }
             );
         }, 1000);
 
@@ -434,7 +434,7 @@ const RunningScreen = () => {
 
                 },
                 (error) => Alert.alert('위치 오류', error.message),
-                { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 }
+                { enableHighAccuracy: false, timeout: 20000, maximumAge: 1000 }
 
             );
         }
@@ -536,13 +536,13 @@ const RunningScreen = () => {
                         </View>
                         <View>
                             <Text style={{ alignSelf: 'center' }}>평균 페이스</Text>
-                            <Text style={{ color: 'black', fontSize: 16, alignSelf: 'center' }}>{distance > 0
-                                ? ((distance / 1000) / (time.hours() * 3600 + time.minutes() * 60 + time.seconds())).toFixed(2)
+                            <Text style={{ color: 'black', fontSize: 16, alignSelf: 'center' }}>{totalDistance > 0
+                                ? ((totalDistance / 1000) / (time.hours() * 3600 + time.minutes() * 60 + time.seconds())).toFixed(2)
                                 : '0'} km/h</Text>
                         </View>
                         <View>
                             <Text style={{ alignSelf: 'center' }}>칼로리</Text>
-                            <Text style={{ color: 'black', fontSize: 16, alignSelf: 'center' }}>{(0.0055 * distance).toFixed(1)}</Text>
+                            <Text style={{ color: 'black', fontSize: 16, alignSelf: 'center' }}>{(0.0055 * totalDistance).toFixed(1)}</Text>
                         </View>
                     </View>
                 </View>
