@@ -102,9 +102,13 @@ const Main = () => {
         name="Community"
         component={Community}
         options={{
-          title: '커뮤니티',
+          title: '기대 및 효과과',
           header: ({ navigation }) => (
-            <Header title="커뮤니티" navigation={navigation} hideBackButton />
+            <Header
+              title="기대 및 효과"
+              navigation={navigation}
+              hideBackButton
+            />
           ),
           tabBarIcon: ({ focused }) => (
             <Image
