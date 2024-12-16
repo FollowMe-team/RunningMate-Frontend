@@ -63,6 +63,7 @@ const MyCrewModification = () => {
   const [openRank, setOpenRank] = useState(false);
   const scrollViewRef = useRef(null);
   const [nameCheckModalVisible, setNameCheckModalVisible] = useState(false);
+  const [initialName, setInitialName] = useState('');
 
   const dayMap = {
     월: 'MONDAY',
@@ -113,6 +114,7 @@ const MyCrewModification = () => {
         const crew = await getCrewDetailForModification(crewId);
         setPhotos([crew.profileImageUrl]);
         setName(crew.name);
+        setInitialName(crew.name); // 초기 크루명 설정
         setShortDescription(crew.shortDescription);
         setDetailDescription(crew.detailDescription);
         setCity(crew.city);
@@ -216,7 +218,7 @@ const MyCrewModification = () => {
   };
 
   const handleSaveChanges = async () => {
-    if (!isNameChecked) {
+    if (!isNameChecked && name !== initialName) {
       setNameError('크루명 중복 체크를 해주세요.');
       setModalMessage('크루명 중복 체크를 해주세요.');
       setNameCheckModalVisible(true);
@@ -239,9 +241,9 @@ const MyCrewModification = () => {
 
     try {
       const updatedCrew = await modifyCrew(crewId, crewData, photos[0] || null); // representativeImage 전달
+      setModalMessage('변경 사항이 저장되었습니다!');
       setModalVisible(true);
       navigation.setParams({ crew: updatedCrew }); // 수정된 크루 정보 전달
-      navigation.navigate('MyCrew', { crew: updatedCrew }); // 수정된 크루 정보 전달
     } catch (error) {
       console.error('Failed to save changes:', error);
       alert('크루 정보를 수정하는데 실패했습니다.');
@@ -255,7 +257,6 @@ const MyCrewModification = () => {
 
   const checkFormCompletion = () => {
     if (
-      name &&
       shortDescription &&
       detailDescription &&
       city &&
@@ -280,7 +281,6 @@ const MyCrewModification = () => {
   useEffect(() => {
     checkFormCompletion();
   }, [
-    name,
     shortDescription,
     detailDescription,
     city,
@@ -343,7 +343,7 @@ const MyCrewModification = () => {
               checkFormCompletion();
             }}
             placeholder="활동 규칙, 뛰는 주기 등등..."
-            style={[styles.input, { height: 200 }]}
+            style={[styles.input, { height: 200, textAlignVertical: 'top' }]}
             placeholderTextColor="#9B9B9D"
             multiline={true}
             scrollEnabled={true}
@@ -692,6 +692,7 @@ const styles = StyleSheet.create({
   },
   inputContainer: {
     position: 'relative',
+    marginBottom: 15,
   },
   nameCheckButton: {
     position: 'absolute',

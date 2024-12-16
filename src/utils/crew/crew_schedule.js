@@ -37,6 +37,7 @@ const fetchMonthlyCrewSchedule = async (crewId, yearMonth) => {
       },
     });
     console.log('Monthly crew schedule:', response.data.data.crewSchedule);
+
     return response.data.data;
   } catch (error) {
     console.error('Failed to fetch monthly crew schedule:', error);
