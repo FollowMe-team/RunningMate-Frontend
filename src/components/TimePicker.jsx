@@ -46,7 +46,7 @@ const TimePicker = ({ time, setTime, placeholder }) => {
 
 const styles = StyleSheet.create({
   container: {
-    width: '45%',
+    width: '40%',
     borderColor: '#D6D6D6',
     borderWidth: 1,
     borderRadius: 8,

@@ -3734,11 +3734,11 @@ __metadata:
     react-native-bouncy-checkbox: ^4.1.2
     react-native-calendars: ^1.1307.0
     react-native-date-picker: ^5.0.7
-    react-native-dropdown-picker: ^5.4.6
+    react-native-dropdown-picker: 5.4.7-beta.1
     react-native-element-dropdown: ^2.12.2
     react-native-geocoding: ^0.5.0
     react-native-geolocation-service: ^5.3.1
-    react-native-gesture-handler: ^2.20.2
+    react-native-gesture-handler: ^2.21.2
     react-native-google-places-autocomplete: ^2.5.7
     react-native-image-crop-picker: ^0.41.5
     react-native-image-picker: ^7.1.2
@@ -10708,13 +10708,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-dropdown-picker@npm:^5.4.6":
-  version: 5.4.6
-  resolution: "react-native-dropdown-picker@npm:5.4.6"
+"react-native-dropdown-picker@npm:5.4.7-beta.1":
+  version: 5.4.7-beta.1
+  resolution: "react-native-dropdown-picker@npm:5.4.7-beta.1"
+  dependencies:
+    react-native-gesture-handler: "*"
   peerDependencies:
     react: "*"
     react-native: "*"
-  checksum: d81ee3d68c17107a4d21dbdf9c2fe2ffe4bf4398973d10113139aadc0674221ce5038b945299fba2abc796930ec5e6d5f84291945bf903344493a15b8e2fca43
+  checksum: 84bed8223c69ab505d46ab913408797c78657de765651549c5fcb8630ebca97afc1f20d6ec22416ef0506f6fb99d150c30acc2687563a4f84a5df62dc385f91d
   languageName: node
   linkType: hard
 
@@ -10744,9 +10746,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-gesture-handler@npm:^2.20.2":
-  version: 2.20.2
-  resolution: "react-native-gesture-handler@npm:2.20.2"
+"react-native-gesture-handler@npm:*, react-native-gesture-handler@npm:^2.21.2":
+  version: 2.21.2
+  resolution: "react-native-gesture-handler@npm:2.21.2"
   dependencies:
     "@egjs/hammerjs": ^2.0.17
     hoist-non-react-statics: ^3.3.0
@@ -10755,7 +10757,7 @@ __metadata:
   peerDependencies:
     react: "*"
     react-native: "*"
-  checksum: 8d9e7496615dad4e6bb6dd1c750c2d3b2e57c6173a1d466b4503b28b159b1dbbb1e7527c3d4bda12324422200c07835f34d81c9bd3cd1b7f594b22949bef274a
+  checksum: 0a42cedb8860a326b465085d0f7622ba03f038b0f0bdd1b1fe5703e58d62cb08bfb82a686c069a1a1410705c2ae0d82971b0449d83796fdd6d071131cf88e68b
   languageName: node
   linkType: hard
 

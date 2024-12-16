@@ -14,6 +14,7 @@ import settingsIcon from '../assets/images/NaviIcon/web-settings.png';
 import apply from '../assets/images/Crew/online-registration.png';
 import modification from '../assets/images/Crew/edit-file.png';
 import kakao from '../assets/images/Crew/bubble-chat.png';
+import { getCrewApplicants } from '../utils/crew/crew2';
 
 const Header = ({
   title,
@@ -24,7 +25,7 @@ const Header = ({
   openChatUrl,
   showModificationButton,
   applyCount,
-  crew,
+  crew, // crew 객체를 props로 받음
 }) => {
   const scaleValue = useRef(new Animated.Value(1)).current;
 
@@ -42,6 +43,16 @@ const Header = ({
       duration: 100,
       useNativeDriver: true,
     }).start();
+  };
+
+  const handleApplyButtonPress = async () => {
+    try {
+      const applicants = await getCrewApplicants(crew.id);
+      navigation.navigate('ApplyList', { applicants });
+    } catch (error) {
+      console.error('Failed to fetch crew applicants:', error);
+      alert('크루 신청자 목록을 불러오는데 실패했습니다.');
+    }
   };
 
   return (
@@ -70,7 +81,7 @@ const Header = ({
       <View style={styles.rightContainer}>
         {showApplyButton && (
           <TouchableOpacity
-            onPress={() => navigation.navigate('ApplyList')} // crew 객체를 params로 전달
+            onPress={handleApplyButtonPress}
             onPressIn={handlePressIn}
             onPressOut={handlePressOut}
             style={styles.rightButton}
@@ -91,7 +102,7 @@ const Header = ({
             </Animated.View>
           </TouchableOpacity>
         )}
-        {showModificationButton && (
+        {showModificationButton && crew && (
           <TouchableOpacity
             onPress={() =>
               navigation.navigate('Modification', { crewId: crew.id })
