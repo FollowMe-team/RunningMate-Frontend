@@ -276,7 +276,7 @@ const RunningScreen = ({ route }) => {
                 {/* 각 포인트에 마커 추가 */}
                 {waypoints.map((point, index) => (
                     < Marker
-                        pinColor={'#73D393'}
+                        pinColor={index === 0 ? '#73D393' : 'red'}
                         key={index}
                         coordinate={point}
                         opacity={index === 0 ? 1 : index === (waypoints.length - 1) ? 1 : 0}

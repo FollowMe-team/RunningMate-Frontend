@@ -75,7 +75,8 @@ const Runningend = ({ route }) => {
       startTime: starttime,
       endTime: endtime,
       distance: totalDistance,
-      averagePace: ((totalDistance / 1000) / (time / 3600)),
+      averagePace: ((totalDistance / 1000) / (formatTime2(time) / 3600)),
+      duration: formatTime2(time),
       caloriesBurned: (0.0055 * totalDistance),
       recordPoints: [
         {

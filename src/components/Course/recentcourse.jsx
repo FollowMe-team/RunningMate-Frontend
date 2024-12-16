@@ -120,7 +120,7 @@ const styles = StyleSheet.create({
 
 const Course_basic = ({ data }) => {
     const navigation = useNavigation();
-    const [isFollowing, setIsFollowing] = useState(false);
+    const [isFollowing, setIsFollowing] = useState(data.bookmarked);
     const [Isdetail, setIsdetail] = useState(false);
     const optiondata = data.courseOptionTypes;
 

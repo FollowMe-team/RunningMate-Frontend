@@ -42,17 +42,29 @@ export const SavesavS = async (Request, representativeImage, startImage, finishI
             return { success: false, message: '인증되지 않은 사용자입니다.' };
         }
         const l = {
-            name: "nickname",
+            name: "nicknames",
             description: "content",
             city: "address",
             district: "",
             distance: 0,
             options: [
             ],
-            coursePoints: []
+            coursePoints: [{
+                "latitude": 0,
+                "longitude": 0,
+                "elevation": 0
+            }, {
+                "latitude": 0,
+                "longitude": 0,
+                "elevation": 0
+            }]
         };
+        console.log("l",l);
+        console.log("request", Request);
+        console.log("jsonl", JSON.stringify(l));
+        console.log("jsonrequeset", JSON.stringify(Request));
         const formData = new FormData();
-        formData.append('request', JSON.stringify(l));
+        formData.append('request', JSON.stringify(Request));
         if (representativeImage) {
             formData.append('representativeImage', {
                 uri: representativeImage,
@@ -102,31 +114,9 @@ export const RecordRunning = async (courseID, Request) => {
             console.error('No access token found');
             return { success: false, message: '인증되지 않은 사용자입니다.' };
         }
-        const l = {
-            startTime: "2024-12-13T19:58:48.877Z",
-            endTime: "2024-12-13T19:58:48.877Z",
-            distance: 0,
-            averagePace: 0,
-            caloriesBurned: 0,
-            recordPoints: [
-                {
-                    latitude: 0,
-                    longitude: 0,
-                    recordedTime: "2024-12-13T19:58:48.877Z"
-                },
-                {
-                    latitude: 1,
-                    longitude: 2,
-                    recordedTime: "2024-12-13T19:58:48.877Z"
-                }
-            ]
-        }
-        const formData = new FormData();
-        formData.append('request', JSON.stringify(l));
-        console.log(formData);
         const response = await api.post(
             `/courses/${courseID}/record`,
-            formData,
+            Request,
             {
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -216,7 +206,7 @@ export const RReviewing = async (courseID, Request, image) => {
 const getCourseSearch = async word => {
     const baseURL = '/courses/search';
     const url = word ? `${baseURL}?${word}` : baseURL;
-
+    console.log("url:", url);
     try {
         const accessToken = await AsyncStorage.getItem('accessToken');
         if (!accessToken) {
@@ -227,7 +217,7 @@ const getCourseSearch = async word => {
             headers: { Authorization: `Bearer ${accessToken}` },
         });
         if (response.status === 200) {
-            console.log('Course fetch successful:', response.data);
+            console.log('Course fetch successful:', response.data, 'word', word, 'url', url);
             return { success: true, data: response.data.data.courses };
         }
     } catch (error) {
