@@ -39,8 +39,7 @@ const Crew = () => {
 
   useEffect(() => {
     if (route.params?.type === 'search' && route.params?.searchParams) {
-      const { name, location, week, startTime, endTime, footprint } =
-        route.params.searchParams;
+      const { name, location, week, rank } = route.params.searchParams;
       const filtered = crewData.crew.filter(crew => {
         const matchesName = name ? crew.name.includes(name) : true;
         const matchesLocation = location
@@ -48,27 +47,12 @@ const Crew = () => {
           : true;
         const matchesWeek =
           week.length > 0 ? week.some(day => crew.week.includes(day)) : true;
-        const matchesTime =
-          startTime && endTime
-            ? crew.start_time === startTime && crew.end_time === endTime
-            : true;
-        const matchesFootprint =
-          footprint.length > 0
-            ? footprint.some(f => {
-                if (f === 6) return crew.footprint >= 85;
-                if (f === 5) return crew.footprint >= 70 && crew.footprint < 85;
-                if (f === 4) return crew.footprint >= 55 && crew.footprint < 70;
-                if (f === 3) return crew.footprint >= 40 && crew.footprint < 55;
-                if (f === 2) return crew.footprint >= 25 && crew.footprint < 40;
-                return crew.footprint < 25;
-              })
-            : true;
+        const matchesRank = rank ? crew.rank === rank : true;
         return (
           matchesName &&
           matchesLocation &&
           matchesWeek &&
-          matchesTime &&
-          matchesFootprint &&
+          matchesRank &&
           !crew.is_my_crew
         );
       });

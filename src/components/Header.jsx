@@ -81,7 +81,7 @@ const Header = ({
       <View style={styles.rightContainer}>
         {showApplyButton && (
           <TouchableOpacity
-            onPress={handleApplyButtonPress} // 수정된 부분
+            onPress={handleApplyButtonPress}
             onPressIn={handlePressIn}
             onPressOut={handlePressOut}
             style={styles.rightButton}

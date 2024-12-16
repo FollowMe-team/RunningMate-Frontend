@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { View, StyleSheet, Animated, Modal } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, StyleSheet, ScrollView, Modal } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 
 import ProfileBox from '../../components/MyProfile/ProfileBox';
@@ -20,10 +20,8 @@ const MyProfile = () => {
   const [badgesLoading, setBadgesLoading] = useState(true);
   const [monthlyRecords, setMonthlyRecords] = useState([]);
   const [isFootprintFigureVisible, setFootprintFigureVisible] = useState(false);
-  const scrollY = useRef(new Animated.Value(0)).current;
+
   const [isMinimized, setIsMinimized] = useState(false);
-  const lastScrollY = useRef(0);
-  const scrollDirection = useRef('');
 
   const fetchMonthlyRecords = async yearMonth => {
     try {
@@ -75,33 +73,8 @@ const MyProfile = () => {
     setSelectedRecord(
       recordForDay || { message: '해당 날짜는 러닝 기록이 없어요!' },
     );
+    setIsMinimized(true); // 날짜 선택 시 ProfileBox 간소화
   };
-
-  const handleScroll = Animated.event(
-    [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-    {
-      useNativeDriver: true,
-      listener: ({ nativeEvent }) => {
-        const currentScrollY = nativeEvent.contentOffset.y;
-
-        // 스크롤 방향 감지
-        if (currentScrollY > lastScrollY.current) {
-          scrollDirection.current = 'down';
-        } else if (currentScrollY < lastScrollY.current) {
-          scrollDirection.current = 'up';
-        }
-
-        // 스크롤 위치에 따른 상태 변경
-        if (currentScrollY > 50 && scrollDirection.current === 'down') {
-          setIsMinimized(true);
-        } else if (currentScrollY <= 50 && scrollDirection.current === 'up') {
-          setIsMinimized(false);
-        }
-
-        lastScrollY.current = currentScrollY;
-      },
-    },
-  );
 
   return (
     <View style={styles.container}>
@@ -114,20 +87,20 @@ const MyProfile = () => {
               data={profileData.data}
               setFootprintFigureVisible={setFootprintFigureVisible}
               isMinimized={isMinimized}
+              setIsMinimized={setIsMinimized} // 상태 변경 함수 전달
             />
           )
         )}
+        <Tabs activeTab={activeTab} setActiveTab={setActiveTab} />
       </View>
-      <Animated.ScrollView
+      <ScrollView
         contentContainerStyle={[
           styles.contentContainer,
-          { paddingTop: isMinimized ? 100 : 340 },
+          { paddingTop: isMinimized ? 100 : 200 },
         ]}
-        onScroll={handleScroll}
         scrollEventThrottle={16}
       >
-        <View style={{ marginTop: isMinimized ? 80 : 320 }}>
-          <Tabs activeTab={activeTab} setActiveTab={setActiveTab} />
+        <View style={{ marginTop: isMinimized ? 50 : 200 }}>
           {activeTab === 'record' ? (
             <RecordView
               handleDayPress={handleDayPress}
@@ -142,7 +115,7 @@ const MyProfile = () => {
             <ActivityView badges={badges} />
           )}
         </View>
-      </Animated.ScrollView>
+      </ScrollView>
       {isFootprintFigureVisible && (
         <Modal
           transparent={true}
@@ -172,16 +145,6 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     flexGrow: 1,
-  },
-  closeButton: {
-    marginTop: 10,
-    padding: 10,
-    backgroundColor: '#fff',
-    borderRadius: 5,
-  },
-  closeButtonText: {
-    color: '#000',
-    fontWeight: 'bold',
   },
 });
 

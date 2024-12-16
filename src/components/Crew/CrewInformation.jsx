@@ -11,20 +11,17 @@ import {
 
 import { useRoute, useNavigation } from '@react-navigation/native';
 import Rank from '../Rank';
-import {
-  cancelCrewApplication,
-  checkCrewAvailability,
-} from '../../utils/crew/crew2';
+import { applyToCrew, cancelCrewApplication } from '../../utils/crew/crew2';
 import { getCrewDetail } from '../../utils/crew/crew';
 
 import defaultProfileImage from '../../assets/images/Settings/profile.png';
 
 const CrewInformation = () => {
   const route = useRoute();
-  const { crew, onApply = async () => {} } = route.params; // 기본 함수 추가
+  const { crew } = route.params;
   const [modalVisible, setModalVisible] = useState(false);
   const [modalMessage, setModalMessage] = useState('');
-  const [isApplied, setIsApplied] = useState(crew.isApplied);
+  const [isApplied, setIsApplied] = useState(false);
   const [crewDetail, setCrewDetail] = useState(crew);
   const navigation = useNavigation();
 
@@ -43,7 +40,7 @@ const CrewInformation = () => {
       try {
         const detail = await getCrewDetail(crew.id);
         setCrewDetail(detail);
-        setIsApplied(detail.isApplied); // 크루 상세 정보에서 isApplied 상태 설정
+        setIsApplied(detail.status === '신청 중');
       } catch (error) {
         console.error('Failed to fetch crew detail:', error);
       }
@@ -54,13 +51,13 @@ const CrewInformation = () => {
 
   const handleJoinCrew = async () => {
     try {
-      const isAvailable = await checkCrewAvailability(crew.id);
-      if (isAvailable) {
-        await onApply(crew.id);
-        setIsApplied(true); // 신청 완료 후 상태 업데이트
+      const response = await applyToCrew(crew.id);
+      console.log('Join Crew Response:', response);
+      if (response && response.status === '신청 중') {
+        setIsApplied(true);
         setModalMessage('신청 완료!');
       } else {
-        setModalMessage('해당 크루에 가입할 수 없습니다.');
+        throw new Error('Invalid response data');
       }
     } catch (error) {
       console.error('Failed to join crew:', error);
@@ -71,10 +68,16 @@ const CrewInformation = () => {
 
   const handleCancelApplication = async () => {
     try {
-      await cancelCrewApplication(crew.id);
-      setIsApplied(false);
-      setModalMessage('신청 취소 완료!');
-    } catch {
+      const response = await cancelCrewApplication(crew.id);
+      console.log('Cancel Application Response:', response);
+      if (response && response.status === '가입 거절') {
+        setIsApplied(false);
+        setModalMessage('신청 취소 완료!');
+      } else {
+        throw new Error('Invalid response data');
+      }
+    } catch (error) {
+      console.error('Failed to cancel application:', error);
       setModalMessage('신청 취소 실패!');
     }
     setModalVisible(true);
@@ -121,13 +124,13 @@ const CrewInformation = () => {
           <Text style={styles.detail}>{crewDetail.detailDescription}</Text>
         </View>
         <View style={styles.formBox}>
-          <Text style={styles.title}>크루 조건</Text>
+          <Text style={styles.title}>크루 참여 최소 랭크</Text>
           <Text style={styles.detail}>{crewDetail.ranking}</Text>
         </View>
         <View style={styles.formBox}>
           <Text style={styles.title}>주 활동 시간대</Text>
           <Text style={styles.detail}>
-            {crewDetail.crewActivityTimeList
+            {(crewDetail.crewActivityTimeList || [])
               .map(
                 time =>
                   `${daysOfWeek[time.activityTimes]} ${time.startTime} ~ ${
@@ -140,8 +143,8 @@ const CrewInformation = () => {
         <View style={styles.formBox}>
           <Text style={styles.title}>크루 활동 지역</Text>
           <Text style={styles.detail}>
-            {crewDetail.crewLocationInfos.city}{' '}
-            {crewDetail.crewLocationInfos.district}
+            {crewDetail.crewLocationInfos?.city || ''}{' '}
+            {crewDetail.crewLocationInfos?.district || ''}
           </Text>
         </View>
         <TouchableOpacity
@@ -216,7 +219,7 @@ const styles = StyleSheet.create({
   button: {
     width: '85%',
     paddingVertical: 22,
-    marginTop: 100,
+    marginTop: 50,
     marginBottom: 100,
     backgroundColor: '#73D393',
     borderRadius: 15,

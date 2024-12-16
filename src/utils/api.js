@@ -5,6 +5,78 @@ const api = axios.create({
   baseURL: 'https://api.running-mate.kro.kr/api',
 });
 
+const refreshAccessToken = async () => {
+  try {
+    const refreshToken = await AsyncStorage.getItem('refreshToken');
+    if (!refreshToken) {
+      throw new Error('No refresh token found');
+    }
+    const response = await api.post('/auth/refresh', null, {
+      headers: {
+        Authorization: `Bearer ${refreshToken}`,
+      },
+    });
+    const { accessToken } = response.data.data;
+    await AsyncStorage.setItem('accessToken', accessToken);
+    return accessToken;
+  } catch (error) {
+    console.error('Failed to refresh access token:', error);
+    throw error;
+  }
+};
+
+export const fetchEmail = async () => {
+  try {
+    const token = await AsyncStorage.getItem('accessToken');
+    if (!token) {
+      throw new Error('No token found');
+    }
+
+    const response = await api.get('/members/email', {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        accept: 'application/json',
+      },
+    });
+
+    if (response.data && response.data.data) {
+      return response.data.data.email;
+    } else {
+      throw new Error('Invalid response data');
+    }
+  } catch (error) {
+    console.error('Failed to fetch email:', error);
+    throw error;
+  }
+};
+
+export const refreshToken = async () => {
+  try {
+    const refreshToken = await AsyncStorage.getItem('refreshToken');
+    if (!refreshToken) {
+      throw new Error('No refresh token found');
+    }
+
+    const response = await api.post('/auth/refresh', null, {
+      headers: {
+        Authorization: `Bearer ${refreshToken}`,
+      },
+    });
+
+    if (response.data && response.data.data) {
+      const { accessToken, refreshToken: newRefreshToken } = response.data.data;
+      await AsyncStorage.setItem('accessToken', accessToken);
+      await AsyncStorage.setItem('refreshToken', newRefreshToken);
+      return { accessToken, refreshToken: newRefreshToken };
+    } else {
+      throw new Error('Invalid response data');
+    }
+  } catch (error) {
+    console.error('Failed to refresh token:', error);
+    throw error;
+  }
+};
+
 const getProfile = async () => {
   try {
     const accessToken = await AsyncStorage.getItem('accessToken');
@@ -175,18 +247,10 @@ const getFollowings = async () => {
     });
     if (response.status === 200) {
       console.log('Followings fetch successful:', response.data);
-      return { success: true, data: response.data.data.followings };
+      return { success: true, data: response.data.data };
     }
   } catch (error) {
     console.error('Followings fetch failed:', error);
-    if (error.response) {
-      const { data } = error.response;
-      if (data.code === 'AUTH001') {
-        return { success: false, message: '인증되지 않은 사용자입니다.' };
-      } else if (data.code === 'MEMBER001') {
-        return { success: false, message: '회원을 찾을 수 없습니다.' };
-      }
-    }
     return {
       success: false,
       message: '팔로잉 목록을 가져오는데 실패했습니다.',
@@ -206,18 +270,10 @@ const getFollowers = async () => {
     });
     if (response.status === 200) {
       console.log('Followers fetch successful:', response.data);
-      return { success: true, data: response.data.data.followers };
+      return { success: true, data: response.data.data };
     }
   } catch (error) {
     console.error('Followers fetch failed:', error);
-    if (error.response) {
-      const { data } = error.response;
-      if (data.code === 'AUTH001') {
-        return { success: false, message: '인증되지 않은 사용자입니다.' };
-      } else if (data.code === 'MEMBER001') {
-        return { success: false, message: '회원을 찾을 수 없습니다.' };
-      }
-    }
     return {
       success: false,
       message: '팔로워 목록을 가져오는데 실패했습니다.',

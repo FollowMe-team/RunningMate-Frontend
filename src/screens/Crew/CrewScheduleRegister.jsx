@@ -15,24 +15,28 @@ import { useNavigation } from '@react-navigation/native';
 import { getFavoriteCourses } from '../../utils/crew/crew_course';
 import SimpleCourse from '../../components/Course/SimpleCourse';
 import { registerCrewSchedule } from '../../utils/crew/crew_schedule';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import { RadioButton } from 'react-native-paper';
 
 import wave from '../../assets/images/Crew/wave.png';
 
 const CrewScheduleRegister = ({ route }) => {
-  const { selectedDate, crewId } = route.params;
+  const { crewId } = route.params;
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
+  const [date, setDate] = useState(new Date());
+  const [showDatePicker, setShowDatePicker] = useState(false);
   const [startTime, setStartTime] = useState(null);
   const [endTime, setEndTime] = useState(null);
   const [maxParticipants, setMaxParticipants] = useState('');
   const [location, setLocation] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
   const [favoriteCourses, setFavoriteCourses] = useState([]);
+  const [selectedCourseId, setSelectedCourseId] = useState(null);
   const navigation = useNavigation();
 
   useEffect(() => {
     const fetchFavoriteCourses = async () => {
       try {
-        const crewId = 37; // Replace with actual crewId
         const courses = await getFavoriteCourses(crewId);
         setFavoriteCourses(courses);
       } catch (error) {
@@ -43,12 +47,24 @@ const CrewScheduleRegister = ({ route }) => {
     fetchFavoriteCourses();
   }, []);
 
+  const handleDateChange = (event, selectedDate) => {
+    const currentDate = selectedDate || date;
+    setShowDatePicker(false);
+    setDate(currentDate);
+    checkFormCompletion();
+  };
+
   const handleTimeChange = (type, value) => {
     if (type === 'startTime') {
       setStartTime(value);
     } else {
       setEndTime(value);
     }
+    checkFormCompletion();
+  };
+
+  const handleCourseSelect = courseId => {
+    setSelectedCourseId(courseId);
     checkFormCompletion();
   };
 
@@ -61,16 +77,18 @@ const CrewScheduleRegister = ({ route }) => {
   };
 
   const handleRegisterCrew = async () => {
+    console.log('Selected course ID:', selectedCourseId); // 추가된 로그
+
+    const formatDateTime = (date, time) => {
+      const datePart = date.toISOString().split('T')[0];
+      const timePart = time.toTimeString().split(' ')[0];
+      return `${datePart}T${timePart}`;
+    };
+
     const newSchedule = {
-      courseId: 1, // 실제 courseId로 변경 필요
-      startTime: `${selectedDate}T${startTime.toLocaleTimeString('ko-KR', {
-        hour: '2-digit',
-        minute: '2-digit',
-      })}`,
-      endTime: `${selectedDate}T${endTime.toLocaleTimeString('ko-KR', {
-        hour: '2-digit',
-        minute: '2-digit',
-      })}`,
+      courseId: selectedCourseId,
+      startTime: formatDateTime(date, startTime),
+      endTime: formatDateTime(date, endTime),
       meetingPlace: location,
       memberMax: parseInt(maxParticipants),
     };
@@ -96,10 +114,41 @@ const CrewScheduleRegister = ({ route }) => {
           <Text style={styles.crewScheduleText}>코스 즐겨찾기</Text>
           {favoriteCourses.length > 0 ? (
             favoriteCourses.map((course, index) => (
-              <SimpleCourse key={index} data={course} />
+              <TouchableOpacity
+                key={index}
+                onPress={() => handleCourseSelect(course.id)}
+                style={styles.courseItem}
+              >
+                <RadioButton
+                  value={course.id}
+                  status={
+                    selectedCourseId === course.id ? 'checked' : 'unchecked'
+                  }
+                  color="#73D393"
+                  onPress={() => handleCourseSelect(course.id)}
+                />
+                <SimpleCourse data={course} />
+              </TouchableOpacity>
             ))
           ) : (
             <Text style={styles.noCoursesText}>해당 코스가 없습니다...</Text>
+          )}
+        </View>
+        <View style={styles.formContainer}>
+          <Text style={styles.title}>날짜 선택</Text>
+          <TouchableOpacity
+            onPress={() => setShowDatePicker(true)}
+            style={styles.datePicker}
+          >
+            <Text style={styles.dateText}>{date.toLocaleDateString()}</Text>
+          </TouchableOpacity>
+          {showDatePicker && (
+            <DateTimePicker
+              value={date}
+              mode="date"
+              display="default"
+              onChange={handleDateChange}
+            />
           )}
         </View>
         <View style={styles.formContainer}>
@@ -166,16 +215,18 @@ const CrewScheduleRegister = ({ route }) => {
           visible={modalVisible}
           onRequestClose={() => setModalVisible(false)}
         >
-          <View style={styles.modalView}>
-            <Text style={styles.modalText}>
-              크루 일정 등록이 완료되었습니다!
-            </Text>
-            <TouchableOpacity
-              style={styles.okButton}
-              onPress={handleModalClose}
-            >
-              <Text style={styles.okButtonText}>OK</Text>
-            </TouchableOpacity>
+          <View style={styles.modalBackground}>
+            <View style={styles.modalView}>
+              <Text style={styles.modalText}>
+                크루 일정 등록이 완료되었습니다!
+              </Text>
+              <TouchableOpacity
+                style={styles.okButton}
+                onPress={handleModalClose}
+              >
+                <Text style={styles.okButtonText}>OK</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </Modal>
       </View>
@@ -227,6 +278,16 @@ const styles = StyleSheet.create({
     paddingLeft: 21,
     paddingVertical: 6,
   },
+  datePicker: {
+    width: '40%',
+    color: 'black',
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#9B9B9D',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 16,
+  },
   registerCrewButton: {
     width: '85%',
     paddingVertical: 22,
@@ -252,26 +313,34 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
   },
-  modalView: {
+  modalBackground: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalView: {
+    width: 300,
+    paddingHorizontal: 20,
+    paddingVertical: 30,
+    backgroundColor: 'white',
+    borderRadius: 10,
+    alignItems: 'center',
   },
   modalText: {
-    fontSize: 20,
+    color: 'black',
+    fontSize: 12,
     fontWeight: 'bold',
-    color: '#fff',
-    marginBottom: 20,
+    textAlign: 'center',
+    marginBottom: 50,
   },
   okButton: {
-    backgroundColor: '#73D393',
     padding: 10,
     borderRadius: 10,
   },
   okButtonText: {
-    color: '#fff',
-    fontSize: 18,
+    color: '#73D393',
+    fontSize: 15,
     fontWeight: 'bold',
   },
   noCoursesText: {
@@ -280,12 +349,20 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 20,
   },
+  dateText: {
+    fontSize: 16,
+    color: 'black',
+  },
+  courseItem: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
 });
 
 CrewScheduleRegister.propTypes = {
   route: PropTypes.shape({
     params: PropTypes.shape({
-      selectedDate: PropTypes.string.isRequired,
       crewId: PropTypes.number.isRequired,
     }).isRequired,
   }).isRequired,

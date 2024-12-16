@@ -364,7 +364,7 @@ const StackNavigator = () => (
       name="CrewSearchResult"
       component={CrewSearchResult}
       options={{
-        title: '크루 검�� 결과',
+        title: '크루 검색 결과',
         header: ({ navigation }) => (
           <Header title="크루 검색 결과" navigation={navigation} />
         ),

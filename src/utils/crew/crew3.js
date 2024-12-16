@@ -38,6 +38,7 @@ export const searchCrews = async (params = {}) => {
         },
         params,
       });
+      console.log('Search Crews Response:', response.data);
       return response.data.data.recommendedCrews;
     } catch (error) {
       if (error.response && error.response.status === 401) {
@@ -55,6 +56,39 @@ export const searchCrews = async (params = {}) => {
     }
   } catch (error) {
     console.error('Failed to search crews:', error);
+    throw error;
+  }
+};
+
+export const searchCrewMembers = async crewId => {
+  try {
+    let accessToken = await AsyncStorage.getItem('accessToken');
+    if (!accessToken) {
+      throw new Error('No token found');
+    }
+    try {
+      const response = await api.get(`/crew/${crewId}/members/complete`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      console.log('Search Crew Members Response:', response.data);
+      return response.data.data.crewMembers;
+    } catch (error) {
+      if (error.response && error.response.status === 401) {
+        accessToken = await refreshAccessToken();
+        const response = await api.get(`/crew/${crewId}/members/complete`, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
+        return response.data.data.crewMembers;
+      } else {
+        throw error;
+      }
+    }
+  } catch (error) {
+    console.error('Failed to search crew members:', error);
     throw error;
   }
 };

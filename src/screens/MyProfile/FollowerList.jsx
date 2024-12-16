@@ -8,10 +8,13 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { getFollowers } from '../../utils/api';
+import { followUser, unfollowUser } from '../../utils/follow';
 import defaultProfile from '../../assets/images/Settings/profile.png';
 import follow from '../../assets/images/MyProfile/free-icon-add-3683218.png';
 import unfollow from '../../assets/images/MyProfile/free-icon-delete-friend-3683211.png';
-import { followUser, unfollowUser } from '../../utils/follow';
+
+import Rank from '../../components/Rank';
+import Footprint from '../../components/Footprint';
 
 const FollowerList = () => {
   const [followers, setFollowers] = useState([]);
@@ -21,7 +24,7 @@ const FollowerList = () => {
     const fetchFollowers = async () => {
       const result = await getFollowers();
       if (result.success) {
-        setFollowers(result.data);
+        setFollowers(result.data.followers || []);
       } else {
         console.error(result.message);
       }
@@ -50,17 +53,23 @@ const FollowerList = () => {
   };
 
   const renderItem = ({ item }) => (
-    <View style={styles.itemContainer}>
-      <Image
-        source={{ uri: item.profile_url || defaultProfile }}
-        style={styles.profileImage}
-      />
+    <View style={styles.itemContainer} key={item.memberId}>
       <View style={styles.infoLayout}>
+        <Image
+          source={
+            item.profileImageUrl
+              ? { uri: item.profileImageUrl }
+              : defaultProfile
+          }
+          style={styles.profileImage}
+        />
         <Text style={styles.nickname}>{item.nickname}</Text>
-        <Text style={styles.info}>{item.info}</Text>
+        <Rank rank={item.ranking} />
+        <View style={{ marginLeft: 5 }} />
+        <Footprint experience={item.footPrint} />
       </View>
       <TouchableOpacity
-        onPress={() => handleFollowToggle(item.id, item.isFollowing)}
+        onPress={() => handleFollowToggle(item.memberId, item.isFollowing)}
       >
         <Image
           source={item.isFollowing ? unfollow : follow}
@@ -89,12 +98,16 @@ const FollowerList = () => {
           {renderSkeleton()}
         </>
       ) : followers.length === 0 ? (
-        <Text style={styles.emptyMessage}>팔로워한 러너가 없습니다...ㅠㅠ</Text>
+        <View style={styles.emptyContainer}>
+          <Text style={styles.emptyMessage}>
+            팔로워한 러너가 없습니다...ㅠㅠ
+          </Text>
+        </View>
       ) : (
         <FlatList
           data={followers}
           renderItem={renderItem}
-          keyExtractor={item => item.id.toString()}
+          keyExtractor={item => item.memberId.toString()}
         />
       )}
     </View>
@@ -104,13 +117,17 @@ const FollowerList = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
+    paddingHorizontal: 20,
+  },
+  infoLayout: {
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
     alignItems: 'center',
+    padding: 10,
   },
   itemContainer: {
     flexDirection: 'row',
-    alignItems: 'center',
-    padding: 10,
   },
   profileImage: {
     width: 50,
@@ -118,17 +135,11 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     marginRight: 10,
   },
-  infoLayout: {
-    flexDirection: 'column',
-  },
   nickname: {
     color: 'black',
     fontSize: 16,
     fontWeight: 'bold',
-  },
-  info: {
-    color: '#666',
-    fontSize: 14,
+    marginRight: 5,
   },
   emptyMessage: {
     fontSize: 18,
@@ -156,6 +167,11 @@ const styles = StyleSheet.create({
   followButton: {
     width: 24,
     height: 24,
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 

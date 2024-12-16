@@ -47,9 +47,9 @@ const RecordDetails = ({ selectedRecord }) => {
                   </Text>
                 </View>
                 <View>
-                  <Text style={styles.recordDetailTitle}>속도</Text>
+                  <Text style={styles.recordDetailTitle}>평균 속도</Text>
                   <Text style={styles.recordDetailValue}>
-                    {selectedRecord.averagePace} km/h
+                    {selectedRecord.averagePace.toFixed(2)} km/h
                   </Text>
                 </View>
               </View>
@@ -85,7 +85,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 20,
     marginTop: 20,
-    marginBottom: 310,
   },
   recordDetailTitle: {
     fontSize: 14,
