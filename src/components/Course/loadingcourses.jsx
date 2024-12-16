@@ -1,32 +1,49 @@
-import React from 'react';
-import { TextInput, TouchableOpacity, StyleSheet, View, Text, Alert, Pressable, Image } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import SkeletonPlaceholder from 'react-native-skeleton-placeholder';
-
-const styles = StyleSheet.create({
-
-  smallbox2: {
-    borderRadius: 15, width: 320, height: 50, backgroundColor: '#EBEBEB', alignSelf: 'center',
-    justifyContent: 'space-around', marginBottom: 12
-  },
-
-  smallbox_text2: { color: '#AAA7A7', fontSize: 16, fontWeight: 'bold', textAlign: 'center', textAlignVertical: 'center' },
-
-});
-
-
+import React, { useEffect, useRef } from 'react';
+import { View, Text, Animated, StyleSheet } from 'react-native';
 
 const SimpleNoCourse = () => {
+  // 애니메이션 값 초기화
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    // 애니메이션 반복
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(fadeAnim, {
+          toValue: 1, // 완전히 보이도록
+          duration: 1000, // 1초 동안
+          useNativeDriver: true,
+        }),
+        Animated.timing(fadeAnim, {
+          toValue: 0, // 사라지도록
+          duration: 1000, // 1초 동안
+          useNativeDriver: true,
+        }),
+      ])
+    ).start();
+  }, [fadeAnim]);
 
   return (
-    <SkeletonPlaceholder>
-      <View style={styles.smallbox2}>
-        <Text style={styles.smallbox_text2}>
-          추천중입니다.
-        </Text>
-      </View>
-    </SkeletonPlaceholder>
+    <View style={styles.smallbox2}>
+      <Animated.Text style={[styles.smallbox_text2, { opacity: fadeAnim }]}>
+        추천중입니다.
+      </Animated.Text>
+    </View>
   );
 }
+
+const styles = StyleSheet.create({
+  smallbox2: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+    backgroundColor: '#f5f5f5',
+    borderRadius: 10,
+  },
+  smallbox_text2: {
+    fontSize: 18,
+    color: '#333',
+  },
+});
 
 export default SimpleNoCourse;

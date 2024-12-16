@@ -259,7 +259,7 @@ const CreateCrew = ({ navigation }) => {
               checkFormCompletion();
             }}
             placeholder="활동 규칙, 뛰는 주기 등등..."
-            style={[styles.input, { height: 200 }]}
+            style={[styles.input, { height: 200, textAlignVertical: 'top' }]}
             placeholderTextColor="#9B9B9D"
             multiline={true}
             scrollEnabled={true}
@@ -653,6 +653,7 @@ const styles = StyleSheet.create({
   },
   inputContainer: {
     position: 'relative',
+    marginBottom: 15,
   },
   nameCheckButton: {
     position: 'absolute',

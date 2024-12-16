@@ -329,86 +329,97 @@ const RunningScreen = ({ route }) => {
         return !isNaN(num) && isFinite(num);
     };
     // 사용자의 현재 위치 가져오기
-    const getAccuratePosition = () => {
-        return new Promise((resolve, reject) => {
-            Geolocation.getCurrentPosition(
-                (position) => resolve(position), // 성공 시 위치 반환
-                (error) => reject(error),       // 에러 발생 시 에러 반환
-                {  // 높은 정확도 요청
-                    timeout: 20000,             // 타임아웃 20초
-                }
-            );
-        });
-    };
-    const handleGetPosition = async () => {
-        try {
-            console.log("Getting location...");
-            let position1 = await getAccuratePosition(); // 정확한 위치를 기다림
-            let position2 = await getAccuratePosition(); // 정확한 위치를 기다림
-            let position3 = await getAccuratePosition(); // 정확한 위치를 기다림
-            let position4 = await getAccuratePosition(); // 정확한 위치를 기다림
-            let position = await getAccuratePosition(); // 정확한 위치를 기다림
-
-            console.log(position);   
-            const { latitude, longitude } = position.coords;
-
-            console.log("Accurate Location Found:", latitude, longitude);
-
-            // 다음 코드 실행
-            performNextTask(latitude, longitude);
-        } catch (error) {
-            console.error("Error getting location:", error.message);
-        }
-    };
-
-    const performNextTask = (llat, llon) => {
-        console.log("Performing next task with location:", llat, llon);
-        // 위치를 활용한 다음 작업 실행
-        const initialLocation = { llat, llon };
-        setCurrentLocation({
-            ...initialLocation,
-            latitudeDelta: 0.01,
-            longitudeDelta: 0.01,
-        });
-        setWaypoints([initialLocation]); // 첫 경로 포인트를 현재 위치로 설정
-
-    };
     const [walking, setwalking] = useState([]);
-    useEffect(() => {
-        handleGetPosition();
-        if (waypoints.length === 1) {
-            addWaypoint2();
+    const getAccuratePosition = async () => {
+        let retries = 5; // 재시도 횟수 제한
+        while (retries > 0) {
+            try {
+                const position = await new Promise((resolve, reject) => {
+                    Geolocation.getCurrentPosition(
+                        (pos) => resolve(pos),
+                        (error) => reject(error),
+                        {
+                            timeout: 20000,
+                            enableHighAccuracy: true,
+                            maximumAge: 1000,
+                        }
+                    );
+                });
+    
+                // 원하는 조건(예: 정확도) 충족 시 반환
+                if (position.coords.accuracy < 50) {
+                    return position;
+                }
+    
+                // 정확도가 낮으면 재시도
+                retries--;
+            } catch (error) {
+                console.warn("Retrying due to error:", error.message);
+                retries--;
+            }
         }
-
-    }, []);
+    
+        throw new Error("Unable to fetch an accurate location");
+    };
     useEffect(() => {
-        const interval = setInterval(() => {
-            Geolocation.getCurrentPosition(
-                (position) => {
-                    console.log("walking");
+        const initializeTracking = async () => {
+            try {
+                if (waypoints.length === 0) {
+                    const position = await getAccuratePosition();
                     const { latitude, longitude } = position.coords;
                     const initialLocation = { latitude, longitude };
+    
+                    // 현재 위치와 초기 경로 설정
                     setCurrentLocation({
                         ...initialLocation,
                         latitudeDelta: 0.01,
                         longitudeDelta: 0.01,
                     });
-                    // 첫 경로 포인트를 현재 위치로 설정
-                    setwalking((prevWaypoints) => [...prevWaypoints, initialLocation]);
-                    if (walking.length > 2) {
-                        setTotalDistance((prevTotal) => prevTotal + haversineDistance(walking[walking.length - 1].latitude, walking[walking.length - 1].longitude, walking[walking.length - 2].latitude, walking[walking.length - 2].longitude));
-                    }
-                    console.log("walkingpoints", walking.length);
-
-                },
-                (error) => Alert.alert('위치 오류', error.message),
-                { timeout: 20000, enableHighAccuracy: false, }
-
-            );
-        }, 1000)
+                    setWaypoints([initialLocation]);
+                    setwalking([initialLocation]);
+                }
+            } catch (error) {
+                console.error("Error initializing tracking:", error.message);
+            }
+        };
+    
+        initializeTracking();
+    }, [waypoints]);
+    
+    useEffect(() => {
+        const interval = setInterval(async () => {
+            try {
+                const position = await getAccuratePosition();
+                const { latitude, longitude } = position.coords;
+                const newLocation = { latitude, longitude };
+    
+                setCurrentLocation({
+                    ...newLocation,
+                    latitudeDelta: 0.01,
+                    longitudeDelta: 0.01,
+                });
+    
+                setwalking((prevWalking) => [...prevWalking, newLocation]);
+    
+                if (walking.length > 2) {
+                    const last = walking[walking.length - 1];
+                    const secondLast = walking[walking.length - 2];
+                    setTotalDistance(
+                        (prevTotal) => prevTotal + haversineDistance(
+                            last.latitude, last.longitude, secondLast.latitude, secondLast.longitude
+                        )
+                    );
+                }
+    
+                console.log("Walking points:", walking.length);
+            } catch (error) {
+                console.error("Error updating location:", error.message);
+            }
+        }, 5000); // 5초 간격
+    
         return () => clearInterval(interval); // 클린업
-
     }, [walking]);
+    
     const addWaypoint2 = () => {
         for (let i = 0; i < data.data.coursePointInfos.length; i++) {
             const a = data.data.coursePointInfos[i].latitude;
