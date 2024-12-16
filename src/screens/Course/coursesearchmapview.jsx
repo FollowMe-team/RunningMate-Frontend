@@ -302,71 +302,153 @@ const RunningScreen = ({ route }) => {
                 ? '도착지'
                 : ``
             }
-          />
-        ))}
-      </MapView>
-      <View
-        style={{
-          flexWrap: 'wrap',
-          flexDirection: 'row',
-          position: 'absolute',
-          top: 75,
-          left: 10,
-        }}
-      ></View>
+        } catch (error) {
+            Alert.alert('네트워크 오류', '네트워크 오류가 발생했습니다.');
+            return null;
+        }
+    };
 
-      <TouchableOpacity
-        onPress={() => navigation.goBack()}
-        onPressIn={handlePressIn}
-        onPressOut={handlePressOut}
-        style={styles.backButton}
-        activeOpacity={0.7}
-      >
-        <Animated.View
-          style={[
-            styles.backButtonCircle,
-            { transform: [{ scale: scaleValue }] },
-          ]}
-        >
-          <Image source={back} style={styles.backIcon} />
-        </Animated.View>
-      </TouchableOpacity>
-      {/* 목적지 설정 모달 */}
-      <Modal
-        visible={isRouteModalVisible}
-        animationType="slide"
-        transparent={true}
-      >
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>좌표를 추가하세요</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="위도 (latitude)"
-              keyboardType="default"
-              value={newPoint.latitude}
-              onChangeText={lat => setNewPoint({ ...newPoint, latitude: lat })}
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="경도 (longitude)"
-              keyboardType="default"
-              value={newPoint.longitude}
-              onChangeText={lng => setNewPoint({ ...newPoint, longitude: lng })}
-            />
-            <View style={styles.modalButtons}>
-              <TouchableOpacity
-                style={[styles.button, { backgroundColor: '#4CAF50' }]}
-                onPress={addWaypoint}
-              >
-                <Text style={styles.buttonText}>추가</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.button, { backgroundColor: '#FF0000' }]}
-                onPress={() => setIsRouteModalVisible(false)}
-              >
-                <Text style={styles.buttonText}>취소</Text>
-              </TouchableOpacity>
+    const isValidCoordinate = (value) => {
+        const num = parseFloat(value);
+        return !isNaN(num) && isFinite(num);
+    };
+    // 사용자의 현재 위치 가져오기
+    useEffect(() => {
+        if (waypoints.length === 0) {
+            Geolocation.getCurrentPosition(
+                (position) => {
+                    const { latitude, longitude } = position.coords;
+                    const initialLocation = { latitude, longitude };
+                    setCurrentLocation({
+                        ...initialLocation,
+                        latitudeDelta: 0.01,
+                        longitudeDelta: 0.01,
+                    });
+                    //setWaypoints([initialLocation]); // 첫 경로 포인트를 현재 위치로 설정
+                },
+                (error) => Alert.alert('위치 오류', error.message),
+                { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 }
+
+            );
+        }
+        if (waypoints.length === 0) {
+            addWaypoint2();
+        }
+        focusOnRoute();
+    }, [waypoints]);
+    const handlePressIn = () => {
+        Animated.timing(scaleValue, {
+            toValue: 0.9,
+            duration: 100,
+            useNativeDriver: true,
+        }).start();
+    };
+
+    const handlePressOut = () => {
+        Animated.timing(scaleValue, {
+            toValue: 1,
+            duration: 100,
+            useNativeDriver: true,
+        }).start();
+    };
+
+    const addWaypoint2 = () => {
+        for (let i = 0; i < data.data.coursePointInfos.length; i++) {
+
+            const a = data.data.coursePointInfos[i].latitude;
+            const b = data.data.coursePointInfos[i].longitude;
+            const lat = parseFloat(a);
+            const lng = parseFloat(b);
+
+            if (isValidCoordinate(a) && isValidCoordinate(b)) {
+                setWaypoints((prevWaypoints) => [...prevWaypoints, { latitude: lat, longitude: lng }]);
+            } else {
+                Alert.alert('오류', '유효한 좌표를 입력하세요.');
+            }
+        }
+    };
+
+    const addWaypoint = () => {
+        const lat = parseFloat(newPoint.latitude);
+        const lng = parseFloat(newPoint.longitude);
+
+        if (isValidCoordinate(newPoint.latitude) && isValidCoordinate(newPoint.longitude)) {
+            setWaypoints((prevWaypoints) => [...prevWaypoints, { latitude: lat, longitude: lng }]);
+            setNewPoint({ latitude: '', longitude: '' });
+        } else {
+            Alert.alert('오류', '유효한 좌표를 입력하세요.');
+        }
+    };
+
+    const resetWaypoints = () => {
+        setWaypoints((prev) => (prev.length > 0 ? [prev[0]] : []));
+    };
+    const focusOnRoute = () => {
+        if (waypoints.length === 0) return;
+
+        const latitudes = waypoints.map((point) => point.latitude);
+        const longitudes = waypoints.map((point) => point.longitude);
+
+        const minLatitude = Math.min(...latitudes);
+        const maxLatitude = Math.max(...latitudes);
+        const minLongitude = Math.min(...longitudes);
+        const maxLongitude = Math.max(...longitudes);
+
+        const region = {
+            latitude: (minLatitude + maxLatitude) / 2,
+            longitude: (minLongitude + maxLongitude) / 2,
+            latitudeDelta: (maxLatitude - minLatitude) * 1.5,
+            longitudeDelta: (maxLongitude - minLongitude) * 1.5,
+        };
+
+        mapRef.current?.animateToRegion(region, 1000);
+    };
+
+    const moveToCurrentLocation = () => {
+        if (currentLocation) {
+            mapRef.current?.animateToRegion(currentLocation, 1000);
+        } else {
+            Alert.alert('오류', '현재 위치를 가져오는 중입니다.');
+        }
+    };
+    const scaleValue = useRef(new Animated.Value(1)).current;
+
+    return (
+        <View style={styles.container}>
+            <MapView
+                ref={mapRef}
+                provider={PROVIDER_GOOGLE}
+                style={styles.map}
+                //region={currentLocation}
+                showsUserLocation={false}
+            >
+                {/* 경로 표시 */}
+
+                <Polyline
+                    coordinates={waypoints}
+                    strokeColor="#73D393"
+                    strokeWidth={4}
+                />
+                {waypoints.length > 1 && (
+                    <Polyline
+                        coordinates={waypoints}
+                        strokeColor="#73D393"
+                        strokeWidth={4}
+                    />
+                )}
+
+                {/* 각 포인트에 마커 추가 */}
+                {waypoints.map((point, index) => (
+                    < Marker
+                        pinColor={index === 0 ? '#73D393' : 'red'}
+                        key={index}
+                        coordinate={point}
+                        opacity={index === 0 ? 1 : index === (waypoints.length - 1) ? 1 : 0}
+                        title={index === 0 ? '출발지' : index === (waypoints.length - 1) ? '도착지' : ``}
+                    />
+                ))}
+            </MapView>
+            <View style={{ flexWrap: 'wrap', flexDirection: 'row', position: 'absolute', top: 75, left: 10 }}>
             </View>
           </View>
         </View>

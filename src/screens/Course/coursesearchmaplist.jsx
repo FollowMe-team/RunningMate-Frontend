@@ -101,31 +101,46 @@ const Coursesearchmaplist = ({ route }) => {
         selectedLevel,
         word
     } = route.params || {};
-    console.log(selectedLocation);
-    const [queryOptions, setqueryOptions] = useState('');
-    const [queryParams, setqueryParams] = useState('');
+    const [queryOptions, setqueryOptions] = useState("");
+    const [queryParams, setqueryParams] = useState();
+    const [update, setupdate] = useState(false);
+    const [updateoptions, setupdateoptions] = useState(false);
+    const [optioncheck, setoptioncheck] = useState(false);
 
     const elevations = selectedElevation.map(item => item.value).join('%2C');
     const environments = selectedEnvironment.map(item => item.value).join('%2C');
     const options = selectedOptions.map(item => item.value).join('%2C');
+    const distance = selectedDistance.map(item => item.value).join('%2C');
 
+    console.log("optioncheck: ", environments);
     const handleSearchCourses = () => {
         // 쿼리 파라미터 조합
         if (elevations) {
             if (environments) {
                 if (options) {
                     setqueryOptions(elevations + '%2C' + environments + '%2C' + options);
+                    setupdateoptions(true);
+                    setoptioncheck(true);
                 }
                 else {
                     setqueryOptions(elevations + '%2C' + environments);
+                    setupdateoptions(true);
+                    setoptioncheck(true);
+
                 }
             }
             else {
                 if (options) {
                     setqueryOptions(elevations + '%2C' + options);
+                    setupdateoptions(true);
+                    setoptioncheck(true);
+
                 }
                 else {
                     setqueryOptions(elevations);
+                    setupdateoptions(true);
+                    setoptioncheck(true);
+
                 }
             }
         }
@@ -133,127 +148,313 @@ const Coursesearchmaplist = ({ route }) => {
             if (environments) {
                 if (options) {
                     setqueryOptions(environments + '%2C' + options);
+                    setupdateoptions(true);
+                    setoptioncheck(true);
                 }
                 else {
                     setqueryOptions(environments);
+                    setupdateoptions(true);
+                    setoptioncheck(true);
                 }
             }
             else {
                 if (options) {
                     setqueryOptions(options);
+                    setupdateoptions(true);
+                    setoptioncheck(true);
                 }
                 else {
                     setqueryOptions();
+                    setupdateoptions(true);
                 }
             }
         }
-        if (word) {
-            if (selectedLocation.latitude) {
-                if (selectedLevel) {
-                    if (queryOptions) {
-                        setqueryParams('keyword=' + word + '&' + 'latitude=' + selectedLocation.latitude + '&' + 'longitude=' + selectedLocation.longitude + '&' +
-                            'difficulties=' + selectedLevel + '&' + 'options=' + queryOptions
-                        );
+    };
+
+    const makeParam = () => {
+        if (distance) {
+            if (word) {
+                if (selectedLocation.latitude) {
+                    if (selectedLevel) {
+                        if (optioncheck) {
+                            setqueryParams('keyword=' + word + '&' + 'latitude=' + selectedLocation.latitude + '&' + 'longitude=' + selectedLocation.longitude + '&' +
+                                'difficulties=' + selectedLevel + '&' + 'options=' + queryOptions + '&' + 'distance=' + distance
+                            );
+                            setupdate(true);
+                            console.log("options입니다1", queryParams);
+                        }
+                        else {
+                            setqueryParams('keyword=' + word + '&' + 'latitude=' + selectedLocation.latitude + '&' + 'longitude=' + selectedLocation.longitude + '&' +
+                                'difficulties=' + selectedLevel + '&' + 'distance=' + distance
+                            );
+                            setupdate(true);
+                            console.log("options입니다2", queryParams);
+                        }
                     }
                     else {
-                        setqueryParams('keyword=' + word + '&' + 'latitude=' + selectedLocation.latitude + '&' + 'longitude=' + selectedLocation.longitude + '&' +
-                            'difficulties=' + selectedLevel
-                        );
+                        if (optioncheck) {
+                            setqueryParams('keyword=' + word + '&' + 'latitude=' + selectedLocation.latitude + '&' + 'longitude=' + selectedLocation.longitude + '&' +
+                                '&' + 'options=' + queryOptions + '&' + 'distance=' + distance
+                            );
+                            setupdate(true);
+                            console.log("options입니다3", queryParams);
+                        }
+                        else {
+                            setqueryParams('keyword=' + word + '&' + 'latitude=' + selectedLocation.latitude + '&' + 'longitude=' + selectedLocation.longitude  + '&' + 'distance=' + distance
+                            );
+                            setupdate(true);
+                            console.log("options입니다4", queryParams);
+                        }
                     }
                 }
                 else {
-                    if (queryOptions) {
-                        setqueryParams('keyword=' + word + '&' + 'latitude=' + selectedLocation.latitude + '&' + 'longitude=' + selectedLocation.longitude + '&' +
-                            '&' + 'options=' + queryOptions
-                        );
+                    if (selectedLevel) {
+                        if (optioncheck) {
+                            setqueryParams('keyword=' + word + '&' +
+                                'difficulties=' + selectedLevel + '&' + 'options=' + queryOptions + '&' + 'distance=' + distance
+                            );
+                            setupdate(true);
+                            console.log("options입니다5", queryParams);
+                        }
+                        else {
+                            setqueryParams('keyword=' + word + '&' +
+                                'difficulties=' + selectedLevel + '&' + 'distance=' + distance
+                            );
+                            setupdate(true);
+                            console.log("options입니다6", queryParams);
+                        }
                     }
                     else {
-                        setqueryParams('keyword=' + word + '&' + 'latitude=' + selectedLocation.latitude + '&' + 'longitude=' + selectedLocation.longitude + '&'
-                        );
+                        if (optioncheck) {
+                            setqueryParams('keyword=' + word +
+                                '&' + 'options=' + queryOptions + '&' + 'distance=' + distance
+                            );
+                            setupdate(true);
+                            console.log("options입니다7", queryParams);
+                        }
+                        else {
+                            setqueryParams('keyword=' + word + '&' + 'distance=' + distance
+                            );
+                            setupdate(true);
+                            console.log("options입니다8", queryParams);
+                        }
                     }
                 }
             }
             else {
-                if (selectedLevel) {
-                    if (queryOptions) {
-                        setqueryParams('keyword=' + word + '&' +
-                            'difficulties=' + selectedLevel + '&' + 'options=' + queryOptions
-                        );
+                if (selectedLocation.latitude) {
+                    if (selectedLevel) {
+                        if (optioncheck) {
+                            setqueryParams('latitude=' + selectedLocation.latitude + '&' + 'longitude=' + selectedLocation.longitude + '&' +
+                                'difficulties=' + selectedLevel + '&' + 'options=' + queryOptions + '&' + 'distance=' + distance
+                            ); setupdate(true);
+                            console.log("options입니다9", queryParams);
+
+                        }
+                        else {
+                            setqueryParams('latitude=' + selectedLocation.latitude + '&' + 'longitude=' + selectedLocation.longitude + '&' +
+                                'difficulties=' + selectedLevel + '&' + 'distance=' + distance
+                            ); setupdate(true);
+                            console.log("options입니다10", queryParams);
+
+                        }
                     }
                     else {
-                        setqueryParams('keyword=' + word + '&' +
-                            'difficulties=' + selectedLevel
-                        );
+                        if (optioncheck) {
+                            setqueryParams('latitude=' + selectedLocation.latitude + '&' + 'longitude=' + selectedLocation.longitude + '&' +
+                                '&' + 'options=' + queryOptions + '&' + 'distance=' + distance
+                            ); setupdate(true);
+                            console.log("options입니다11", queryParams);
+
+                        }
+                        else {
+                            setqueryParams('latitude=' + selectedLocation.latitude + '&' + 'longitude=' + selectedLocation.longitude + '&' + 'distance=' + distance
+                            ); setupdate(true);
+                            console.log("options입니다12", queryParams);
+
+                        }
                     }
                 }
                 else {
-                    if (queryOptions) {
-                        setqueryParams('keyword=' + word +
-                            '&' + 'options=' + queryOptions
-                        );
+                    if (selectedLevel) {
+                        if (optioncheck) {
+                            setqueryParams(
+                                'difficulties=' + selectedLevel + '&' + 'options=' + queryOptions + '&' + 'distance=' + distance
+                            ); setupdate(true);
+                            console.log("options입니다13", queryParams);
+
+                        }
+                        else {
+                            setqueryParams(
+                                'difficulties=' + selectedLevel + '&' + 'distance=' + distance
+                            ); setupdate(true);
+                            console.log("options입니다14", queryParams);
+
+                        }
                     }
                     else {
-                        setqueryParams('keyword=' + word
-                        );
+                        if (optioncheck) {
+                            setqueryParams(
+                                'options=' + queryOptions + '&' + 'distance=' + distance
+                            ); setupdate(true);
+                            console.log("options입니다15", queryParams);
+                            console.log("options입니다15", update);
+                        }
+                        else {
+                            setqueryParams('distance=' + distance
+                            ); setupdate(true);
+                            console.log("options입니다16", queryParams);
+
+
+
+                        }
                     }
                 }
             }
         }
         else {
-            if (selectedLocation.latitude) {
-                if (selectedLevel) {
-                    if (queryOptions) {
-                        setqueryParams('latitude=' + selectedLocation.latitude + '&' + 'longitude=' + selectedLocation.longitude + '&' +
-                            'difficulties=' + selectedLevel + '&' + 'options=' + queryOptions
-                        );
+            if (word) {
+                if (selectedLocation.latitude) {
+                    if (selectedLevel) {
+                        if (optioncheck) {
+                            setqueryParams('keyword=' + word + '&' + 'latitude=' + selectedLocation.latitude + '&' + 'longitude=' + selectedLocation.longitude + '&' +
+                                'difficulties=' + selectedLevel + '&' + 'options=' + queryOptions
+                            );
+                            setupdate(true);
+                            console.log("options입니다1", queryParams);
+                        }
+                        else {
+                            setqueryParams('keyword=' + word + '&' + 'latitude=' + selectedLocation.latitude + '&' + 'longitude=' + selectedLocation.longitude + '&' +
+                                'difficulties=' + selectedLevel
+                            );
+                            setupdate(true);
+                            console.log("options입니다2", queryParams);
+                        }
                     }
                     else {
-                        setqueryParams('latitude=' + selectedLocation.latitude + '&' + 'longitude=' + selectedLocation.longitude + '&' +
-                            'difficulties=' + selectedLevel
-                        );
+                        if (optioncheck) {
+                            setqueryParams('keyword=' + word + '&' + 'latitude=' + selectedLocation.latitude + '&' + 'longitude=' + selectedLocation.longitude + '&' +
+                                '&' + 'options=' + queryOptions
+                            );
+                            setupdate(true);
+                            console.log("options입니다3", queryParams);
+                        }
+                        else {
+                            setqueryParams('keyword=' + word + '&' + 'latitude=' + selectedLocation.latitude + '&' + 'longitude=' + selectedLocation.longitude + '&'
+                            );
+                            setupdate(true);
+                            console.log("options입니다4", queryParams);
+                        }
                     }
                 }
                 else {
-                    if (queryOptions) {
-                        setqueryParams('latitude=' + selectedLocation.latitude + '&' + 'longitude=' + selectedLocation.longitude + '&' +
-                            '&' + 'options=' + queryOptions
-                        );
+                    if (selectedLevel) {
+                        if (optioncheck) {
+                            setqueryParams('keyword=' + word + '&' +
+                                'difficulties=' + selectedLevel + '&' + 'options=' + queryOptions
+                            );
+                            setupdate(true);
+                            console.log("options입니다5", queryParams);
+                        }
+                        else {
+                            setqueryParams('keyword=' + word + '&' +
+                                'difficulties=' + selectedLevel
+                            );
+                            setupdate(true);
+                            console.log("options입니다6", queryParams);
+                        }
                     }
                     else {
-                        setqueryParams('latitude=' + selectedLocation.latitude + '&' + 'longitude=' + selectedLocation.longitude + '&'
-                        );
+                        if (optioncheck) {
+                            setqueryParams('keyword=' + word +
+                                '&' + 'options=' + queryOptions
+                            );
+                            setupdate(true);
+                            console.log("options입니다7", queryParams);
+                        }
+                        else {
+                            setqueryParams('keyword=' + word
+                            );
+                            setupdate(true);
+                            console.log("options입니다8", queryParams);
+                        }
                     }
                 }
             }
             else {
-                if (selectedLevel) {
-                    if (queryOptions) {
-                        setqueryParams(
-                            'difficulties=' + selectedLevel + '&' + 'options=' + queryOptions
-                        );
+                if (selectedLocation.latitude) {
+                    if (selectedLevel) {
+                        if (optioncheck) {
+                            setqueryParams('latitude=' + selectedLocation.latitude + '&' + 'longitude=' + selectedLocation.longitude + '&' +
+                                'difficulties=' + selectedLevel + '&' + 'options=' + queryOptions
+                            ); setupdate(true);
+                            console.log("options입니다9", queryParams);
+
+                        }
+                        else {
+                            setqueryParams('latitude=' + selectedLocation.latitude + '&' + 'longitude=' + selectedLocation.longitude + '&' +
+                                'difficulties=' + selectedLevel
+                            ); setupdate(true);
+                            console.log("options입니다10", queryParams);
+
+                        }
                     }
                     else {
-                        setqueryParams(
-                            'difficulties=' + selectedLevel
-                        );
+                        if (optioncheck) {
+                            setqueryParams('latitude=' + selectedLocation.latitude + '&' + 'longitude=' + selectedLocation.longitude + '&' +
+                                '&' + 'options=' + queryOptions
+                            ); setupdate(true);
+                            console.log("options입니다11", queryParams);
+
+                        }
+                        else {
+                            setqueryParams('latitude=' + selectedLocation.latitude + '&' + 'longitude=' + selectedLocation.longitude + '&'
+                            ); setupdate(true);
+                            console.log("options입니다12", queryParams);
+
+                        }
                     }
                 }
                 else {
-                    if (queryOptions) {
-                        setqueryParams(
-                            'options=' + queryOptions
-                        );
+                    if (selectedLevel) {
+                        if (optioncheck) {
+                            setqueryParams(
+                                'difficulties=' + selectedLevel + '&' + 'options=' + queryOptions
+                            ); setupdate(true);
+                            console.log("options입니다13", queryParams);
+
+                        }
+                        else {
+                            setqueryParams(
+                                'difficulties=' + selectedLevel
+                            ); setupdate(true);
+                            console.log("options입니다14", queryParams);
+
+                        }
                     }
                     else {
-                        setqueryParams(
-                        );
+                        if (optioncheck) {
+                            setqueryParams(
+                                'options=' + queryOptions
+                            ); setupdate(true);
+                            console.log("options입니다15", queryParams);
+                            console.log("options입니다15", update);
+                        }
+                        else {
+                            setqueryParams(""
+                            ); setupdate(true);
+                            console.log("options입니다16", queryParams);
 
+
+
+                        }
                     }
                 }
             }
         }
+        console.log("update", update);
 
-    };
+    }
 
     const navigation = useNavigation();
     const [searchCourse, setsearchCourse] = useState([]);
@@ -266,21 +467,23 @@ const Coursesearchmaplist = ({ route }) => {
     };
     useEffect(() => {
         handleSearchCourses();
-        { searchCourse != null &&
-            console.log("가나다라",{queryParams});
-            fetchsearchCourse(queryParams);
-        console.log(
-            {selectedDistance},{
-            selectedElevation},{
-            selectedEnvironment},{
-            selectedOptions},{
-            selectedLocation},{
-            selectedLevel},{
-            word}, "이건", {queryParams}, "zmam", {elevations}, {environments}, {options})
-    }
+        console.log("가나다라", { queryParams }, queryOptions, update);
     }, []);
+    useEffect(() => {
+        makeParam();
+        console.log("파라미터", { queryParams }, queryOptions, update);
 
-    
+    }, [updateoptions]);
+    useEffect(() => {
+        if (update && !searchsuccess) {
+            fetchsearchCourse(queryParams);
+            console.log("ccheck");
+        }
+        console.log("check", queryParams, update, searchsuccess);
+    }, [queryParams]);
+
+
+
     return (
 
         <ScrollView>
@@ -343,7 +546,7 @@ const Coursesearchmaplist = ({ route }) => {
                                     <SimpleNoCourse /> : <View></View>
                             }
                         </View>
-                        
+
                     </View> : <View></View>}
         </ScrollView>
     );

@@ -88,7 +88,9 @@ const RunningScreen = () => {
                         setNewPoint({ ...newPoint, latitude: latitude });
                         setNewPoint({ ...newPoint, longitude: longitude });
 
-                        const elevation = getElevation(latitude, longitude);
+                        
+                        //const elevation = getElevation(latitude, longitude);
+                        const elevation = 0;
                         setNewPoint({ ...newPoint, elevation: elevation });
                         addWaypoint();
                     }
@@ -348,6 +350,20 @@ const RunningScreen = () => {
         } else {
             setEnd(true)
             toggleTimer();
+            const elevation = 0;
+            const lastpoint = { latitude: currentLocation.latitude, longitude: currentLocation.longitude, elevation: elevation };
+            console.log("latitude", lastpoint.latitude, "longitude", lastpoint.longitude, "elevation", lastpoint.elevation);
+
+            const lat = parseFloat(lastpoint.latitude);
+            const lng = parseFloat(lastpoint.longitude);
+            const elv = parseFloat(lastpoint.elevation);
+
+            if (isValidCoordinate(lastpoint.latitude) && isValidCoordinate(lastpoint.longitude)) {
+                setWaypoints((prevWaypoints) => [...prevWaypoints, { latitude: lat, longitude: lng, elevation: elv }]);
+                setNewPoint({ latitude: '', longitude: '', elevation: '' });
+            } else {
+                Alert.alert('오류', '유효한 좌표를 입력하세요.');
+            }
         }
     }
 
@@ -401,12 +417,13 @@ const RunningScreen = () => {
     // 사용자의 현재 위치 가져오기
     useEffect(() => {
 
-        console.log("waypoints",waypoints[0]);
+        console.log("waypoints", waypoints[0]);
         if (waypoints.length === 0) {
             Geolocation.getCurrentPosition(
                 (position) => {
                     const { latitude, longitude } = position.coords;
-                    const elevation = getElevation(latitude, longitude);
+                    //const elevation = getElevation(latitude, longitude);
+                    const elevation = 0;
                     const initialLocation = { latitude, longitude, elevation };
                     setCurrentLocation({
                         ...initialLocation,
@@ -497,11 +514,11 @@ const RunningScreen = () => {
                 {/* 각 포인트에 마커 추가 */}
                 {waypoints.map((point, index) => (
                     <Marker
-                        pinColor={'#73D393'}
+                        pinColor={index === 0 ? '#73D393' : 'red'}
                         key={index}
                         coordinate={point}
                         opacity={index === 0 ? 1 : 0}
-                        title={index === 0 ? '출발지' :  ``}
+                        title={index === 0 ? '출발지' : ``}
                     />
                 ))}
             </MapView>
@@ -563,7 +580,7 @@ const RunningScreen = () => {
                                     <Text style={{ color: 'black', alignSelf: 'center', fontWeight: 'bold' }}>Cancel</Text>
                                 </View>
                             </TouchableOpacity>
-                            <TouchableOpacity onPress={() => navigation.navigate('Savingcourse',{time : time, totalDistance:totalDistance, starttime : starttime, endtime : endtime, waypoint:waypoints})}
+                            <TouchableOpacity onPress={() => navigation.navigate('Savingcourse', { time: time, totalDistance: totalDistance, starttime: starttime, endtime: endtime, waypoint: waypoints })}
                                 style={{ width: '50%', height: '100%', justifyContent: 'center' }}>
                                 <View style={{ alignSelf: 'center', justifyContent: 'center' }}>
                                     <Text style={{ color: 'black', alignSelf: 'center', fontWeight: 'bold', color: 'red' }}>Finish</Text>

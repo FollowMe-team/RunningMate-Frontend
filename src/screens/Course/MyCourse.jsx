@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { TextInput, TouchableOpacity, StyleSheet, View, Text, Alert, Pressable, Image } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation,useIsFocused } from '@react-navigation/native';
 
 import Qmark from '../../assets/images/Course/Qmark.png';
 import rightarrow from '../../assets/images/Course/rightarrow.png';
@@ -48,6 +48,7 @@ const styles = StyleSheet.create({
 const MyCourse = () => {
   const navigation = useNavigation();
   const [myCourse, setmyCourse] = useState([]);
+  const isFocused = useIsFocused();
 
   useEffect(() => {
     const fetchmyCourse = async () => {
@@ -56,7 +57,7 @@ const MyCourse = () => {
     };
 
     fetchmyCourse();
-  }, []);
+  }, [isFocused]);
   return (
     <View>
       <View style={styles.space}></View>

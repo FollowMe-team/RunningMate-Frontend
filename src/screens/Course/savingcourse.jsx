@@ -151,6 +151,7 @@ const Savingcourse = ({ route }) => {
     const [modalVisible, setModalVisible] = useState(false);
     const [isNicknameChecked, setIsNicknameChecked] = useState(false);
     const [modalMessage, setModalMessage] = useState('');
+    const [checkoption, setcheckoption] = useState(false);
     const handleNicknameCheck = async () => {
         try {
             const response = await checkName(nickname);
@@ -186,20 +187,84 @@ const Savingcourse = ({ route }) => {
       setModalMessage('코스 이름 확인 중 오류가 발생했습니다.');
       setModalVisible(true);
     }
+    const [option, setoption] = useState("");
+
+    const settingoptions = () => {
+        if (Coursedata) {
+            if (Stairsdata) {
+                if (Optiondata) {
+                    setoption(CourseDatas + ", " + Stairsdata + ", " + Optiondata);
+                }
+                else {
+
+                    setoption(CourseDatas + ", " + Stairsdata)
+                }
+            }
+            else {
+                if (Optiondata) {
+
+                    setoption(CourseDatas + ", " + Optiondata);
+                }
+                else {
+                    setoption(CourseDatas);
+
+                }
+
+            }
+        }
+        else {
+            if (Stairsdata) {
+                if (Optiondata) {
+                    setoption(Stairsdata + ", " + Optiondata);
+
+                }
+                else {
+                    setoption(Stairsdata);
+
+                }
+            }
+            else {
+                if (Optiondata) {
+
+                    setoption(Optiondata);
+                }
+                else {
+
+                    setoption();
+                    setcheckoption(true);
+                }
+
+            }
+        }
+    }
     const savesave = async () => {
-        const request = {
-            name: nickname,
-            description: content,
-            city: address,
-            district: "",
-            distance: distance,
-            options: [
-                Coursedata, Stairsdata, Optiondata
-            ],
-            coursePoints: waypoints
-        };
+        settingoptions();
+        console.log("option : ", option);
+        if (checkoption) {
+            const request = {
+                name: nickname,
+                description: content,
+                city: address,
+                district: "",
+                distance: distance,
+                options: [],
+                coursePoints: waypoints
+            };
+        }
+        else {
+
+            const request = {
+                name: nickname,
+                description: content,
+                city: address,
+                district: "",
+                distance: distance,
+                options: [option],
+                coursePoints: waypoints
+            };
+        }
         console.log("request", request);
-        
+
         const result = await SavesavS(request, photo, startphoto, endphoto);
         navigation.navigate('MyCourse');
     }

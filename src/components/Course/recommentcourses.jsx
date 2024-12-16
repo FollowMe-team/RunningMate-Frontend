@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { TextInput, TouchableOpacity, StyleSheet, View, Text, Alert, Pressable, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
-import SimpleNoCourse from '../../components/Course/SimpleNoCourse';
+import SimpleNoCourse from './nocourses';
 import Courses from '../../components/Course/Courses';
 
 const styles = StyleSheet.create({

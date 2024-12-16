@@ -22,7 +22,7 @@ const styles = StyleSheet.create({
     blacktext: { color: 'black', fontSize: 18, fontWeight: 'bold', paddingVertical: 7 },
 
     smallbox: {
-        borderRadius: 15, width: 320, height: 50, backgroundColor: 'white', alignSelf: 'center',
+        borderRadius: 15, width: 320, height: 'auto', backgroundColor: 'white', alignSelf: 'center',
         elevation: 7, justifyContent: 'space-around', marginBottom: 12
     },
 
@@ -135,7 +135,7 @@ const Course_basic = ({ data }) => {
                 <View style={styles.smallbox}>
                     <View style={{ flexWrap: 'wrap', flexDirection: 'row', justifyContent: 'space-between' }}>
                         <View style={{ flexWrap: 'wrap', flexDirection: 'row' }}>
-                            <Text style={{ color: 'black', fontSize: 16, marginLeft: 22 }}>{data.name}</Text>
+                            <Text style={{ color: 'black', fontSize: 16, marginLeft: 22, marginBottom:5 }}>{data.name}</Text>
                           
                         </View>
                         <View style={{ flexWrap: 'wrap', flexDirection: 'row' }}>
@@ -161,7 +161,7 @@ const Course_basic = ({ data }) => {
                     </View>
                     <View style={{ flexWrap: 'wrap', flexDirection: 'row', justifyContent: 'space-between', marginBottom: 3 }}>
                         <Text
-                            style={{ color: 'grey', fontSize: 12, marginLeft: 22 }}
+                            style={{ color: 'grey', fontSize: 12, marginLeft: 22, width:200 }}
                         >{data.location}</Text>
                         <View style={{ flexWrap: 'wrap', flexDirection: 'row', marginRight: 12 }}>
 

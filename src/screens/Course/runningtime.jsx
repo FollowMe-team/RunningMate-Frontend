@@ -55,6 +55,7 @@ const RunningScreen = ({ route }) => {
     const curr = new Date();
     const [starttime, setStarttime] = useState();
     const [endtime, setEndtime] = useState();
+    const [voicelist, setvoicelist] = useState([]);
 
     const [completedWaypoints, setCompletedWaypoints] = useState([]);
     const [remainingWaypoints, setRemainingWaypoints] = useState([]);
@@ -109,12 +110,13 @@ const RunningScreen = ({ route }) => {
                         );
 
                         // 특정 거리 내에 들어오면 해당 포인트를 완료로 이동
-                        if (distanceToNext <= 10) { // 10m 이내
+                        if (distanceToNext <= 5) { // 5m 이내
                             setCompletedWaypoints((prev) => [...prev, nextWaypoint]);
                             setRemainingWaypoints((prev) => prev.slice(1));
                             // 첫 번째 포인트 제거
                             if (completedWaypoints.length > 2) {
                                 setRemainingWaypointsformap((prev) => prev.slice(1));
+                                
                             }
                         }
                     }
@@ -402,9 +404,11 @@ const RunningScreen = ({ route }) => {
             const b = data.data.coursePointInfos[i].longitude;
             const lat = parseFloat(a);
             const lng = parseFloat(b);
+            const voice = Coursedetails.coursePoints[i].voice
 
             if (isValidCoordinate(a) && isValidCoordinate(b)) {
                 setWaypoints((prevWaypoints) => [...prevWaypoints, { latitude: lat, longitude: lng }]);
+                setvoicelist((prev) => [...prev, {voice : voice}]);
             } else {
                 Alert.alert('오류', '유효한 좌표를 입력하세요.');
             }
@@ -484,7 +488,7 @@ const RunningScreen = ({ route }) => {
                 {/* 각 포인트에 마커 추가 */}
                 {waypoints.map((point, index) => (
                     <Marker
-                        pinColor={'#73D393'}
+                        pinColor={index === 0 ? '#73D393' : 'red'}
                         key={index}
                         coordinate={point}
                         opacity={index === 0 ? 1 : index === (waypoints.length - 1) ? 1 : 0}

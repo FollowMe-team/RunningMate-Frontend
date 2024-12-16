@@ -143,25 +143,22 @@ const Course_basic = () => {
   const navigation = useNavigation();
   const [recentCourse, setrecentCourse] = useState([]);
   const [bookedCourse, setbookedCourse] = useState([]);
-
+  
   const isFocused = useIsFocused();
-  useEffect(
-    () => {
-      const fetchrecentCourse = async () => {
-        result = await getRecentCourse();
-        setrecentCourse(result.data);
-      };
-      fetchrecentCourse();
-      const fetchbookedCourse = async () => {
-        const result = await getBookedCourse();
-        setbookedCourse(result.data);
-      };
-      fetchbookedCourse();
-    },
-    [
-      /*bookedCourse*/
-    ],
-  );
+  useEffect(() => {
+    if ( isFocused){
+    const fetchrecentCourse = async () => {
+      result = await getRecentCourse();
+      setrecentCourse(result.data);
+    };
+    fetchrecentCourse();
+    const fetchbookedCourse = async () => {
+      const result = await getBookedCourse();
+      setbookedCourse(result.data);
+    };
+    fetchbookedCourse();
+  }
+  }, [isFocused/*, bookedCourse*/]);
 
   return (
     <ScrollView>

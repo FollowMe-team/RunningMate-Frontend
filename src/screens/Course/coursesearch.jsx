@@ -104,10 +104,10 @@ const Coursesearch = ({ route }) => {
         longitude: null
     };
     const distance = [
-        { id: 0, label: '# 3KM 미만', value: '3km_under' },
-        { id: 1, label: '# 3~5KM', value: '3_5km' },
-        { id: 2, label: '# 5~10KM', value: '5_10km' },
-        { id: 3, label: '# 10KM 이상', value: '10km_over' }
+        { id: 0, label: '# 3KM 미만', value: 'UNDER_3KM' },
+        { id: 1, label: '# 3~5KM', value: 'BETWEEN_3KM_AND_5KM' },
+        { id: 2, label: '# 5~10KM', value: 'BETWEEN_5KM_AND_10KM' },
+        { id: 3, label: '# 10KM 이상', value: 'UPPER_10KM' }
     ];
 
     const elevations = [
