@@ -1,6 +1,7 @@
 import React from 'react';
 import { TextInput, TouchableOpacity, StyleSheet, View, Text, Alert, Pressable, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import SkeletonPlaceholder from 'react-native-skeleton-placeholder';
 
 const styles = StyleSheet.create({
 
@@ -9,7 +10,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around', marginBottom: 12
   },
 
-  smallbox_text2: { color: '#AAA7A7', fontSize: 16, fontWeight: 'bold', textAlign: 'center', textAlignVertical: 'center'},
+  smallbox_text2: { color: '#AAA7A7', fontSize: 16, fontWeight: 'bold', textAlign: 'center', textAlignVertical: 'center' },
 
 });
 
@@ -18,11 +19,13 @@ const styles = StyleSheet.create({
 const SimpleNoCourse = () => {
 
   return (
-        <View style={styles.smallbox2}>
-          <Text style={styles.smallbox_text2}>
+    <SkeletonPlaceholder>
+      <View style={styles.smallbox2}>
+        <Text style={styles.smallbox_text2}>
           추천중입니다.
-          </Text>
-        </View>
+        </Text>
+      </View>
+    </SkeletonPlaceholder>
   );
 }
 

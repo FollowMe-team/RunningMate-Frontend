@@ -77,10 +77,10 @@ const Runningend = ({ route }) => {
       const request = {
         startTime: starttime,
         endTime: endtime,
-        distance: totalDistance,
-        averagePace: ((formatTime2(time)) / (totalDistance / 1000)),
+        distance: (totalDistance/1000).toFixed(2),
+        averagePace: ((formatTime2(time)) / (totalDistance)),
         duration: formatTime2(time),
-        caloriesBurned: (0.0055 * totalDistance),
+        caloriesBurned: (0.0055 * totalDistance).toFixed(2),
         recordPoints: [
           {
             latitude: startlatitude,
@@ -102,10 +102,10 @@ const Runningend = ({ route }) => {
       const request = {
         startTime: starttime,
         endTime: endtime,
-        distance: totalDistance,
+        distance: (totalDistance/1000).toFixed(2),
         averagePace: 0,
         duration: formatTime2(time),
-        caloriesBurned: (0.0055 * totalDistance),
+        caloriesBurned: (0.0055 * totalDistance).toFixed,
         recordPoints: [
           {
             latitude: startlatitude,

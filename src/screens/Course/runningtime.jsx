@@ -329,31 +329,58 @@ const RunningScreen = ({ route }) => {
         return !isNaN(num) && isFinite(num);
     };
     // 사용자의 현재 위치 가져오기
+    const getAccuratePosition = () => {
+        return new Promise((resolve, reject) => {
+            Geolocation.getCurrentPosition(
+                (position) => resolve(position), // 성공 시 위치 반환
+                (error) => reject(error),       // 에러 발생 시 에러 반환
+                {  // 높은 정확도 요청
+                    timeout: 20000,             // 타임아웃 20초
+                }
+            );
+        });
+    };
+    const handleGetPosition = async () => {
+        try {
+            console.log("Getting location...");
+            let position1 = await getAccuratePosition(); // 정확한 위치를 기다림
+            let position2 = await getAccuratePosition(); // 정확한 위치를 기다림
+            let position3 = await getAccuratePosition(); // 정확한 위치를 기다림
+            let position4 = await getAccuratePosition(); // 정확한 위치를 기다림
+            let position = await getAccuratePosition(); // 정확한 위치를 기다림
+
+            console.log(position);   
+            const { latitude, longitude } = position.coords;
+
+            console.log("Accurate Location Found:", latitude, longitude);
+
+            // 다음 코드 실행
+            performNextTask(latitude, longitude);
+        } catch (error) {
+            console.error("Error getting location:", error.message);
+        }
+    };
+
+    const performNextTask = (llat, llon) => {
+        console.log("Performing next task with location:", llat, llon);
+        // 위치를 활용한 다음 작업 실행
+        const initialLocation = { llat, llon };
+        setCurrentLocation({
+            ...initialLocation,
+            latitudeDelta: 0.01,
+            longitudeDelta: 0.01,
+        });
+        setWaypoints([initialLocation]); // 첫 경로 포인트를 현재 위치로 설정
+
+    };
     const [walking, setwalking] = useState([]);
     useEffect(() => {
-        if (waypoints.length === 0) {
-            Geolocation.getCurrentPosition(
-                (position) => {
-                    const { latitude, longitude } = position.coords;
-                    const initialLocation = { latitude, longitude };
-                    setCurrentLocation({
-                        ...initialLocation,
-                        latitudeDelta: 0.01,
-                        longitudeDelta: 0.01,
-                    });
-                    setWaypoints([initialLocation]); // 첫 경로 포인트를 현재 위치로 설정
-                    setwalking([initialLocation]);
-                },
-                (error) => Alert.alert('위치 오류', error.message),
-                { timeout: 20000, enableHighAccuracy: false, }
-
-            );
-        }
+        handleGetPosition();
         if (waypoints.length === 1) {
             addWaypoint2();
         }
 
-    }, [waypoints]);
+    }, []);
     useEffect(() => {
         const interval = setInterval(() => {
             Geolocation.getCurrentPosition(
@@ -470,7 +497,7 @@ const RunningScreen = ({ route }) => {
                 )}
 
                 {/* 각 포인트에 마커 추가 */}
-                {waypoints.map((point, index) => (
+                {waypoints[0] && waypoints.map((point, index) => (
                     <Marker
                         pinColor={index === 0 ? 'green' : 'green'}
                         key={index}
@@ -479,7 +506,7 @@ const RunningScreen = ({ route }) => {
                         title={index === 0 ? '출발지' : index === (waypoints.length - 1) ? '도착지' : ``}
                     />
                 ))}
-                {walking.map((point, index) => (
+                {walking[0] && walking.map((point, index) => (
                     <Marker
                         pinColor={index === 0 ? 'blue' : 'blue'}
                         key={index}
@@ -585,7 +612,7 @@ const RunningScreen = ({ route }) => {
                                     <Text style={{ color: 'black', alignSelf: 'center', fontWeight: 'bold' }}>Cancel</Text>
                                 </View>
                             </TouchableOpacity>
-                            <TouchableOpacity onPress={() => navigation.navigate('Runningend', { time: time, totalDistance: totalDistance, id: data.data.id, starttime: starttime, endtime: endtime, startlatitude: walking[0].latitude, startlongitude: walking[0].longitude, endlatitude: walking[walking.length - 1].latitude, endlongitude: walking[walking.length - 1].longitude, thumbnailUrl: data.data.thumbnailUrl })}
+                            <TouchableOpacity onPress={() => navigation.navigate('Runningend', { time: time, totalDistance: (totalDistance), id: data.data.id, starttime: starttime, endtime: endtime, startlatitude: walking[0].latitude, startlongitude: walking[0].longitude, endlatitude: walking[walking.length - 1].latitude, endlongitude: walking[walking.length - 1].longitude, thumbnailUrl: data.data.thumbnailUrl })}
                                 style={{ width: '50%', height: '100%', justifyContent: 'center' }}>
                                 <View style={{ alignSelf: 'center', justifyContent: 'center' }}>
                                     <Text style={{ color: 'black', alignSelf: 'center', fontWeight: 'bold', color: 'red' }}>Finish</Text>
